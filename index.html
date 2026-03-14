@@ -3,416 +3,337 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLS - POS System</title>
+    <title>FLS POS - PC & Mobile Friendly</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        :root {
+            --primary: #1e293b;
+            --accent: #38bdf8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+        }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: #f0f2f5; color: #333; }
-        .pos-container { display: flex; height: 100vh; overflow: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); color: #334155; }
 
-        /* Sidebar */
-        .sidebar { width: 260px; background-color: #1e293b; color: white; display: flex; flex-direction: column; }
-        .brand { padding: 20px; text-align: center; border-bottom: 1px solid #334155; }
-        .brand h2 { font-size: 22px; margin-bottom: 5px; color: #38bdf8; }
-        .brand p { font-size: 14px; color: #94a3b8; }
+        /* Responsive Layout */
+        .app-container { display: flex; flex-direction: column; height: 100vh; }
+        
+        @media (min-width: 768px) {
+            .app-container { flex-direction: row; }
+        }
 
-        .nav-links { list-style: none; flex-grow: 1; padding: 20px 0; }
-        .nav-links li { padding: 15px 25px; cursor: pointer; font-size: 16px; transition: 0.2s; color: #cbd5e1; border-left: 4px solid transparent; }
-        .nav-links li:hover { background-color: #334155; color: white; }
-        .nav-links li.active { background-color: #0f172a; color: #38bdf8; border-left: 4px solid #38bdf8; font-weight: 600; }
+        /* Sidebar / Navbar */
+        .sidebar { 
+            background: var(--primary); 
+            color: white; 
+            padding: 15px; 
+            width: 100%; 
+        }
+        
+        @media (min-width: 768px) {
+            .sidebar { width: 280px; height: 100vh; }
+        }
 
-        .sidebar-footer { padding: 20px; border-top: 1px solid #334155; display: flex; flex-direction: column; gap: 10px; }
+        .brand h2 { color: var(--accent); font-size: 20px; text-align: center; margin-bottom: 15px; }
+        
+        .nav-menu { display: flex; flex-wrap: wrap; gap: 5px; list-style: none; justify-content: center; }
+        
+        @media (min-width: 768px) {
+            .nav-menu { flex-direction: column; justify-content: flex-start; margin-top: 20px; }
+        }
+
+        .nav-menu li { 
+            padding: 10px 15px; 
+            background: #334155; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 14px; 
+            flex: 1 1 40%;
+            text-align: center;
+        }
+        
+        .nav-menu li.active { background: var(--accent); color: var(--primary); font-weight: bold; }
 
         /* Main Content */
-        .main-content { flex-grow: 1; padding: 30px; overflow-y: auto; }
-        .header-title { font-size: 24px; font-weight: 700; margin-bottom: 25px; color: #0f172a; }
+        .main-content { flex: 1; padding: 15px; overflow-y: auto; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
 
+        /* Inputs & Buttons */
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 8px 0; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 8px; 
+            font-size: 16px; /* Mobile friendly size */
+        }
+
+        .btn { 
+            width: 100%; 
+            padding: 12px; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        .btn-add { background: #e0f2fe; color: #0369a1; margin-bottom: 15px; }
+        .btn-save { background: var(--success); color: white; margin-top: 15px; }
+        .btn-reset { background: var(--danger); color: white; margin-top: 20px; }
+
+        /* Dynamic Rows */
+        .row-group { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+        .row-group input { margin: 0; }
+        .btn-del { background: #fee2e2; color: #ef4444; padding: 10px; border-radius: 8px; width: 45px; }
+
+        /* Dashboard Stats */
+        .stats-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        @media (min-width: 600px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
+
+        .stat-box { background: white; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #e2e8f0; }
+        .stat-box.total { background: var(--accent); color: white; }
+
+        /* Tables */
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 500px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+        
         .tab-content { display: none; }
         .active-tab { display: block; }
-
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .mt-20 { margin-top: 20px; }
-
-        /* Forms & Inputs */
-        input { padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; transition: 0.2s; width: 100%; }
-        input:focus { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); }
-        .input-row { display: flex; gap: 15px; margin-bottom: 20px; }
-        .dynamic-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
-
-        .section-box { border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 20px; background: #f8fafc; }
-        .section-box h3 { font-size: 16px; margin-bottom: 15px; color: #475569; }
-        .section-box small { font-weight: normal; color: #64748b; font-size: 12px; }
-
-        /* Buttons */
-        button { cursor: pointer; font-weight: 600; border: none; border-radius: 6px; transition: 0.2s; }
-        .add-btn { background: #e0f2fe; color: #0284c7; padding: 8px 15px; font-size: 13px; }
-        .add-btn:hover { background: #bae6fd; }
-        .generate-btn { background: #10b981; color: white; width: 100%; padding: 15px; font-size: 16px; margin-top: 10px; }
-        .generate-btn:hover { background: #059669; }
-        .action-btn { background: #3b82f6; color: white; padding: 12px; width: 100%; margin-top: 10px; }
-        .action-btn:hover { background: #2563eb; }
-        .danger-btn { background: #ef4444; color: white; padding: 10px; width: 100%; }
-        .danger-btn:hover { background: #dc2626; }
-        .warning-btn { background: #f59e0b; color: white; padding: 10px; width: 100%; }
-        .warning-btn:hover { background: #d97706; }
-        .remove-btn { background: #fee2e2; color: #ef4444; padding: 10px 15px; border-radius: 6px; }
-        .remove-btn:hover { background: #fecaca; }
-
-        /* Grid & Tables */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .stat-card { background: white; padding: 25px; border-radius: 12px; text-align: center; border: 1px solid #e2e8f0; }
-        .stat-card h4 { color: #64748b; font-weight: 600; margin-bottom: 10px; }
-        .stat-card h2 { font-size: 32px; color: #0f172a; }
-        .stat-card.highlight { background: #10b981; color: white; border: none; }
-        .stat-card.highlight h4, .stat-card.highlight h2, .stat-card.highlight small { color: white; }
-
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-        th { background: #f8fafc; color: #475569; font-weight: 600; }
-        td button { background: #ef4444; color: white; padding: 5px 10px; font-size: 12px; }
-
-        .data-list { list-style: none; margin-top: 10px; }
-        .data-list li { padding: 12px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; font-size: 14px; }
-        .report-list p { background: #f8fafc; padding: 15px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #e2e8f0; font-weight: 600; display: flex; justify-content: space-between;}
     </style>
 </head>
 <body>
 
-<div class="pos-container">
+<div class="app-container">
     <aside class="sidebar">
         <div class="brand">
-            <h2>FLS Salon POS</h2>
-            <p>Bill No: <strong id="billNumber">FLS-0001</strong></p>
+            <h2>FLS SALON POS</h2>
+            <p style="text-align:center; font-size: 12px;">Bill No: <span id="billNoDisplay">FLS-0001</span></p>
         </div>
-        <ul class="nav-links">
-            <li onclick="showTab('billingTab')" class="active" id="nav-billingTab">🛒 New Billing</li>
-            <li onclick="showTab('reportsTab')" id="nav-reportsTab">📊 Daily Reports</li>
-            <li onclick="showTab('financeTab')" id="nav-financeTab">💸 Expenses & Advance</li>
-            <li onclick="showTab('onlineTab')" id="nav-onlineTab">💳 Online Payments</li>
+        <ul class="nav-menu">
+            <li onclick="switchTab('billing')" class="active" id="btn-billing">Billing</li>
+            <li onclick="switchTab('reports')" id="btn-reports">Reports</li>
+            <li onclick="switchTab('finance')" id="btn-finance">Expense</li>
+            <li onclick="switchTab('online')" id="btn-online">Online</li>
         </ul>
-        <div class="sidebar-footer">
-            <button class="danger-btn" onclick="resetBillNumber()">Reset Bill Counter</button>
-            <button class="warning-btn" onclick="clearAllData()">🗑️ Clear All Data</button>
-        </div>
+        <button class="btn btn-reset" onclick="fullSystemReset()">⚠️ Reset System</button>
     </aside>
 
     <main class="main-content">
-        <section id="billingTab" class="tab-content active-tab">
-            <div class="header-title">Create New Bill</div>
+        <div id="billing" class="tab-content active-tab">
             <div class="card">
-                <div class="input-row">
-                    <input type="text" id="customerName" placeholder="Customer Name (Optional)">
-                    <input type="text" id="phone" placeholder="Phone Number (Optional)">
+                <h3>New Bill</h3>
+                <input type="text" id="custName" placeholder="Customer Name">
+                
+                <p style="margin-top:15px; font-weight:bold;">Products (In Balance)</p>
+                <div id="prodArea"></div>
+                <button class="btn btn-add" onclick="addRow('prodArea')">+ Add Product</button>
+
+                <p style="margin-top:10px; font-weight:bold;">Services (Staff Report)</p>
+                <div id="servArea"></div>
+                <button class="btn btn-add" onclick="addRow('servArea')">+ Add Service</button>
+
+                <button class="btn btn-save" onclick="saveBill()">Generate & Save Bill</button>
+            </div>
+
+            <div class="card">
+                <h3>Today's Bills</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>No</th><th>Customer</th><th>Product</th><th>Service</th><th>Staff</th><th>Action</th></tr>
+                        </thead>
+                        <tbody id="billList"></tbody>
+                    </table>
                 </div>
-                <div class="section-box">
-                    <h3>🛍️ Products <small>(Adds to Final Balance)</small></h3>
-                    <div id="productsContainer"></div>
-                    <button class="add-btn" onclick="addProduct()">+ Add Product</button>
-                </div>
-                <div class="section-box">
-                    <h3>✂️ Services <small>(Goes to Staff Report Only)</small></h3>
-                    <div id="servicesContainer"></div>
-                    <button class="add-btn" onclick="addService()">+ Add Service</button>
-                </div>
-                <button class="generate-btn" onclick="createBill()">✅ Generate Bill</button>
+            </div>
+        </div>
+
+        <div id="reports" class="tab-content">
+            <div class="stats-grid">
+                <div class="stat-box"><h4>Bills</h4><h2 id="statBills">0</h2></div>
+                <div class="stat-box"><h4>Sales</h4><h2>₹<span id="statSales">0</span></h2></div>
+                <div class="stat-box total"><h4>Balance</h4><h2>₹<span id="statBalance">0</span></h2></div>
             </div>
             <div class="card mt-20">
-                <h3>Recent Bills</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Bill No</th>
-                            <th>Customer</th>
-                            <th>Products (Price)</th>
-                            <th>Services (Price)</th>
-                            <th>Staff</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="billTable"></tbody>
-                </table>
+                <h3>Staff Service Reports</h3>
+                <div id="staffList" style="margin-top:15px;"></div>
             </div>
-        </section>
+        </div>
 
-        <section id="reportsTab" class="tab-content">
-            <div class="header-title">Today's Dashboard (<span id="todayDateDisplay"></span>)</div>
-            <div class="dashboard-grid">
-                <div class="stat-card">
-                    <h4>Total Bills Today</h4>
-                    <h2 id="todayBills">0</h2>
-                </div>
-                <div class="stat-card">
-                    <h4>Product Sales (Cash)</h4>
-                    <h2>₹<span id="todaySale">0</span></h2>
-                </div>
-                <div class="stat-card highlight">
-                    <h4>Final Cash Balance</h4>
-                    <h2>₹<span id="finalBalance">0</span></h2>
-                    <small>(Products + Online - Exp - Adv)</small>
-                </div>
-            </div>
-            <div class="card mt-20">
-                <h3>👨‍🎤 Today's Staff Service Report</h3>
-                <div id="staffReport" class="report-list"></div>
-            </div>
-        </section>
-
-        <section id="financeTab" class="tab-content">
-            <div class="header-title">Expenses & Staff Advance</div>
-            <div class="grid-2">
-                <div class="card">
-                    <h3>💸 Add Daily Expense</h3>
-                    <input type="text" id="expenseStaff" placeholder="Expense Reason / Item">
-                    <input type="number" id="expenseAmount" placeholder="Amount (₹)">
-                    <button class="action-btn" onclick="addExpense()">Save Expense</button>
-                    <ul id="expenseList" class="data-list"></ul>
-                </div>
-                <div class="card">
-                    <h3>💰 Give Staff Advance</h3>
-                    <input type="text" id="advanceStaff" placeholder="Staff Name">
-                    <input type="number" id="advanceAmount" placeholder="Amount (₹)">
-                    <button class="action-btn" onclick="addAdvance()">Save Advance</button>
-                    <ul id="advanceList" class="data-list"></ul>
-                </div>
-            </div>
-        </section>
-
-        <section id="onlineTab" class="tab-content">
-            <div class="header-title">Online Payments Received</div>
+        <div id="finance" class="tab-content">
             <div class="card">
-                <div class="input-row">
-                    <input type="text" id="onlineCustomer" placeholder="Customer / Reference">
-                    <input type="number" id="onlineAmount" placeholder="Amount (₹)">
-                    <button class="action-btn" onclick="addOnlinePayment()">Save Payment</button>
-                </div>
-                <ul id="onlineList" class="data-list"></ul>
+                <h3>Add Expense / Advance</h3>
+                <input type="text" id="expName" placeholder="Reason / Staff Name">
+                <input type="number" id="expAmt" placeholder="Amount">
+                <select id="expType" style="width:100%; padding:10px; border-radius:8px; margin-top:5px;">
+                    <option value="expense">Expense</option>
+                    <option value="advance">Advance</option>
+                </select>
+                <button class="btn btn-save" onclick="saveFinance()">Save Entry</button>
             </div>
-        </section>
+            <div id="financeHistory" class="card"></div>
+        </div>
+
+        <div id="online" class="tab-content">
+            <div class="card">
+                <h3>Online Payment</h3>
+                <input type="text" id="onCust" placeholder="Customer Name">
+                <input type="number" id="onAmt" placeholder="Amount">
+                <button class="btn btn-save" onclick="saveOnline()">Save Online Payment</button>
+            </div>
+            <div id="onlineHistory" class="card"></div>
+        </div>
     </main>
 </div>
 
 <script>
-    // 1. Data Loading & Anti-Crash Sanitization
-    function loadData(key) {
-        let data = JSON.parse(localStorage.getItem(key));
-        return Array.isArray(data) ? data : [];
+    // ডাটা নিশ্চিত করার ফাংশন
+    const getDB = (key) => {
+        try {
+            let res = JSON.parse(localStorage.getItem(key));
+            return Array.isArray(res) ? res : [];
+        } catch(e) { return []; }
+    };
+
+    let bills = getDB("fls_bills");
+    let finance = getDB("fls_finance");
+    let online = getDB("fls_online");
+    let counter = Number(localStorage.getItem("fls_counter")) || 1;
+
+    // ট্যাব পরিবর্তন
+    function switchTab(id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
+        document.querySelectorAll('.nav-menu li').forEach(l => l.classList.remove('active'));
+        document.getElementById(id).classList.add('active-tab');
+        document.getElementById('btn-'+id).classList.add('active');
     }
 
-    let bills = loadData("bills");
-    let advances = loadData("advances");
-    let expenses = loadData("expenses");
-    let onlinePayments = loadData("onlinePayments");
-    let billCounter = Number(localStorage.getItem("billCounter")) || 1;
-
-    document.getElementById("todayDateDisplay").innerText = new Date().toDateString();
-
-    // 2. Tab Navigation
-    function showTab(tabId) {
-        document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active-tab"));
-        document.querySelectorAll(".nav-links li").forEach(l => l.classList.remove("active"));
-        document.getElementById(tabId).classList.add("active-tab");
-        document.getElementById("nav-" + tabId).classList.add("active");
-    }
-
-    // 3. Update Bill Number UI
-    function updateBillNumber() {
-        let number = "FLS-" + String(billCounter).padStart(4, "0");
-        document.getElementById("billNumber").innerText = number;
-    }
-
-    // 4. Dynamic Inputs
-    function addProduct() {
+    // রো যোগ করা
+    function addRow(areaId) {
         let div = document.createElement("div");
-        div.className = "dynamic-row";
-        div.innerHTML = `
-            <input class="productName" placeholder="Product Name">
-            <input class="productPrice" type="number" placeholder="Price (₹)">
-            <button class="remove-btn" onclick="this.parentElement.remove()">❌</button>
-        `;
-        document.getElementById("productsContainer").appendChild(div);
-    }
-
-    function addService() {
-        let div = document.createElement("div");
-        div.className = "dynamic-row";
-        div.innerHTML = `
-            <input class="serviceName" placeholder="Service Name">
-            <input class="servicePrice" type="number" placeholder="Price (₹)">
-            <input class="staffName" placeholder="Staff Name">
-            <button class="remove-btn" onclick="this.parentElement.remove()">❌</button>
-        `;
-        document.getElementById("servicesContainer").appendChild(div);
-    }
-
-    // 5. Create Bill logic
-    function createBill() {
-        let customer = document.getElementById("customerName").value || "Walk-in";
-        let phone = document.getElementById("phone").value || "N/A";
-        
-        let products = [];
-        document.querySelectorAll("#productsContainer .dynamic-row").forEach(row => {
-            let name = row.querySelector(".productName").value.trim();
-            let price = Number(row.querySelector(".productPrice").value) || 0;
-            if (name || price > 0) products.push({ name: name || "Item", price });
-        });
-
-        let services = [];
-        document.querySelectorAll("#servicesContainer .dynamic-row").forEach(row => {
-            let name = row.querySelector(".serviceName").value.trim();
-            let price = Number(row.querySelector(".servicePrice").value) || 0;
-            let staff = row.querySelector(".staffName").value.trim() || "Unknown Staff";
-            if (name || price > 0) services.push({ name: name || "Service", price, staff });
-        });
-
-        if (products.length === 0 && services.length === 0) {
-            alert("Please add at least one Product or Service!");
-            return;
+        div.className = "row-group";
+        if(areaId === 'prodArea') {
+            div.innerHTML = `<input class="p-name" placeholder="Item"><input class="p-price" type="number" placeholder="₹"><button class="btn-del" onclick="this.parentElement.remove()">❌</button>`;
+        } else {
+            div.innerHTML = `<input class="s-name" placeholder="Service"><input class="s-price" type="number" placeholder="₹"><input class="s-staff" placeholder="Staff"><button class="btn-del" onclick="this.parentElement.remove()">❌</button>`;
         }
+        document.getElementById(areaId).appendChild(div);
+    }
 
-        let bill = {
-            billNumber: "FLS-" + String(billCounter).padStart(4, "0"),
-            customer, phone, products, services,
+    // বিল সেভ করা
+    function saveBill() {
+        let prods = [];
+        document.querySelectorAll("#prodArea .row-group").forEach(r => {
+            let n = r.querySelector(".p-name").value;
+            let p = Number(r.querySelector(".p-price").value);
+            if(n) prods.push({n, p});
+        });
+
+        let servs = [];
+        document.querySelectorAll("#servArea .row-group").forEach(r => {
+            let n = r.querySelector(".s-name").value;
+            let p = Number(r.querySelector(".s-price").value);
+            let s = r.querySelector(".s-staff").value || "Staff";
+            if(n) servs.push({n, p, s});
+        });
+
+        if(prods.length === 0 && servs.length === 0) return alert("Empty Bill!");
+
+        let newBill = {
+            id: "FLS-" + String(counter).padStart(4, "0"),
+            cust: document.getElementById("custName").value || "Walk-in",
+            prods, servs,
             date: new Date().toDateString()
         };
 
-        bills.push(bill);
-        localStorage.setItem("bills", JSON.stringify(bills));
+        bills.push(newBill);
+        counter++;
+        localStorage.setItem("fls_bills", JSON.stringify(bills));
+        localStorage.setItem("fls_counter", counter);
         
-        billCounter++;
-        localStorage.setItem("billCounter", billCounter);
-
-        updateAll();
-        resetForm();
+        document.getElementById("custName").value = "";
+        document.getElementById("prodArea").innerHTML = "";
+        document.getElementById("servArea").innerHTML = "";
+        updateUI();
+        alert("Saved!");
     }
 
-    // 6. Reset Form
-    function resetForm() {
-        document.getElementById("customerName").value = "";
-        document.getElementById("phone").value = "";
-        document.getElementById("productsContainer").innerHTML = "";
-        document.getElementById("servicesContainer").innerHTML = "";
-        addProduct();
-        addService();
+    function saveFinance() {
+        let n = document.getElementById("expName").value;
+        let a = Number(document.getElementById("expAmt").value);
+        let t = document.getElementById("expType").value;
+        if(!n || !a) return alert("Fill details!");
+
+        finance.push({n, a, t, date: new Date().toDateString()});
+        localStorage.setItem("fls_finance", JSON.stringify(finance));
+        updateUI();
+        document.getElementById("expName").value = "";
+        document.getElementById("expAmt").value = "";
     }
 
-    // 7. Finance Entries
-    function addEntry(nameId, amountId, storageArray, storageKey) {
-        let name = document.getElementById(nameId).value.trim();
-        let amount = Number(document.getElementById(amountId).value);
-        
-        if (name && amount > 0) {
-            storageArray.push({ name, amount, date: new Date().toDateString() });
-            localStorage.setItem(storageKey, JSON.stringify(storageArray));
-            document.getElementById(nameId).value = "";
-            document.getElementById(amountId).value = "";
-            updateAll();
-        } else {
-            alert("Please enter a valid Name/Reason and Amount!");
-        }
+    function saveOnline() {
+        let n = document.getElementById("onCust").value;
+        let a = Number(document.getElementById("onAmt").value);
+        if(!n || !a) return alert("Fill details!");
+
+        online.push({n, a, date: new Date().toDateString()});
+        localStorage.setItem("fls_online", JSON.stringify(online));
+        updateUI();
+        document.getElementById("onCust").value = "";
+        document.getElementById("onAmt").value = "";
     }
 
-    function addExpense() { addEntry("expenseStaff", "expenseAmount", expenses, "expenses"); }
-    function addAdvance() { addEntry("advanceStaff", "advanceAmount", advances, "advances"); }
-    function addOnlinePayment() { addEntry("onlineCustomer", "onlineAmount", onlinePayments, "onlinePayments"); }
-
-    // 8. Delete Bill
-    function deleteBill(index) {
-        if(confirm("Are you sure you want to delete this bill?")) {
-            bills.splice(index, 1);
-            localStorage.setItem("bills", JSON.stringify(bills));
-            updateAll();
-        }
+    function deleteBill(idx) {
+        if(confirm("Delete?")) { bills.splice(idx, 1); localStorage.setItem("fls_bills", JSON.stringify(bills)); updateUI(); }
     }
 
-    // 9. Update UI & Calculate
-    function updateAll() {
-        updateBillNumber();
-        
-        // Render Bills
-        let billTable = document.getElementById("billTable");
-        billTable.innerHTML = "";
-        bills.forEach((b, i) => {
-            let pTxt = b.products.map(p => `${p.name} (₹${p.price})`).join("<br>");
-            let sTxt = b.services.map(s => `${s.name} (₹${s.price})`).join("<br>");
-            let staffTxt = b.services.map(s => s.staff).join(", ");
-            billTable.innerHTML += `
-                <tr>
-                    <td><strong>${b.billNumber}</strong><br><small>${b.date}</small></td>
-                    <td>${b.customer}</td>
-                    <td>${pTxt || "-"}</td>
-                    <td>${sTxt || "-"}</td>
-                    <td>${staffTxt || "-"}</td>
-                    <td><button onclick="deleteBill(${i})">Delete</button></td>
-                </tr>
-            `;
-        });
+    function fullSystemReset() {
+        if(confirm("Delete everything?")) { localStorage.clear(); location.reload(); }
+    }
 
-        // Render Lists
-        const renderList = (array, elementId) => {
-            let list = document.getElementById(elementId);
-            list.innerHTML = "";
-            array.slice().reverse().forEach(item => {
-                list.innerHTML += `<li><span>${item.name} <small>(${item.date})</small></span> <strong>₹${item.amount}</strong></li>`;
-            });
-        }
-        renderList(expenses, "expenseList");
-        renderList(advances, "advanceList");
-        renderList(onlinePayments, "onlineList");
-
-        // Calculations (Only Today's Data)
+    function updateUI() {
         let today = new Date().toDateString();
-        let productSalesOnly = 0;
-        let staffWork = {};
+        document.getElementById("billNoDisplay").innerText = "FLS-" + String(counter).padStart(4, "0");
 
+        // Bill Table
+        let bTable = document.getElementById("billList");
+        bTable.innerHTML = "";
+        bills.forEach((b, i) => {
+            bTable.innerHTML += `<tr><td>${b.id}</td><td>${b.cust}</td><td>${b.prods.length}</td><td>${b.servs.length}</td><td>${b.servs.map(s=>s.s).join(",")}</td><td><button onclick="deleteBill(${i})">Del</button></td></tr>`;
+        });
+
+        // Reports & Calculations
+        let tSales = 0, tExp = 0, tAdv = 0, tOnline = 0, staffWork = {};
+        
         bills.filter(b => b.date === today).forEach(b => {
-            b.products.forEach(p => productSalesOnly += p.price);
-            b.services.forEach(s => {
-                if (!staffWork[s.staff]) staffWork[s.staff] = 0;
-                staffWork[s.staff] += s.price;
+            b.prods.forEach(p => tSales += p.p);
+            b.servs.forEach(s => {
+                if(!staffWork[s.s]) staffWork[s.s] = 0;
+                staffWork[s.s] += s.p;
             });
         });
 
-        let onlineTotal = onlinePayments.filter(p => p.date === today).reduce((t, i) => t + i.amount, 0);
-        let expenseTotal = expenses.filter(e => e.date === today).reduce((t, i) => t + i.amount, 0);
-        let advanceTotal = advances.filter(a => a.date === today).reduce((t, i) => t + i.amount, 0);
+        finance.filter(f => f.date === today).forEach(f => {
+            if(f.t === 'expense') tExp += f.a; else tAdv += f.a;
+        });
 
-        let finalBalance = (productSalesOnly + onlineTotal) - expenseTotal - advanceTotal;
+        online.filter(o => o.date === today).forEach(o => tOnline += o.a);
 
-        document.getElementById("todayBills").innerText = bills.filter(b => b.date === today).length;
-        document.getElementById("todaySale").innerText = productSalesOnly;
-        document.getElementById("finalBalance").innerText = finalBalance;
+        document.getElementById("statBills").innerText = bills.filter(b => b.date === today).length;
+        document.getElementById("statSales").innerText = tSales;
+        document.getElementById("statBalance").innerText = (tSales + tOnline) - (tExp + tAdv);
 
-        let staffHtml = "";
-        for (let staffName in staffWork) {
-            staffHtml += `<p><span>${staffName}</span> <span>₹${staffWork[staffName]}</span></p>`;
-        }
-        document.getElementById("staffReport").innerHTML = staffHtml || "<p>No service done today.</p>";
+        let sList = document.getElementById("staffList");
+        sList.innerHTML = "";
+        for(let s in staffWork) sList.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span>${s}</span> <strong>₹${staffWork[s]}</strong></div>`;
     }
 
-    // 10. Clear All Data (Safety System Reset)
-    function clearAllData() {
-        if(confirm("⚠️ WARNING: This will delete ALL Bills, Expenses, and Reports permanently! Are you 100% sure?")) {
-            localStorage.clear();
-            location.reload(); // Page reload to start fresh
-        }
-    }
-
-    function resetBillNumber() {
-        if(confirm("Reset the bill counter to FLS-0001?")) {
-            billCounter = 1;
-            localStorage.setItem("billCounter", billCounter);
-            updateBillNumber();
-        }
-    }
-
-    // Initialization
-    window.onload = () => {
-        resetForm();
-        updateAll();
-    };
+    window.onload = () => { updateUI(); addRow('prodArea'); addRow('servArea'); };
 </script>
+
 </body>
 </html>
