@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLS POS - Customer Phone Support</title>
+    <title>FLS POS - Secure Edition</title>
     <style>
         :root {
             --primary: #1e293b;
@@ -211,6 +211,7 @@
 </div>
 
 <script>
+    // --- DATABASE HANDLERS ---
     const getDB = (key) => {
         try {
             let res = JSON.parse(localStorage.getItem(key));
@@ -222,7 +223,9 @@
     let finance = getDB("fls_finance");
     let online = getDB("fls_online");
     let counter = Number(localStorage.getItem("fls_counter")) || 1;
+    const MASTER_PASSWORD = "Fancy2003";
 
+    // --- NAVIGATION ---
     function switchTab(id) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
         document.querySelectorAll('.nav-menu li').forEach(l => l.classList.remove('active'));
@@ -230,6 +233,7 @@
         document.getElementById('btn-'+id).classList.add('active');
     }
 
+    // --- DYNAMIC ROWS ---
     function addRow(areaId) {
         let div = document.createElement("div");
         div.className = "row-group";
@@ -241,6 +245,7 @@
         document.getElementById(areaId).appendChild(div);
     }
 
+    // --- CORE LOGIC ---
     function saveBill() {
         let prods = [];
         document.querySelectorAll("#prodArea .row-group").forEach(r => {
@@ -272,7 +277,6 @@
         localStorage.setItem("fls_bills", JSON.stringify(bills));
         localStorage.setItem("fls_counter", counter);
         
-        // Reset inputs
         document.getElementById("custName").value = "";
         document.getElementById("custPhone").value = "";
         document.getElementById("prodArea").innerHTML = "";
@@ -283,12 +287,40 @@
         alert("Bill Saved Successfully!");
     }
 
+    // --- SECURE DELETE FUNCTION ---
+    function deleteBill(idx) {
+        let pass = prompt("Enter Password to Delete Bill:");
+        if (pass === MASTER_PASSWORD) {
+            if(confirm("Are you sure you want to delete this bill?")) { 
+                bills.splice(idx, 1); 
+                localStorage.setItem("fls_bills", JSON.stringify(bills)); 
+                updateUI(); 
+                alert("Bill Deleted.");
+            }
+        } else if (pass !== null) {
+            alert("❌ Incorrect Password! Access Denied.");
+        }
+    }
+
+    // --- SYSTEM RESET ---
+    function fullSystemReset() {
+        let pass = prompt("ADMIN ACTION: Enter password to reset EVERYTHING:");
+        if(pass === MASTER_PASSWORD) {
+            if(confirm("⚠️ This will delete ALL data. Proceed?")) { 
+                localStorage.clear(); 
+                location.reload(); 
+            }
+        } else if (pass !== null) {
+            alert("❌ Unauthorized Access!");
+        }
+    }
+
+    // --- OTHER ENTRIES ---
     function saveFinance() {
         let n = document.getElementById("expName").value;
         let a = Number(document.getElementById("expAmt").value);
         let t = document.getElementById("expType").value;
-        if(!n || !a) return alert("Please fill Name and Amount!");
-
+        if(!n || !a) return alert("Fill details!");
         finance.push({n, a, t, date: new Date().toDateString()});
         localStorage.setItem("fls_finance", JSON.stringify(finance));
         updateUI();
@@ -299,8 +331,7 @@
     function saveOnline() {
         let n = document.getElementById("onCust").value;
         let a = Number(document.getElementById("onAmt").value);
-        if(!n || !a) return alert("Please fill Name and Amount!");
-
+        if(!n || !a) return alert("Fill details!");
         online.push({n, a, date: new Date().toDateString()});
         localStorage.setItem("fls_online", JSON.stringify(online));
         updateUI();
@@ -308,26 +339,11 @@
         document.getElementById("onAmt").value = "";
     }
 
-    function deleteBill(idx) {
-        if(confirm("Are you sure you want to delete this bill?")) { 
-            bills.splice(idx, 1); 
-            localStorage.setItem("fls_bills", JSON.stringify(bills)); 
-            updateUI(); 
-        }
-    }
-
-    function fullSystemReset() {
-        if(confirm("⚠️ This will delete ALL data. Proceed?")) { 
-            localStorage.clear(); 
-            location.reload(); 
-        }
-    }
-
+    // --- UI UPDATER ---
     function updateUI() {
         let today = new Date().toDateString();
         document.getElementById("billNoDisplay").innerText = "FLS-" + String(counter).padStart(4, "0");
 
-        // Bill Table Rendering
         let bTable = document.getElementById("billList");
         bTable.innerHTML = "";
         bills.slice().reverse().forEach((b, originalIdx) => {
@@ -348,9 +364,7 @@
                 </tr>`;
         });
 
-        // Stats & Calculation
         let tSales = 0, tExp = 0, tAdv = 0, tOnline = 0, staffWork = {};
-        
         bills.filter(b => b.date === today).forEach(b => {
             b.prods.forEach(p => tSales += p.p);
             b.servs.forEach(s => {
@@ -358,26 +372,19 @@
                 staffWork[s.s] += s.p;
             });
         });
-
         finance.filter(f => f.date === today).forEach(f => {
             if(f.t === 'expense') tExp += f.a; else tAdv += f.a;
         });
-
         online.filter(o => o.date === today).forEach(o => tOnline += o.a);
 
         document.getElementById("statBills").innerText = bills.filter(b => b.date === today).length;
         document.getElementById("statSales").innerText = tSales;
         document.getElementById("statBalance").innerText = (tSales + tOnline) - (tExp + tAdv);
 
-        // Staff Report
         let sList = document.getElementById("staffList");
         sList.innerHTML = "";
-        for(let s in staffWork) {
-            sList.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span>${s}</span> <strong>₹${staffWork[s]}</strong></div>`;
-        }
-        if(Object.keys(staffWork).length === 0) sList.innerHTML = "<p style='text-align:center; color:#94a3b8;'>No service data for today.</p>";
-
-        // Log views for Finance and Online
+        for(let s in staffWork) sList.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span>${s}</span> <strong>₹${staffWork[s]}</strong></div>`;
+        
         document.getElementById("finLog").innerHTML = finance.slice(-5).reverse().map(f => `<p><small>${f.date}</small> | ${f.n} - ₹${f.a} (${f.t})</p>`).join("");
         document.getElementById("onLog").innerHTML = online.slice(-5).reverse().map(o => `<p><small>${o.date}</small> | ${o.n} - ₹${o.a}</p>`).join("");
     }
