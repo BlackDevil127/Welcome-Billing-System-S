@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FLS POS - Full Details Edition</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --primary: #1e293b; --accent: #38bdf8; --success: #10b981; --danger: #ef4444; --bg: #f8fafc;
@@ -35,6 +36,9 @@
 
         .row-group { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
         .btn-del { background: #fee2e2; color: #ef4444; padding: 10px; border-radius: 8px; width: 45px; border:none; cursor:pointer; }
+        
+        .btn-print { background: #f1f5f9; color: #475569; padding: 10px; border-radius: 8px; width: 45px; border:none; cursor:pointer; margin-right: 5px; }
+        .btn-wa { background: #dcfce7; color: #166534; padding: 10px; border-radius: 8px; width: 45px; border:none; cursor:pointer; margin-right: 5px; }
 
         .table-wrapper { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 950px; }
@@ -58,9 +62,47 @@
         .balance-card { text-align: center; padding: 30px; }
         .balance-value { font-size: 32px; font-weight: bold; color: var(--primary); margin: 10px 0; }
         .history-item { background: #f1f5f9; border-radius: 10px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--accent); }
+
+        /* LIST MANAGEMENT STYLES */
+        .list-mgr { display: flex; gap: 10px; background: #f1f5f9; padding: 10px; border-radius: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+        .tag { background: var(--primary); color: white; padding: 4px 10px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 5px; }
+        .tag span { cursor: pointer; color: var(--danger); font-weight: bold; }
+
+        /* PRINT STYLES */
+        @media print {
+            body * { visibility: hidden; }
+            #printReceipt, #printReceipt * { visibility: visible; }
+            #printReceipt { position: fixed; left: 0; top: 0; width: 100%; }
+        }
+
+        #printReceipt { position: absolute; top: -10000px; left: -10000px; width: 400px; padding: 20px; background: white; border: 1px solid #eee; }
+        .receipt-header { text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px; }
+        .receipt-info { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 15px; }
+        .receipt-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .receipt-table th, .receipt-table td { text-align: left; padding: 8px; border-bottom: 1px solid #eee; }
+        .receipt-footer { margin-top: 15px; text-align: right; border-top: 1px solid #333; padding-top: 10px; }
     </style>
 </head>
 <body>
+
+<div id="printReceipt">
+    <div class="receipt-header">
+        <h2 style="color:var(--primary); margin:0;">FLS SALON</h2>
+        <p style="font-size:10px; margin:0;">Premium Hair & Beauty Care</p>
+        <p style="font-size:10px; margin:0;">Contact: +91 79802 83920</p>
+    </div>
+    <div class="receipt-info" id="rtInfo"></div>
+    <table class="receipt-table">
+        <thead>
+            <tr><th>Item</th><th>Type</th><th>Price</th></tr>
+        </thead>
+        <tbody id="rtBody"></tbody>
+    </table>
+    <div class="receipt-footer" id="rtFooter"></div>
+    <div style="text-align:center; margin-top:15px; font-size:10px; color:#666;">
+        <p>Thank you for visiting!</p>
+    </div>
+</div>
 
 <div id="passModal">
     <div class="modal-box">
@@ -118,6 +160,22 @@
                 
                 <button class="btn btn-save" onclick="saveBill()">Save Bill</button>
             </div>
+
+            <div class="card">
+                <h4 style="margin-bottom:10px;">🛠️ Manage Staff & Services</h4>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div>
+                        <input type="text" id="newStaffName" placeholder="Staff Name">
+                        <button class="btn btn-add" onclick="manageList('staff', 'add')">Add Staff</button>
+                        <div id="staffTags" class="list-mgr"></div>
+                    </div>
+                    <div>
+                        <input type="text" id="newServName" placeholder="Service Name">
+                        <button class="btn btn-add" onclick="manageList('service', 'add')">Add Service</button>
+                        <div id="serviceTags" class="list-mgr"></div>
+                    </div>
+                </div>
+            </div>
             
             <div class="card">
                 <h3>Recent History</h3>
@@ -128,7 +186,7 @@
                                 <th>Date</th>
                                 <th>Bill No</th>
                                 <th>Customer & Phone</th>
-                                <th>Details (Staff & Task)</th>
+                                <th>Details</th>
                                 <th>Prod Price</th>
                                 <th>Total Price</th>
                                 <th>Payment</th>
@@ -148,7 +206,6 @@
                     <button class="btn btn-reset" style="width: auto; margin: 0; padding: 8px 15px; font-size: 12px;" onclick="initAction('REFRESH_REPORT')">🔄 Refresh Today</button>
                 </div>
                 <div id="staffDetailedList" style="margin-top:15px;"></div>
-
                 <div style="margin-top: 30px; border-top: 2px solid #e2e8f0; padding-top: 20px;">
                     <h3>📜 Staff Performance History</h3>
                     <div id="staffHistoryList" style="margin-top:15px;"></div>
@@ -192,6 +249,7 @@
 
 <script>
     const MASTER_PASSWORD = "Fancy2003";
+    const COMPANY_NUM = "+917980283920";
     let currentAction = null, currentIdx = null;
 
     const getDB = (k) => JSON.parse(localStorage.getItem(k)) || [];
@@ -199,6 +257,8 @@
         finance = getDB("fls_finance"), 
         online = getDB("fls_online"), 
         staffHistory = getDB("fls_staff_history"),
+        staffList = getDB("fls_staff_list"),
+        serviceList = getDB("fls_service_list"),
         counter = Number(localStorage.getItem("fls_counter")) || 1;
 
     function switchTab(id) {
@@ -239,12 +299,48 @@
         } else { alert("Incorrect Password!"); }
     }
 
+    // --- LIST MANAGEMENT ---
+    function manageList(type, action, name = null) {
+        if(action === 'add') {
+            let input = document.getElementById(type === 'staff' ? "newStaffName" : "newServName");
+            if(!input.value) return;
+            if(type === 'staff') staffList.push(input.value);
+            else serviceList.push(input.value);
+            input.value = "";
+        } else {
+            if(type === 'staff') staffList.splice(staffList.indexOf(name), 1);
+            else serviceList.splice(serviceList.indexOf(name), 1);
+        }
+        localStorage.setItem("fls_staff_list", JSON.stringify(staffList));
+        localStorage.setItem("fls_service_list", JSON.stringify(serviceList));
+        renderListTags();
+    }
+
+    function renderListTags() {
+        let st = document.getElementById("staffTags");
+        let sv = document.getElementById("serviceTags");
+        st.innerHTML = staffList.map(n => `<div class="tag">${n} <span onclick="manageList('staff', 'remove', '${n}')">×</span></div>`).join("");
+        sv.innerHTML = serviceList.map(n => `<div class="tag">${n} <span onclick="manageList('service', 'remove', '${n}')">×</span></div>`).join("");
+    }
+
+    function generateOptions(list, placeholder) {
+        let options = `<option value="">${placeholder}</option>`;
+        list.forEach(n => options += `<option value="${n}">${n}</option>`);
+        return options;
+    }
+
     function addRow(area) {
         let div = document.createElement("div"); div.className = "row-group";
         if(area === 'prodArea') {
-            div.innerHTML = `<input class="p-name" placeholder="Product"><input class="p-price" type="number" placeholder="₹"><input class="p-staff" placeholder="Staff (Opt)"><button class="btn-del" onclick="this.parentElement.remove()">❌</button>`;
+            div.innerHTML = `<input class="p-name" placeholder="Product">
+                             <input class="p-price" type="number" placeholder="₹">
+                             <select class="p-staff">${generateOptions(staffList, "Staff (Opt)")}</select>
+                             <button class="btn-del" onclick="this.parentElement.remove()">❌</button>`;
         } else {
-            div.innerHTML = `<input class="s-name" placeholder="Service"><input class="s-price" type="number" placeholder="₹"><input class="s-staff" placeholder="Staff Name"><button class="btn-del" onclick="this.parentElement.remove()">❌</button>`;
+            div.innerHTML = `<select class="s-name">${generateOptions(serviceList, "Service")}</select>
+                             <input class="s-price" type="number" placeholder="₹">
+                             <select class="s-staff">${generateOptions(staffList, "Staff Name")}</select>
+                             <button class="btn-del" onclick="this.parentElement.remove()">❌</button>`;
         }
         document.getElementById(area).appendChild(div);
     }
@@ -256,15 +352,15 @@
             if(n && p) prods.push({n, p, s});
         });
         document.querySelectorAll("#servArea .row-group").forEach(r => {
-            let n = r.querySelector(".s-name").value, p = Number(r.querySelector(".s-price").value), s = r.querySelector(".s-staff").value || "Staff";
-            if(n && p) servs.push({n, p, s});
+            let n = r.querySelector(".s-name").value, p = Number(r.querySelector(".s-price").value), s = r.querySelector(".s-staff").value;
+            if(n && p && s) servs.push({n, p, s});
         });
-        if(!prods.length && !servs.length) return alert("Please enter at least one item!");
+        if(!prods.length && !servs.length) return alert("Please enter items & select staff!");
 
         bills.push({ 
             id: "FLS-"+String(counter).padStart(4, "0"), 
             cust: document.getElementById("custName").value || "Walk-in", 
-            phone: document.getElementById("custPhone").value || "N/A", 
+            phone: document.getElementById("custPhone").value || "", 
             prods, servs, 
             payMethod: document.getElementById("payMethod").value,
             date: new Date().toDateString(),
@@ -275,11 +371,52 @@
         location.reload();
     }
 
+    // --- NEW: PRINT & WHATSAPP PNG FUNCTION ---
+    async function handleBillAction(idx, type) {
+        const b = bills[idx];
+        const prodT = b.prods.reduce((a,c)=>a+c.p, 0);
+        const servT = b.servs.reduce((a,c)=>a+c.p, 0);
+        const total = prodT + servT;
+
+        // Populate the print template
+        document.getElementById("rtInfo").innerHTML = `
+            <div><strong>Bill To:</strong> ${b.cust}<br><strong>Phone:</strong> ${b.phone || 'N/A'}</div>
+            <div style="text-align:right;"><strong>Bill:</strong> ${b.id}<br><strong>Date:</strong> ${b.date}</div>
+        `;
+        let rows = "";
+        b.prods.forEach(p => rows += `<tr><td>${p.n}</td><td>Product</td><td>₹${p.p}</td></tr>`);
+        b.servs.forEach(s => rows += `<tr><td>${s.n}</td><td>Service</td><td>₹${s.p}</td></tr>`);
+        document.getElementById("rtBody").innerHTML = rows;
+        document.getElementById("rtFooter").innerHTML = `<strong>Total: ₹${total}</strong><br><small>Payment: ${b.payMethod}</small>`;
+
+        if(type === 'print') {
+            window.print();
+        } else {
+            if(!b.phone) return alert("No phone number!");
+            const target = document.getElementById("printReceipt");
+            target.style.top = "0"; target.style.left = "0"; // Bring to view temporarily
+            
+            const canvas = await html2canvas(target);
+            const imgData = canvas.toDataURL("image/png");
+            
+            // Download the PNG for sharing
+            const link = document.createElement('a');
+            link.download = `Bill_${b.id}.png`;
+            link.href = imgData;
+            link.click();
+            
+            target.style.top = "-10000px"; // Hide again
+            
+            const msg = `*FLS SALON INVOICE*%0AHello ${b.cust}, your bill ${b.id} has been generated. Chobi-ti save korun.`;
+            window.open(`https://wa.me/${b.phone.includes('+91') ? b.phone : '+91'+b.phone}?text=${msg}`, '_blank');
+        }
+    }
+
     function archiveStaffPerformance() {
         let today = new Date().toDateString();
         let staffPerf = {};
         let activeBills = bills.filter(b => b.date === today && !b.archived);
-        if(activeBills.length === 0) return alert("No performance data to refresh!");
+        if(activeBills.length === 0) return alert("No performance data!");
         
         activeBills.forEach(b => {
             b.servs.concat(b.prods).forEach(item => {
@@ -292,7 +429,7 @@
         localStorage.setItem("fls_staff_history", JSON.stringify(staffHistory));
         bills.forEach(b => { if(b.date === today) b.archived = true; });
         localStorage.setItem("fls_bills", JSON.stringify(bills));
-        alert("Today's report archived.");
+        alert("Report archived.");
     }
 
     function saveFinance() {
@@ -308,45 +445,42 @@
     function updateUI() {
         document.getElementById("billNoDisplay").innerText = "FLS-" + String(counter).padStart(4, "0");
         let today = new Date().toDateString();
-        
-        // Balance Calculations
-        let totalProdSales = 0, totalOnlinePay = 0, totalStaffAdv = 0, totalStaffExp = 0;
-        bills.filter(b => b.date === today).forEach(b => b.prods.forEach(p => totalProdSales += p.p));
-        online.filter(o => o.date === today).forEach(o => totalOnlinePay += o.a);
-        finance.filter(f => f.date === today).forEach(f => {
-            if(f.t === 'advance') totalStaffAdv += f.a;
-            if(f.t === 'expense') totalStaffExp += f.a;
-        });
-        document.getElementById("finalBalanceDisplay").innerText = "₹" + ((totalProdSales + totalOnlinePay) - totalStaffAdv - totalStaffExp);
-        document.getElementById("calcProd").innerText = "₹" + totalProdSales;
-        document.getElementById("calcOnline").innerText = "₹" + totalOnlinePay;
-        document.getElementById("calcAdv").innerText = "- ₹" + totalStaffAdv;
-        document.getElementById("calcExp").innerText = "- ₹" + totalStaffExp;
+        renderListTags();
 
-        // --- Bill History (DETAILED) ---
+        let tp = 0, ton = 0, tadv = 0, texp = 0;
+        bills.filter(b => b.date === today).forEach(b => b.prods.forEach(p => tp += p.p));
+        online.filter(o => o.date === today).forEach(o => ton += o.a);
+        finance.filter(f => f.date === today).forEach(f => {
+            if(f.t === 'advance') tadv += f.a; else texp += f.a;
+        });
+        document.getElementById("finalBalanceDisplay").innerText = "₹" + ((tp + ton) - tadv - texp);
+        document.getElementById("calcProd").innerText = "₹" + tp;
+        document.getElementById("calcOnline").innerText = "₹" + ton;
+        document.getElementById("calcAdv").innerText = "- ₹" + tadv;
+        document.getElementById("calcExp").innerText = "- ₹" + texp;
+
         let bTable = document.getElementById("billList");
         bTable.innerHTML = "";
         bills.slice().reverse().forEach((b, i) => {
             let idx = bills.length - 1 - i;
-            let pDetail = b.prods.map(p => `<span class="badge-prod-info">Prod: ${p.n} (₹${p.p}) [Staff: ${p.s}]</span>`).join("");
-            let sDetail = b.servs.map(s => `<span class="badge-serv">Serv: ${s.n} (₹${s.p}) [Staff: ${s.s}]</span>`).join("");
-            
-            let prodTotal = b.prods.reduce((a,c)=>a+c.p, 0);
-            let fullTotal = prodTotal + b.servs.reduce((a,c)=>a+c.p, 0);
+            let pDetail = b.prods.map(p => `<span class="badge-prod-info">${p.n} (₹${p.p}) [${p.s}]</span>`).join("");
+            let sDetail = b.servs.map(s => `<span class="badge-serv">${s.n} (₹${s.p}) [${s.s}]</span>`).join("");
+            let pTot = b.prods.reduce((a,c)=>a+c.p, 0);
+            let fTot = pTot + b.servs.reduce((a,c)=>a+c.p, 0);
             
             bTable.innerHTML += `<tr>
-                <td>${b.date}</td>
-                <td>${b.id}</td>
-                <td>${b.cust}<br><small>${b.phone}</small></td>
-                <td>${pDetail}${sDetail}</td>
-                <td style="color:var(--success); font-weight:bold;">₹${prodTotal}</td>
-                <td style="font-weight:bold;">₹${fullTotal}</td>
+                <td>${b.date}</td><td>${b.id}</td><td>${b.cust}<br>${b.phone}</td>
+                <td>${pDetail}${sDetail}</td><td>₹${pTot}</td><td>₹${fTot}</td>
                 <td><span class="badge-pay">${b.payMethod}</span></td>
-                <td><button class="btn-del" onclick="initAction('DELETE_BILL', ${idx})">🗑️</button></td>
+                <td>
+                    <button class="btn-print" onclick="handleBillAction(${idx}, 'print')">🖨️</button>
+                    <button class="btn-wa" onclick="handleBillAction(${idx}, 'wa')">📱</button>
+                    <button class="btn-del" onclick="initAction('DELETE_BILL', ${idx})">🗑️</button>
+                </td>
             </tr>`;
         });
 
-        // Today's Staff Performance
+        // Staff performance and history...
         let staffPerf = {};
         bills.filter(b => b.date === today && !b.archived).forEach(b => {
             b.servs.concat(b.prods).forEach(item => {
@@ -358,21 +492,15 @@
         });
         let sHtml = "";
         for(let s in staffPerf) {
-            sHtml += `<div class="staff-block"><div class="staff-header"><span>${s}</span><span>₹${staffPerf[s].total}</span></div>
-                <div style="font-size:11px; color:#64748b;">${staffPerf[s].actions.join(", ")}</div></div>`;
+            sHtml += `<div class="staff-block"><div class="staff-header"><span>${s}</span><span>₹${staffPerf[s].total}</span></div><div style="font-size:11px;">${staffPerf[s].actions.join(", ")}</div></div>`;
         }
-        document.getElementById("staffDetailedList").innerHTML = sHtml || "No active records today.";
+        document.getElementById("staffDetailedList").innerHTML = sHtml || "No active records.";
 
-        // Staff History List
         let hHtml = "";
         staffHistory.slice().reverse().forEach((h, i) => {
             let idx = staffHistory.length - 1 - i;
-            let summ = "";
-            for(let s in h.data) { summ += `<li>${s}: ₹${h.data[s]}</li>`; }
-            hHtml += `<div class="history-item">
-                <div style="display:flex; justify-content:space-between;"><strong>📅 Date: ${h.date}</strong>
-                <button class="btn-del" style="width:30px; height:30px; padding:0;" onclick="initAction('DELETE_STAFF_HIST', ${idx})">🗑️</button></div>
-                <ul style="margin-top:8px; font-size:13px; padding-left:20px;">${summ}</ul></div>`;
+            let summ = ""; for(let s in h.data) { summ += `<li>${s}: ₹${h.data[s]}</li>`; }
+            hHtml += `<div class="history-item"><strong>Date: ${h.date}</strong><button class="btn-del" style="float:right; width:30px;" onclick="initAction('DELETE_STAFF_HIST', ${idx})">🗑️</button><ul style="font-size:13px;">${summ}</ul></div>`;
         });
         document.getElementById("staffHistoryList").innerHTML = hHtml || "No archived records.";
     }
