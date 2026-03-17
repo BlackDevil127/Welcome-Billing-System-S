@@ -1,511 +1,1421 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLS POS - Full Details Edition</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
-        :root {
-            --primary: #1e293b; --accent: #38bdf8; --success: #10b981; --danger: #ef4444; --bg: #f8fafc;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); color: #334155; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fancy Looks Salon POS — Advanced AI Edition</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pri:#0d1b2a;--pri2:#1b3a5c;--acc:#00d4ff;--acc2:#0099cc;
+  --ok:#00c896;--err:#ff4757;--wrn:#ffaa00;--bg:#f0f4f8;
+  --card:#fff;--txt:#1a2a3a;--txt2:#5a6a7a;--bdr:#e0e8f0;
+  --grad:linear-gradient(135deg,#0d1b2a 0%,#1b3a5c 100%);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Sora',sans-serif;}
+body{background:var(--bg);color:var(--txt);overflow-x:hidden;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#c0ccda;border-radius:10px;}
 
-        .app-container { display: flex; flex-direction: column; height: 100vh; }
-        @media (min-width: 768px) { .app-container { flex-direction: row; } }
+/* LAYOUT */
+.app{display:flex;flex-direction:column;min-height:100vh;}
+@media(min-width:768px){.app{flex-direction:row;height:100vh;overflow:hidden;}}
 
-        .sidebar { background: var(--primary); color: white; padding: 15px; width: 100%; }
-        @media (min-width: 768px) { .sidebar { width: 280px; height: 100vh; } }
+/* SIDEBAR */
+.sidebar{background:var(--grad);color:#fff;width:100%;flex-shrink:0;display:flex;flex-direction:column;}
+@media(min-width:768px){.sidebar{width:255px;height:100vh;overflow-y:auto;}}
+.brand{text-align:center;padding:20px 12px 14px;border-bottom:1px solid rgba(255,255,255,.1);}
+.brand-logo{font-size:22px;font-weight:800;color:var(--acc);letter-spacing:1px;text-shadow:0 0 20px rgba(0,212,255,.4);}
+.brand-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:3px;letter-spacing:1px;text-transform:uppercase;}
+.bill-badge{display:inline-block;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.3);color:var(--acc);padding:3px 12px;border-radius:20px;font-size:11px;font-family:'JetBrains Mono',monospace;font-weight:600;margin-top:7px;}
+.nav-wrap{padding:10px 12px;flex:1;}
+.nav-menu{list-style:none;display:flex;flex-wrap:wrap;gap:4px;}
+@media(min-width:768px){.nav-menu{flex-direction:column;gap:3px;}}
+.nav-item{padding:10px 13px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.65);transition:all .2s;display:flex;align-items:center;gap:8px;flex:1 1 42%;}
+@media(min-width:768px){.nav-item{flex:none;}}
+.nav-item:hover{background:rgba(255,255,255,.08);color:#fff;}
+.nav-item.active{background:rgba(0,212,255,.2);color:var(--acc);border:1px solid rgba(0,212,255,.3);}
+.nav-icon{font-size:15px;width:18px;text-align:center;flex-shrink:0;}
+.sidebar-footer{padding:12px 14px;border-top:1px solid rgba(255,255,255,.08);}
+.btn-reset-sys{width:100%;padding:10px;border:1px solid rgba(255,71,87,.4);background:rgba(255,71,87,.1);color:#ff6b78;border-radius:10px;cursor:pointer;font-size:12px;font-weight:700;transition:all .2s;}
+.btn-reset-sys:hover{background:rgba(255,71,87,.28);}
 
-        .brand h2 { color: var(--accent); font-size: 20px; text-align: center; margin-bottom: 15px; }
-        .nav-menu { display: flex; flex-wrap: wrap; gap: 5px; list-style: none; justify-content: center; }
-        @media (min-width: 768px) { .nav-menu { flex-direction: column; margin-top: 20px; } }
+/* MAIN */
+.main{flex:1;padding:14px;overflow-y:auto;background:var(--bg);}
+@media(min-width:768px){.main{height:100vh;}}
 
-        .nav-menu li { padding: 12px 15px; background: #334155; border-radius: 8px; cursor: pointer; font-size: 14px; flex: 1 1 40%; text-align: center; }
-        .nav-menu li.active { background: var(--accent); color: var(--primary); font-weight: bold; }
+/* CARDS */
+.card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 2px 14px rgba(0,0,0,.06);border:1px solid var(--bdr);margin-bottom:16px;}
+.card-title{font-size:15px;font-weight:800;color:var(--txt);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
 
-        .main-content { flex: 1; padding: 15px; overflow-y: auto; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:14px;}
+@media(min-width:560px){.stats-grid{grid-template-columns:repeat(4,1fr);}}
+.stat-box{background:var(--card);border-radius:12px;padding:13px;text-align:center;border:1px solid var(--bdr);}
+.stat-icon{font-size:21px;margin-bottom:3px;}.stat-val{font-size:17px;font-weight:800;line-height:1.2;}
+.stat-lbl{font-size:10px;color:var(--txt2);margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
 
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 5px; }
-        .btn-add { background: #e0f2fe; color: #0369a1; margin-bottom: 15px; }
-        .btn-save { background: var(--success); color: white; }
-        .btn-reset { background: var(--danger); color: white; margin-top: 20px; }
+/* FORMS */
+input,select,textarea{width:100%;padding:10px 13px;margin:4px 0;border:1.5px solid var(--bdr);border-radius:10px;font-size:13px;color:var(--txt);background:#f8fbff;transition:border-color .2s;outline:none;font-family:'Sora',sans-serif;}
+input:focus,select:focus,textarea:focus{border-color:var(--acc2);background:#fff;box-shadow:0 0 0 3px rgba(0,153,204,.1);}
+input::placeholder{color:#a0aec0;}
+.flbl{font-size:12px;font-weight:700;color:var(--txt2);display:block;margin:7px 0 2px;letter-spacing:.3px;}
 
-        .row-group { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
-        .btn-del { background: #fee2e2; color: #ef4444; padding: 10px; border-radius: 8px; width: 45px; border:none; cursor:pointer; }
-        
-        .btn-print { background: #f1f5f9; color: #475569; padding: 10px; border-radius: 8px; width: 45px; border:none; cursor:pointer; margin-right: 5px; }
-        .btn-wa { background: #dcfce7; color: #166534; padding: 10px; border-radius: 8px; width: 45px; border:none; cursor:pointer; margin-right: 5px; }
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:11px 15px;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;transition:all .18s;font-family:'Sora',sans-serif;width:100%;}
+.btn:hover{filter:brightness(.92);transform:translateY(-1px);}
+.btn:active{transform:translateY(0);}
+.btn-add{background:#e0f7fe;color:#0272a8;margin-bottom:8px;}
+.btn-save{background:linear-gradient(135deg,var(--ok),#00a87a);color:#fff;}
+.btn-warn{background:linear-gradient(135deg,var(--wrn),#e68900);color:#fff;}
+.btn-blue{background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;}
+.btn-ghost{background:#f1f5f9;color:#475569;border:1px solid var(--bdr);}
+.btn-sm{padding:7px 13px;width:auto;font-size:12px;}
+.abt{padding:8px 10px;border:none;border-radius:8px;cursor:pointer;font-size:13px;transition:all .15s;flex-shrink:0;}
+.abt:hover{transform:scale(1.06);}
+.abt-p{background:#f1f5f9;color:#475569;}.abt-w{background:#d1fae5;color:#065f46;}.abt-d{background:#fee2e2;color:#dc2626;}
 
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 950px; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
-        
-        .tab-content { display: none; }
-        .active-tab { display: block; }
+/* ── BILLING ROW WITH AUTOCOMPLETE ── */
+.row-group{display:flex;gap:6px;margin-bottom:7px;align-items:flex-start;flex-wrap:wrap;position:relative;}
+.row-group input,.row-group select{margin:0;flex:1;min-width:65px;}
+.ac-wrap{flex:1;min-width:65px;position:relative;}
+.ac-wrap input{width:100%;margin:0;}
+.ac-drop{
+  position:absolute;top:calc(100% + 2px);left:0;width:100%;min-width:180px;
+  background:#fff;border:1.5px solid var(--acc2);border-radius:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:9999;
+  max-height:220px;overflow-y:auto;display:none;
+}
+.ac-drop.open{display:block;}
+.ac-item{
+  padding:9px 13px;cursor:pointer;font-size:13px;
+  border-bottom:1px solid var(--bdr);transition:background .12s;
+}
+.ac-item:last-child{border-bottom:none;}
+.ac-item:hover,.ac-item.focused{background:#e0f7fe;color:#0272a8;}
+.ac-item .ac-price{font-size:11px;color:var(--ok);margin-left:5px;font-weight:700;}
+.ac-item .ac-sub{font-size:10px;color:var(--txt2);display:block;margin-top:1px;}
+.ac-empty{padding:10px 13px;font-size:12px;color:var(--txt2);text-align:center;}
 
-        .staff-block { border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 10px; background: #fff; }
-        .staff-header { display: flex; justify-content: space-between; font-weight: bold; font-size: 16px; color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 5px; margin-bottom: 8px; }
-        
-        .badge-serv { background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px; font-size: 11px; display: block; margin-bottom: 2px; }
-        .badge-prod-info { background: #dcfce7; color: #166534; padding: 2px 6px; border-radius: 4px; font-size: 11px; display: block; margin-bottom: 2px; }
-        .badge-pay { background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+/* ROWS helper */
+.sec-title{font-size:11px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:1.2px;margin:12px 0 5px;padding-bottom:5px;border-bottom:2px solid var(--bdr);display:flex;align-items:center;gap:5px;}
 
-        #passModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center; }
-        .modal-box { background:white; padding:25px; border-radius:12px; width:320px; position:relative; }
-        .pass-input-container { position:relative; }
-        .toggle-pass { position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:18px; }
+/* TABLE */
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--bdr);}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:var(--pri);color:#fff;}
+th{padding:10px 13px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
+td{padding:10px 13px;border-bottom:1px solid var(--bdr);font-size:12px;vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:#f8fbff;}
 
-        .balance-card { text-align: center; padding: 30px; }
-        .balance-value { font-size: 32px; font-weight: bold; color: var(--primary); margin: 10px 0; }
-        .history-item { background: #f1f5f9; border-radius: 10px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--accent); }
+/* BADGES */
+.badge{padding:2px 7px;border-radius:6px;font-size:11px;font-weight:700;display:inline-block;margin:2px;}
+.b-prod{background:#dcfce7;color:#166534;}.b-serv{background:#fef3c7;color:#854d0e;}
+.b-cash{background:#d1fae5;color:#065f46;}.b-online{background:#dbeafe;color:#1e40af;}
+.b-due{background:#fee2e2;color:#991b1b;}.b-info{background:#e0f7fe;color:#0272a8;}
 
-        /* LIST MANAGEMENT STYLES */
-        .list-mgr { display: flex; gap: 10px; background: #f1f5f9; padding: 10px; border-radius: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-        .tag { background: var(--primary); color: white; padding: 4px 10px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 5px; }
-        .tag span { cursor: pointer; color: var(--danger); font-weight: bold; }
+/* TAGS */
+.list-mgr{display:flex;flex-wrap:wrap;gap:5px;background:#f8fbff;padding:9px;border-radius:10px;min-height:42px;margin-top:5px;border:1px dashed var(--bdr);}
+.tag{background:var(--pri);color:#fff;padding:4px 9px;border-radius:20px;font-size:11px;display:flex;align-items:center;gap:4px;font-weight:600;}
+.tag-x{cursor:pointer;color:#f87171;font-weight:900;}.tag-x:hover{color:#fff;}
+.tag-empty{font-size:11px;color:#a0aec0;align-self:center;}
+.list-search{width:100%;padding:7px 11px;margin-bottom:5px;border:1.5px solid var(--bdr);border-radius:8px;font-size:12px;background:#f8fbff;outline:none;font-family:'Sora',sans-serif;}
+.list-search:focus{border-color:var(--acc2);background:#fff;}
 
-        /* PRINT STYLES */
-        @media print {
-            body * { visibility: hidden; }
-            #printReceipt, #printReceipt * { visibility: visible; }
-            #printReceipt { position: fixed; left: 0; top: 0; width: 100%; }
-        }
+/* STAFF */
+.staff-block{border:1px solid var(--bdr);border-radius:12px;padding:13px;margin-bottom:9px;background:#fafcff;}
+.staff-header{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px;color:var(--pri);border-bottom:2px solid var(--acc);padding-bottom:7px;margin-bottom:7px;}
+.staff-items{font-size:11px;color:var(--txt2);line-height:1.7;}
+.history-item{background:var(--card);border:1px solid var(--bdr);border-left:4px solid var(--acc);border-radius:12px;padding:14px;margin-bottom:11px;}
 
-        #printReceipt { position: absolute; top: -10000px; left: -10000px; width: 400px; padding: 20px; background: white; border: 1px solid #eee; }
-        .receipt-header { text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px; }
-        .receipt-info { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 15px; }
-        .receipt-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .receipt-table th, .receipt-table td { text-align: left; padding: 8px; border-bottom: 1px solid #eee; }
-        .receipt-footer { margin-top: 15px; text-align: right; border-top: 1px solid #333; padding-top: 10px; }
-    </style>
+/* DUES */
+.due-item{background:#fff5f5;border:1px solid #fecaca;border-left:4px solid var(--err);border-radius:12px;padding:13px;margin-bottom:9px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+.due-amount{font-size:18px;font-weight:800;color:var(--err);}
+
+/* BALANCE */
+.balance-hero{text-align:center;padding:26px 20px 18px;background:linear-gradient(135deg,#f0f9ff,#e0f7fe);border-radius:14px;margin-bottom:16px;border:1px solid #bae6fd;}
+.balance-big{font-size:40px;font-weight:800;color:var(--pri);font-family:'JetBrains Mono',monospace;}
+.balance-lbl{font-size:11px;color:var(--txt2);margin-bottom:7px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.bal-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-size:13px;border-bottom:1px solid var(--bdr);}
+.bal-row:last-child{border-bottom:none;font-weight:800;font-size:15px;}
+
+/* PAY BREAKDOWN */
+.pay-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:10px;}
+@media(max-width:400px){.pay-grid{grid-template-columns:1fr;}}
+.pay-box{border-radius:10px;padding:13px;text-align:center;}
+.pb-val{font-size:19px;font-weight:800;}.pb-lbl{font-size:11px;margin-top:3px;font-weight:600;}
+.pay-cash{background:#d1fae5;color:#065f46;}.pay-online{background:#dbeafe;color:#1e40af;}.pay-due{background:#fee2e2;color:#991b1b;}
+
+/* AI CHAT */
+.chat-wrap{display:flex;flex-direction:column;height:440px;}
+.chat-msgs{flex:1;overflow-y:auto;padding:12px;background:#f8fbff;border-radius:12px;border:1px solid var(--bdr);margin-bottom:9px;display:flex;flex-direction:column;gap:9px;}
+.bubble{max-width:86%;padding:11px 14px;border-radius:12px;font-size:13px;line-height:1.65;white-space:pre-wrap;}
+.bubble-u{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;font-weight:600;align-self:flex-end;border-bottom-right-radius:3px;}
+.bubble-a{background:#fff;border:1px solid var(--bdr);align-self:flex-start;border-bottom-left-radius:3px;}
+.chat-row{display:flex;gap:8px;}.chat-row input{margin:0;flex:1;}
+.chat-row button{width:auto;padding:11px 17px;flex-shrink:0;}
+.ai-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.ai-chip{background:#e0f7fe;color:#0272a8;padding:5px 11px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid #bae6fd;transition:all .15s;}
+.ai-chip:hover{background:#0272a8;color:#fff;}
+.typing-dots span{display:inline-block;width:5px;height:5px;background:var(--txt2);border-radius:50%;animation:tb 1.2s infinite;margin:0 2px;}
+.typing-dots span:nth-child(2){animation-delay:.2s;}.typing-dots span:nth-child(3){animation-delay:.4s;}
+@keyframes tb{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+.ai-panel{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+@media(max-width:480px){.ai-panel{grid-template-columns:1fr;}}
+.ai-box{background:#f8fbff;border:1px solid var(--bdr);border-radius:12px;padding:13px;}
+.ai-box-title{font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.ai-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--bdr);}
+.ai-row:last-child{border-bottom:none;}
+
+/* BILL PREVIEW */
+.bill-preview{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac;border-radius:12px;padding:13px;margin-bottom:11px;display:none;}
+.prev-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;}
+.prev-total{display:flex;justify-content:space-between;font-size:16px;font-weight:800;color:var(--ok);margin-top:7px;padding-top:7px;border-top:1px solid #86efac;}
+
+/* LAYOUT HELPERS */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;}
+@media(max-width:700px){.three-col{grid-template-columns:1fr 1fr;}}
+@media(max-width:440px){.three-col,.two-col{grid-template-columns:1fr;}}
+.filter-bar{display:flex;gap:7px;margin-bottom:13px;flex-wrap:wrap;align-items:center;}
+.filter-bar input,.filter-bar select{margin:0;flex:1;min-width:110px;}
+.divider{height:1px;background:var(--bdr);margin:12px 0;}
+.pill-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+.pill{background:#e0f7fe;color:#0272a8;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.pill-g{background:#dcfce7;color:#166534;}
+.empty-state{text-align:center;padding:26px;color:#94a3b8;font-size:14px;}
+.fin-item{display:flex;justify-content:space-between;align-items:center;padding:11px;border-bottom:1px solid var(--bdr);}
+.fin-item:last-child{border-bottom:none;}
+.tab-content{display:none;}.tab-content.active-tab{display:block;}
+
+/* MODAL */
+#passModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;justify-content:center;align-items:center;backdrop-filter:blur(6px);}
+.modal-box{background:#fff;padding:24px;border-radius:16px;width:310px;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:mPop .2s ease;}
+@keyframes mPop{from{transform:scale(.9);opacity:0;}to{transform:scale(1);opacity:1;}}
+.pass-wrap{position:relative;}.pass-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;}
+.modal-btns{display:flex;gap:9px;margin-top:11px;}
+
+/* TOAST */
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--pri);color:#fff;padding:11px 22px;border-radius:50px;font-size:13px;font-weight:700;z-index:99999;transition:transform .3s;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.3);}
+#toast.show{transform:translateX(-50%) translateY(0);}
+
+/* PRINT */
+@media print{body *{visibility:hidden;}#printReceipt,#printReceipt *{visibility:visible;}#printReceipt{position:fixed;left:0;top:0;width:100%;}}
+#printReceipt{position:absolute;top:-10000px;left:-10000px;width:380px;padding:20px;background:#fff;font-family:'Courier New',monospace;}
+.rct-header{text-align:center;border-bottom:2px solid #1a2a3a;padding-bottom:10px;margin-bottom:13px;}
+.rct-info{display:flex;justify-content:space-between;font-size:11px;margin-bottom:13px;}
+.rct-table{width:100%;border-collapse:collapse;font-size:11px;}
+.rct-table th,.rct-table td{text-align:left;padding:7px;border-bottom:1px solid #eee;}
+.rct-footer{margin-top:12px;text-align:right;border-top:2px solid #333;padding-top:10px;}
+.rct-thanks{text-align:center;margin-top:12px;font-size:10px;color:#666;}
+</style>
 </head>
 <body>
 
+<!-- PRINT RECEIPT -->
 <div id="printReceipt">
-    <div class="receipt-header">
-        <h2 style="color:var(--primary); margin:0;">FLS SALON</h2>
-        <p style="font-size:10px; margin:0;">Premium Hair & Beauty Care</p>
-        <p style="font-size:10px; margin:0;">Contact: +91 79802 83920</p>
-    </div>
-    <div class="receipt-info" id="rtInfo"></div>
-    <table class="receipt-table">
-        <thead>
-            <tr><th>Item</th><th>Type</th><th>Price</th></tr>
-        </thead>
-        <tbody id="rtBody"></tbody>
-    </table>
-    <div class="receipt-footer" id="rtFooter"></div>
-    <div style="text-align:center; margin-top:15px; font-size:10px; color:#666;">
-        <p>Thank you for visiting!</p>
-    </div>
+  <div class="rct-header">
+    <div style="font-size:20px;font-weight:900;color:#0d1b2a;letter-spacing:2px;">✂ Fancy Looks Salon</div>
+    <div style="font-size:10px;margin-top:3px;">Premium Hair &amp; Beauty Care</div>
+    <div style="font-size:10px;">+91 79802 83920</div>
+  </div>
+  <div class="rct-info" id="rtInfo"></div>
+  <table class="rct-table">
+    <thead><tr id="rtHead"><th>Item</th><th>Type</th><th>Price</th></tr></thead>
+    <tbody id="rtBody"></tbody>
+  </table>
+  <div class="rct-footer" id="rtFooter"></div>
+  <div class="rct-thanks"><p>Thank you for visiting Fancy Looks Salon!</p></div>
 </div>
 
+<!-- MODAL -->
 <div id="passModal">
-    <div class="modal-box">
-        <h3>🔒 Secure Access</h3>
-        <p style="font-size:12px; margin-bottom:10px;">Enter password to continue</p>
-        <div class="pass-input-container">
-            <input type="password" id="securePass" placeholder="Enter Password">
-            <span class="toggle-pass" onclick="togglePassVisibility()">👁️</span>
-        </div>
-        <div style="display:flex; gap:10px; margin-top:10px;">
-            <button class="btn" style="background:#e2e8f0;" onclick="closePassModal()">Cancel</button>
-            <button class="btn btn-save" onclick="confirmSecureAction()">Confirm</button>
-        </div>
+  <div class="modal-box">
+    <p style="font-size:17px;font-weight:800;margin-bottom:4px;">🔒 Secure Access</p>
+    <p style="font-size:12px;color:var(--txt2);margin-bottom:11px;">Master password দিন</p>
+    <div class="pass-wrap">
+      <input type="password" id="securePass" placeholder="Password...">
+      <span class="pass-eye" onclick="togglePV()">👁️</span>
     </div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-save" onclick="doAction()">Confirm ✓</button>
+    </div>
+  </div>
 </div>
 
-<div class="app-container">
-    <aside class="sidebar">
-        <div class="brand"><h2>FLS SALON POS</h2><p style="text-align:center; font-size:12px;">Next: <span id="billNoDisplay">FLS-0001</span></p></div>
-        <ul class="nav-menu">
-            <li onclick="switchTab('billing')" class="active" id="btn-billing">🛒 Billing</li>
-            <li onclick="switchTab('reports')" id="btn-reports">📊 Reports</li>
-            <li onclick="switchTab('balance')" id="btn-balance">💰 Balance</li>
-            <li onclick="switchTab('finance')" id="btn-finance">💸 Expense</li>
-            <li onclick="switchTab('online')" id="btn-online">💳 Online</li>
-        </ul>
-        <button class="btn btn-reset" onclick="initAction('RESET_ALL')">⚠️ Reset System</button>
-    </aside>
+<div id="toast"></div>
 
-    <main class="main-content">
-        <div id="billing" class="tab-content active-tab">
-            <div class="card">
-                <h3>New Bill</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <input type="text" id="custName" placeholder="Customer Name">
-                    <input type="text" id="custPhone" placeholder="Phone">
-                </div>
-                
-                <p style="margin-top:10px; font-weight:bold; color:var(--success);">Products (Adds to Balance)</p>
-                <div id="prodArea"></div>
-                <button class="btn btn-add" onclick="addRow('prodArea')">+ Product</button>
-                
-                <div style="margin-bottom: 15px;">
-                    <label style="font-size: 12px; font-weight: bold;">Payment Method:</label>
-                    <select id="payMethod">
-                        <option value="Cash">Cash</option>
-                        <option value="Online">Online</option>
-                        <option value="Due">Due</option>
-                    </select>
-                </div>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">✂ Fancy Looks</div>
+      <div class="brand-sub">Fancy Looks Salon — AI POS</div>
+      <div class="bill-badge">Next: <span id="billNoDisplay">FLS-0001</span></div>
+    </div>
+    <div class="nav-wrap">
+      <ul class="nav-menu">
+        <li class="nav-item active" id="btn-billing" onclick="switchTab('billing')"><span class="nav-icon">🛒</span>Billing</li>
+        <li class="nav-item" id="btn-reports" onclick="switchTab('reports')"><span class="nav-icon">📊</span>Reports</li>
+        <li class="nav-item" id="btn-balance" onclick="switchTab('balance')"><span class="nav-icon">💰</span>Balance</li>
+        <li class="nav-item" id="btn-dues"    onclick="switchTab('dues')"><span class="nav-icon">⚠️</span>Dues</li>
+        <li class="nav-item" id="btn-finance" onclick="switchTab('finance')"><span class="nav-icon">💸</span>Expense</li>
+        <li class="nav-item" id="btn-online"  onclick="switchTab('online')"><span class="nav-icon">💳</span>Online</li>
+        <li class="nav-item" id="btn-ai"      onclick="switchTab('ai')"><span class="nav-icon">🤖</span>AI Brain</li>
+      </ul>
+    </div>
+    <div class="sidebar-footer">
+      <button class="btn-reset-sys" onclick="initAction('RESET_ALL')">⚠️ Reset All Data</button>
+    </div>
+  </aside>
 
-                <p style="margin-top:10px; font-weight:bold; color:#f59e0b;">Services (Staff Report)</p>
-                <div id="servArea"></div>
-                <button class="btn btn-add" onclick="addRow('servArea')">+ Service</button>
-                
-                <button class="btn btn-save" onclick="saveBill()">Save Bill</button>
-            </div>
+  <main class="main">
 
-            <div class="card">
-                <h4 style="margin-bottom:10px;">🛠️ Manage Staff & Services</h4>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <div>
-                        <input type="text" id="newStaffName" placeholder="Staff Name">
-                        <button class="btn btn-add" onclick="manageList('staff', 'add')">Add Staff</button>
-                        <div id="staffTags" class="list-mgr"></div>
-                    </div>
-                    <div>
-                        <input type="text" id="newServName" placeholder="Service Name">
-                        <button class="btn btn-add" onclick="manageList('service', 'add')">Add Service</button>
-                        <div id="serviceTags" class="list-mgr"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3>Recent History</h3>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Bill No</th>
-                                <th>Customer & Phone</th>
-                                <th>Details</th>
-                                <th>Prod Price</th>
-                                <th>Total Price</th>
-                                <th>Payment</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="billList"></tbody>
-                    </table>
-                </div>
-            </div>
+    <!-- BILLING -->
+    <div id="billing" class="tab-content active-tab">
+      <div id="quickStats" class="stats-grid"></div>
+      <div class="card">
+        <div class="card-title"><span>🧾</span> New Bill</div>
+        <div class="two-col">
+          <div><label class="flbl">👤 Customer Name</label><input id="custName" type="text" placeholder="Walk-in / Name"></div>
+          <div><label class="flbl">📱 Phone</label><input id="custPhone" type="text" placeholder="10-digit number"></div>
         </div>
-
-        <div id="reports" class="tab-content">
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3>Today's Staff Performance</h3>
-                    <button class="btn btn-reset" style="width: auto; margin: 0; padding: 8px 15px; font-size: 12px;" onclick="initAction('REFRESH_REPORT')">🔄 Refresh Today</button>
-                </div>
-                <div id="staffDetailedList" style="margin-top:15px;"></div>
-                <div style="margin-top: 30px; border-top: 2px solid #e2e8f0; padding-top: 20px;">
-                    <h3>📜 Staff Performance History</h3>
-                    <div id="staffHistoryList" style="margin-top:15px;"></div>
-                </div>
-            </div>
+        <div class="sec-title">📦 Products <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--ok);margin-left:4px;">(Balance-এ যাবে)</span></div>
+        <div id="prodArea"></div>
+        <button class="btn btn-add btn-sm" onclick="addRow('prodArea')">+ Product Row</button>
+        <label class="flbl" style="margin-top:10px;">💳 Payment Method</label>
+        <select id="payMethod">
+          <option value="Cash">💵 Cash</option>
+          <option value="Online">📱 Online (UPI / Card)</option>
+          <option value="Due">⚠️ Due (Credit)</option>
+        </select>
+        <div class="sec-title" style="margin-top:12px;">✂️ Services <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--wrn);margin-left:4px;">(Staff Report এ যাবে)</span></div>
+        <div id="servArea"></div>
+        <button class="btn btn-add btn-sm" onclick="addRow('servArea')">+ Service Row</button>
+        <div class="bill-preview" id="billPreview">
+          <div class="prev-row"><span>📦 Products:</span><strong id="prevProd">₹0</strong></div>
+          <div class="prev-row"><span>✂️ Services:</span><strong id="prevServ">₹0</strong></div>
+          <div class="prev-total"><span>💰 Grand Total:</span><span id="prevTotal">₹0</span></div>
         </div>
+        <button class="btn btn-save" onclick="saveBill()" style="margin-top:6px;">💾 Save Bill</button>
+      </div>
 
-        <div id="balance" class="tab-content">
-            <div class="card balance-card">
-                <h3>💰 Final Balance (Today)</h3>
-                <div class="balance-value" id="finalBalanceDisplay">₹0</div>
-                <div style="display: flex; flex-direction: column; gap: 10px; text-align: left; max-width: 300px; margin: 0 auto; margin-top:20px;">
-                    <div style="display:flex; justify-content: space-between;"><span>Product Sales:</span> <strong id="calcProd">₹0</strong></div>
-                    <div style="display:flex; justify-content: space-between;"><span>Online (Manual):</span> <strong id="calcOnline">₹0</strong></div>
-                    <div style="display:flex; justify-content: space-between; color: var(--danger);"><span>Staff Advance:</span> <strong id="calcAdv">- ₹0</strong></div>
-                    <div style="display:flex; justify-content: space-between; color: var(--danger);"><span>Staff Expense:</span> <strong id="calcExp">- ₹0</strong></div>
-                </div>
-            </div>
+      <div class="card">
+        <div class="card-title"><span>🛠️</span> Manage Staff, Services &amp; Products</div>
+        <div class="three-col">
+          <div>
+            <div class="sec-title">👤 Staff</div>
+            <input id="newStaffName" type="text" placeholder="Staff Name">
+            <button class="btn btn-add btn-sm" onclick="addToList('staff')">+ Add</button>
+            <input type="text" class="list-search" id="searchStaff" placeholder="🔍 Search staff..." oninput="filterTags('staff')">
+            <div id="staffTags" class="list-mgr"><span class="tag-empty">Empty</span></div>
+          </div>
+          <div>
+            <div class="sec-title">✂️ Services</div>
+            <input id="newServName" type="text" placeholder="Service Name">
+            <button class="btn btn-add btn-sm" onclick="addToList('service')">+ Add</button>
+            <input type="text" class="list-search" id="searchService" placeholder="🔍 Search service..." oninput="filterTags('service')">
+            <div id="serviceTags" class="list-mgr"><span class="tag-empty">Empty</span></div>
+          </div>
+          <div>
+            <div class="sec-title">📦 Products</div>
+            <input id="newProdName" type="text" placeholder="Product Name">
+            <input id="newProdPrice" type="number" placeholder="Default ₹ (optional)">
+            <button class="btn btn-add btn-sm" onclick="addToList('product')">+ Add</button>
+            <input type="text" class="list-search" id="searchProduct" placeholder="🔍 Search product..." oninput="filterTags('product')">
+            <div id="productTags" class="list-mgr"><span class="tag-empty">Empty</span></div>
+          </div>
         </div>
+      </div>
 
-        <div id="finance" class="tab-content">
-            <div class="card">
-                <h3>Expense / Advance</h3>
-                <input type="text" id="expName" placeholder="Name/Reason">
-                <input type="number" id="expAmt" placeholder="Amount">
-                <select id="expType"><option value="expense">Expense</option><option value="advance">Advance</option></select>
-                <button class="btn btn-save" onclick="saveFinance()">Save</button>
-            </div>
+      <div class="card">
+        <div class="card-title"><span>📋</span> Bill History</div>
+        <div class="filter-bar">
+          <input type="text" id="searchFilter" placeholder="🔍 Name / Bill No..." oninput="renderBillTable()">
+          <select id="payFilter" onchange="renderBillTable()">
+            <option value="">All Payments</option>
+            <option value="Cash">Cash</option>
+            <option value="Online">Online</option>
+            <option value="Due">Due</option>
+          </select>
+          <input type="date" id="dateFilter" onchange="renderBillTable()">
+          <button class="btn btn-ghost btn-sm" onclick="clearFilters()">✕ Clear</button>
         </div>
+        <div class="tbl-wrap">
+          <table style="min-width:820px;">
+            <thead><tr><th>Date</th><th>Bill No</th><th>Customer</th><th>Details</th><th>Prod ₹</th><th>Total ₹</th><th>Pay</th><th>Actions</th></tr></thead>
+            <tbody id="billList"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
-        <div id="online" class="tab-content">
-            <div class="card">
-                <h3>Online Payment (Direct Entry)</h3>
-                <input type="text" id="onCust" placeholder="Name/Ref">
-                <input type="number" id="onAmt" placeholder="Amount">
-                <button class="btn btn-save" onclick="saveOnline()">Save</button>
-            </div>
+    <!-- REPORTS -->
+    <div id="reports" class="tab-content">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+          <div class="card-title" style="margin:0;"><span>📊</span> Today's Staff Performance</div>
+          <button class="btn btn-warn btn-sm" onclick="initAction('REFRESH_REPORT')">📦 Archive &amp; Reset Today</button>
         </div>
-    </main>
+        <div id="staffDetailedList"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span>📜</span> Staff Performance History</div>
+        <div id="staffHistoryList"></div>
+      </div>
+    </div>
+
+    <!-- BALANCE -->
+    <div id="balance" class="tab-content">
+      <div class="card">
+        <div class="card-title"><span>💰</span> Today's Balance</div>
+        <div class="balance-hero">
+          <div class="balance-lbl">Final Cash Balance</div>
+          <div class="balance-big" id="finalBalanceDisplay">₹0</div>
+        </div>
+        <div class="bal-row"><span>📦 Product Sales:</span><strong id="calcProd" style="color:var(--ok);">₹0</strong></div>
+        <div class="bal-row"><span>📱 Online (Bills):</span><strong id="calcOnlineBills" style="color:#3b82f6;">₹0</strong></div>
+        <div class="bal-row"><span>📲 Online (Manual):</span><strong id="calcOnline" style="color:#3b82f6;">₹0</strong></div>
+        <div class="bal-row" style="color:var(--err);"><span>💵 Staff Advance:</span><strong id="calcAdv">- ₹0</strong></div>
+        <div class="bal-row" style="color:var(--err);"><span>💸 Expense:</span><strong id="calcExp">- ₹0</strong></div>
+        <div class="divider"></div>
+        <div class="bal-row"><span>🏆 Net Balance:</span><strong id="calcFinal" style="font-size:17px;color:var(--pri);">₹0</strong></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span>🔵</span> Payment Breakdown (Today)</div>
+        <div class="pay-grid" id="payBreakdown"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span>📅</span> Date-wise Summary</div>
+        <div id="dateSummary"></div>
+      </div>
+    </div>
+
+    <!-- DUES -->
+    <div id="dues" class="tab-content">
+      <div class="card">
+        <div class="card-title"><span>⚠️</span> Pending Dues</div>
+        <div id="dueList"></div>
+        <div class="divider"></div>
+        <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:800;color:var(--err);padding:6px 2px;">
+          <span>Total Pending:</span><span id="totalDueAmt">₹0</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span>✅</span> Cleared Dues</div>
+        <div id="clearedDueList"></div>
+      </div>
+    </div>
+
+    <!-- FINANCE -->
+    <div id="finance" class="tab-content">
+      <div class="card">
+        <div class="card-title"><span>💸</span> Expense / Advance Entry</div>
+        <label class="flbl">Name / Reason</label>
+        <input id="expName" type="text" placeholder="e.g. Shampoo supply / Staff advance">
+        <label class="flbl">Amount (₹)</label>
+        <input id="expAmt" type="number" placeholder="0">
+        <label class="flbl">Type</label>
+        <select id="expType">
+          <option value="expense">💸 Expense</option>
+          <option value="advance">💵 Staff Advance</option>
+        </select>
+        <button class="btn btn-save" style="margin-top:10px;" onclick="saveFinance()">💾 Save</button>
+      </div>
+      <div class="card">
+        <div class="card-title"><span>📋</span> Today's Finance Records</div>
+        <div id="financeHistory"></div>
+      </div>
+    </div>
+
+    <!-- ONLINE -->
+    <div id="online" class="tab-content">
+      <div class="card">
+        <div class="card-title"><span>💳</span> Manual Online Payment</div>
+        <p style="font-size:12px;color:var(--txt2);margin-bottom:11px;">Bill-এর বাইরে সরাসরি UPI/Card payment লিখুন।</p>
+        <label class="flbl">Customer / Reference</label>
+        <input id="onCust" type="text" placeholder="Name or UPI ref">
+        <label class="flbl">Amount (₹)</label>
+        <input id="onAmt" type="number" placeholder="0">
+        <button class="btn btn-save" style="margin-top:10px;" onclick="saveOnline()">💾 Save</button>
+      </div>
+      <div class="card">
+        <div class="card-title"><span>📋</span> Today's Online Records</div>
+        <div id="onlineHistory"></div>
+      </div>
+    </div>
+
+    <!-- AI BRAIN -->
+    <div id="ai" class="tab-content">
+      <div class="card">
+        <div class="card-title"><span>🤖</span> Fancy Looks AI Brain</div>
+        <p style="font-size:13px;color:var(--txt2);margin-bottom:13px;">বাংলায় বা English-এ প্রশ্ন করুন — সব data আমার কাছে আছে!</p>
+        <div class="ai-chips" id="aiChips"></div>
+        <div class="chat-wrap">
+          <div class="chat-msgs" id="chatMessages">
+            <div class="bubble bubble-a">
+              <strong>👋 নমস্কার! আমি Fancy Looks AI Brain।</strong><br><br>
+              আমাকে যা যা জিজ্ঞেস করতে পারেন:<br><br>
+              • আজকের মোট বিক্রি কত?<br>
+              • কোন staff সবচেয়ে বেশি কামিয়েছে?<br>
+              • Balance কত?<br>
+              • Due কত আছে?<br>
+              • Product / Service list দাও<br>
+              • সর্বশেষ bills দেখাও<br><br>
+              অথবা নিচের chip গুলো press করুন 👇
+            </div>
+          </div>
+          <div class="chat-row">
+            <input type="text" id="aiInput" placeholder="প্রশ্ন করুন..." onkeypress="if(event.key==='Enter')sendAI()">
+            <button class="btn btn-blue btn-sm" onclick="sendAI()">Send 📤</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span>📊</span> Live Data Overview</div>
+        <div class="ai-panel" id="aiDataPanel"></div>
+      </div>
+    </div>
+
+  </main>
 </div>
 
 <script>
-    const MASTER_PASSWORD = "Fancy2003";
-    const COMPANY_NUM = "+917980283920";
-    let currentAction = null, currentIdx = null;
+/* =============================================================
+   DATA LAYER
+   ============================================================= */
+const PW = "Fancy2003";
+const LS = {
+  get:(k,d=[])=>{ try{return JSON.parse(localStorage.getItem(k))||d;}catch(e){return d;} },
+  set:(k,v)=>{ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
+};
 
-    const getDB = (k) => JSON.parse(localStorage.getItem(k)) || [];
-    let bills = getDB("fls_bills"), 
-        finance = getDB("fls_finance"), 
-        online = getDB("fls_online"), 
-        staffHistory = getDB("fls_staff_history"),
-        staffList = getDB("fls_staff_list"),
-        serviceList = getDB("fls_service_list"),
-        counter = Number(localStorage.getItem("fls_counter")) || 1;
+let bills     = LS.get("fls_bills"),
+    fin       = LS.get("fls_finance"),
+    onl       = LS.get("fls_online"),
+    staffHist = LS.get("fls_staff_history"),
+    staffList = LS.get("fls_staff_list"),
+    servList  = LS.get("fls_service_list"),
+    prodList  = LS.get("fls_product_list"),
+    counter   = Number(localStorage.getItem("fls_counter")) || 1;
 
-    function switchTab(id) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
-        document.querySelectorAll('.nav-menu li').forEach(l => l.classList.remove('active'));
-        document.getElementById(id).classList.add('active-tab');
-        document.getElementById('btn-'+id).classList.add('active');
-        updateUI();
-    }
+let curAct=null, curIdx=null;
 
-    function togglePassVisibility() {
-        let p = document.getElementById("securePass");
-        p.type = p.type === "password" ? "text" : "password";
-    }
+/* =============================================================
+   TOAST
+   ============================================================= */
+function toast(msg, ms=2800){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("show");
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),ms);
+}
 
-    function initAction(type, idx = null) {
-        currentAction = type; currentIdx = idx;
-        document.getElementById("passModal").style.display = "flex";
-        document.getElementById("securePass").value = "";
-    }
+/* =============================================================
+   TAB
+   ============================================================= */
+function switchTab(id){
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active-tab'));
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  const tc=document.getElementById(id), nb=document.getElementById('btn-'+id);
+  if(tc) tc.classList.add('active-tab');
+  if(nb) nb.classList.add('active');
+  closeAllDropdowns();
+  renderAll();
+}
 
-    function closePassModal() { document.getElementById("passModal").style.display = "none"; }
+/* =============================================================
+   MODAL
+   ============================================================= */
+function togglePV(){ const p=document.getElementById("securePass"); p.type=p.type==="password"?"text":"password"; }
+function initAction(type,idx=null){
+  curAct=type; curIdx=idx;
+  document.getElementById("passModal").style.display="flex";
+  document.getElementById("securePass").value="";
+  setTimeout(()=>document.getElementById("securePass").focus(),80);
+}
+function closeModal(){ document.getElementById("passModal").style.display="none"; }
 
-    function confirmSecureAction() {
-        if(document.getElementById("securePass").value === MASTER_PASSWORD) {
-            if(currentAction === 'DELETE_BILL') {
-                bills.splice(currentIdx, 1);
-                localStorage.setItem("fls_bills", JSON.stringify(bills));
-            } else if(currentAction === 'RESET_ALL') {
-                localStorage.clear(); location.reload();
-            } else if(currentAction === 'REFRESH_REPORT') {
-                archiveStaffPerformance();
-            } else if(currentAction === 'DELETE_STAFF_HIST') {
-                staffHistory.splice(currentIdx, 1);
-                localStorage.setItem("fls_staff_history", JSON.stringify(staffHistory));
-            }
-            closePassModal(); updateUI();
-        } else { alert("Incorrect Password!"); }
-    }
+function doAction(){
+  if(document.getElementById("securePass").value!==PW){
+    toast("❌ ভুল Password!"); document.getElementById("securePass").value=""; return;
+  }
+  switch(curAct){
+    case 'DELETE_BILL':
+      bills.splice(curIdx,1); LS.set("fls_bills",bills); toast("🗑️ Bill deleted"); break;
+    case 'RESET_ALL':
+      localStorage.clear(); location.reload(); return;
+    case 'REFRESH_REPORT':
+      archivePerf(); break;
+    case 'DELETE_STAFF_HIST':
+      staffHist.splice(curIdx,1); LS.set("fls_staff_history",staffHist); toast("🗑️ History deleted"); break;
+    case 'MARK_DUE_PAID':
+      bills[curIdx].payMethod="Cash (was Due)";
+      bills[curIdx].duePaidDate=new Date().toDateString();
+      LS.set("fls_bills",bills); toast("✅ Due marked paid!"); break;
+    case 'DELETE_FIN':
+      fin.splice(curIdx,1); LS.set("fls_finance",fin); toast("🗑️ Deleted"); break;
+    case 'DELETE_ONL':
+      onl.splice(curIdx,1); LS.set("fls_online",onl); toast("🗑️ Deleted"); break;
+    case 'DELETE_DATE_SUMMARY':
+      bills=bills.filter(b=>b.date!==curIdx);
+      LS.set("fls_bills",bills); toast("🗑️ Date summary deleted"); break;
+  }
+  closeModal(); renderAll();
+}
 
-    // --- LIST MANAGEMENT ---
-    function manageList(type, action, name = null) {
-        if(action === 'add') {
-            let input = document.getElementById(type === 'staff' ? "newStaffName" : "newServName");
-            if(!input.value) return;
-            if(type === 'staff') staffList.push(input.value);
-            else serviceList.push(input.value);
-            input.value = "";
-        } else {
-            if(type === 'staff') staffList.splice(staffList.indexOf(name), 1);
-            else serviceList.splice(serviceList.indexOf(name), 1);
-        }
-        localStorage.setItem("fls_staff_list", JSON.stringify(staffList));
-        localStorage.setItem("fls_service_list", JSON.stringify(serviceList));
-        renderListTags();
-    }
+/* =============================================================
+   LIST MANAGEMENT
+   ============================================================= */
+function addToList(type){
+  if(type==='staff'){
+    const el=document.getElementById("newStaffName"), v=el.value.trim();
+    if(!v) return toast("❌ Staff name দিন!");
+    staffList.push(v); LS.set("fls_staff_list",staffList); el.value="";
+  } else if(type==='service'){
+    const el=document.getElementById("newServName"), v=el.value.trim();
+    if(!v) return toast("❌ Service name দিন!");
+    servList.push(v); LS.set("fls_service_list",servList); el.value="";
+  } else if(type==='product'){
+    const nEl=document.getElementById("newProdName"), pEl=document.getElementById("newProdPrice");
+    const v=nEl.value.trim(); if(!v) return toast("❌ Product name দিন!");
+    prodList.push({name:v,price:Number(pEl.value)||0});
+    LS.set("fls_product_list",prodList); nEl.value=""; pEl.value="";
+  }
+  toast("✅ Added!"); renderTags(); refreshDropdowns();
+}
 
-    function renderListTags() {
-        let st = document.getElementById("staffTags");
-        let sv = document.getElementById("serviceTags");
-        st.innerHTML = staffList.map(n => `<div class="tag">${n} <span onclick="manageList('staff', 'remove', '${n}')">×</span></div>`).join("");
-        sv.innerHTML = serviceList.map(n => `<div class="tag">${n} <span onclick="manageList('service', 'remove', '${n}')">×</span></div>`).join("");
-    }
+function removeFromList(type,key){
+  const name=decodeURIComponent(key);
+  if(type==='staff')   staffList=staffList.filter(n=>n!==name);
+  if(type==='service') servList=servList.filter(n=>n!==name);
+  if(type==='product') prodList=prodList.filter(p=>p.name!==name);
+  LS.set("fls_staff_list",staffList);
+  LS.set("fls_service_list",servList);
+  LS.set("fls_product_list",prodList);
+  toast("🗑️ Removed"); renderTags(); refreshDropdowns();
+}
 
-    function generateOptions(list, placeholder) {
-        let options = `<option value="">${placeholder}</option>`;
-        list.forEach(n => options += `<option value="${n}">${n}</option>`);
-        return options;
-    }
+function renderTags(){
+  const mk=(items,type,isObj)=>{
+    if(!items.length) return '<span class="tag-empty">Empty</span>';
+    return items.map(n=>{
+      const lbl=isObj?`${n.name}${n.price?' ₹'+n.price:''}`:n;
+      const key=encodeURIComponent(isObj?n.name:n);
+      return `<div class="tag">${lbl} <span class="tag-x" onclick="removeFromList('${type}','${key}')">×</span></div>`;
+    }).join('');
+  };
+  const st=document.getElementById("staffTags");
+  const sv=document.getElementById("serviceTags");
+  const pt=document.getElementById("productTags");
+  if(st) st.innerHTML=mk(staffList,'staff',false);
+  if(sv) sv.innerHTML=mk(servList,'service',false);
+  if(pt) pt.innerHTML=mk(prodList,'product',true);
+}
 
-    function addRow(area) {
-        let div = document.createElement("div"); div.className = "row-group";
-        if(area === 'prodArea') {
-            div.innerHTML = `<input class="p-name" placeholder="Product">
-                             <input class="p-price" type="number" placeholder="₹">
-                             <select class="p-staff">${generateOptions(staffList, "Staff (Opt)")}</select>
-                             <button class="btn-del" onclick="this.parentElement.remove()">❌</button>`;
-        } else {
-            div.innerHTML = `<select class="s-name">${generateOptions(serviceList, "Service")}</select>
-                             <input class="s-price" type="number" placeholder="₹">
-                             <select class="s-staff">${generateOptions(staffList, "Staff Name")}</select>
-                             <button class="btn-del" onclick="this.parentElement.remove()">❌</button>`;
-        }
-        document.getElementById(area).appendChild(div);
-    }
+function filterTags(type){
+  const idMap={staff:'searchStaff',service:'searchService',product:'searchProduct'};
+  const elMap={staff:'staffTags',service:'serviceTags',product:'productTags'};
+  const q=(document.getElementById(idMap[type])?.value||'').toLowerCase().trim();
+  const el=document.getElementById(elMap[type]); if(!el) return;
+  let items=[], isObj=false;
+  if(type==='staff')   items=staffList;
+  if(type==='service') items=servList;
+  if(type==='product'){ items=prodList; isObj=true; }
+  const filtered=items.filter(n=>{ const lbl=isObj?n.name.toLowerCase():n.toLowerCase(); return !q||lbl.includes(q); });
+  if(!filtered.length){ el.innerHTML='<span class="tag-empty">No match</span>'; return; }
+  el.innerHTML=filtered.map(n=>{
+    const lbl=isObj?`${n.name}${n.price?' ₹'+n.price:''}`:n;
+    const key=encodeURIComponent(isObj?n.name:n);
+    return `<div class="tag">${lbl} <span class="tag-x" onclick="removeFromList('${type}','${key}')">×</span></div>`;
+  }).join('');
+}
 
-    function saveBill() {
-        let prods = [], servs = [];
-        document.querySelectorAll("#prodArea .row-group").forEach(r => {
-            let n = r.querySelector(".p-name").value, p = Number(r.querySelector(".p-price").value), s = r.querySelector(".p-staff").value || "Direct Sale";
-            if(n && p) prods.push({n, p, s});
+/* =============================================================
+   AUTOCOMPLETE ENGINE (for billing rows)
+   ============================================================= */
+let _acActive=null; // currently open dropdown element
+
+function closeAllDropdowns(){
+  document.querySelectorAll('.ac-drop.open').forEach(d=>d.classList.remove('open'));
+  _acActive=null;
+}
+
+// Create a searchable autocomplete input wrapper
+// type: 'product' | 'service' | 'staff'
+// extraCls: extra CSS classes on the input
+// placeholder
+// onSelect(value, price): callback when item selected
+function makeAC(type, placeholder, extraCls, onSelect){
+  const wrap=document.createElement('div');
+  wrap.className='ac-wrap '+extraCls;
+  wrap.style.position='relative';
+
+  const inp=document.createElement('input');
+  inp.type='text'; inp.placeholder=placeholder; inp.className='ac-inp-'+type;
+
+  const drop=document.createElement('div');
+  drop.className='ac-drop';
+
+  wrap.appendChild(inp); wrap.appendChild(drop);
+
+  function getList(){
+    if(type==='product') return prodList.map(p=>({label:p.name+(p.price?` (₹${p.price})`:''),value:p.name,price:p.price,sub:'📦 Product'}));
+    if(type==='service') return servList.map(s=>({label:s,value:s,price:0,sub:'✂️ Service'}));
+    if(type==='staff')   return staffList.map(s=>({label:s,value:s,price:0,sub:'👤 Staff'}));
+    return [];
+  }
+
+  function renderDrop(q){
+    const list=getList();
+    const filtered=!q?list:list.filter(i=>i.label.toLowerCase().includes(q.toLowerCase()));
+    if(!filtered.length){
+      drop.innerHTML='<div class="ac-empty">No results</div>';
+    } else {
+      drop.innerHTML=filtered.map((item,i)=>
+        `<div class="ac-item" data-val="${item.value}" data-price="${item.price}" tabindex="-1">
+          ${item.label.replace(q?new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig'):/.^/,'<strong>$1</strong>')}
+          ${item.sub?`<span class="ac-sub">${item.sub}</span>`:''}
+        </div>`
+      ).join('');
+      drop.querySelectorAll('.ac-item').forEach(el=>{
+        el.addEventListener('mousedown',e=>{
+          e.preventDefault();
+          const v=el.getAttribute('data-val');
+          const p=Number(el.getAttribute('data-price'))||0;
+          inp.value=v;
+          drop.classList.remove('open');
+          _acActive=null;
+          onSelect(v,p);
         });
-        document.querySelectorAll("#servArea .row-group").forEach(r => {
-            let n = r.querySelector(".s-name").value, p = Number(r.querySelector(".s-price").value), s = r.querySelector(".s-staff").value;
-            if(n && p && s) servs.push({n, p, s});
-        });
-        if(!prods.length && !servs.length) return alert("Please enter items & select staff!");
-
-        bills.push({ 
-            id: "FLS-"+String(counter).padStart(4, "0"), 
-            cust: document.getElementById("custName").value || "Walk-in", 
-            phone: document.getElementById("custPhone").value || "", 
-            prods, servs, 
-            payMethod: document.getElementById("payMethod").value,
-            date: new Date().toDateString(),
-            archived: false
-        });
-        localStorage.setItem("fls_bills", JSON.stringify(bills));
-        localStorage.setItem("fls_counter", ++counter);
-        location.reload();
+      });
     }
+    drop.classList.add('open');
+    _acActive=drop;
+  }
 
-    // --- NEW: PRINT & WHATSAPP PNG FUNCTION ---
-    async function handleBillAction(idx, type) {
-        const b = bills[idx];
-        const prodT = b.prods.reduce((a,c)=>a+c.p, 0);
-        const servT = b.servs.reduce((a,c)=>a+c.p, 0);
-        const total = prodT + servT;
-
-        // Populate the print template
-        document.getElementById("rtInfo").innerHTML = `
-            <div><strong>Bill To:</strong> ${b.cust}<br><strong>Phone:</strong> ${b.phone || 'N/A'}</div>
-            <div style="text-align:right;"><strong>Bill:</strong> ${b.id}<br><strong>Date:</strong> ${b.date}</div>
-        `;
-        let rows = "";
-        b.prods.forEach(p => rows += `<tr><td>${p.n}</td><td>Product</td><td>₹${p.p}</td></tr>`);
-        b.servs.forEach(s => rows += `<tr><td>${s.n}</td><td>Service</td><td>₹${s.p}</td></tr>`);
-        document.getElementById("rtBody").innerHTML = rows;
-        document.getElementById("rtFooter").innerHTML = `<strong>Total: ₹${total}</strong><br><small>Payment: ${b.payMethod}</small>`;
-
-        if(type === 'print') {
-            window.print();
-        } else {
-            if(!b.phone) return alert("No phone number!");
-            const target = document.getElementById("printReceipt");
-            target.style.top = "0"; target.style.left = "0"; // Bring to view temporarily
-            
-            const canvas = await html2canvas(target);
-            const imgData = canvas.toDataURL("image/png");
-            
-            // Download the PNG for sharing
-            const link = document.createElement('a');
-            link.download = `Bill_${b.id}.png`;
-            link.href = imgData;
-            link.click();
-            
-            target.style.top = "-10000px"; // Hide again
-            
-            const msg = `*FLS SALON INVOICE*%0AHello ${b.cust}, your bill ${b.id} has been generated. Chobi-ti save korun.`;
-            window.open(`https://wa.me/${b.phone.includes('+91') ? b.phone : '+91'+b.phone}?text=${msg}`, '_blank');
-        }
+  inp.addEventListener('focus',()=>renderDrop(inp.value));
+  inp.addEventListener('input',()=>renderDrop(inp.value));
+  inp.addEventListener('blur',()=>setTimeout(()=>{ drop.classList.remove('open'); },200));
+  inp.addEventListener('keydown',e=>{
+    const items=drop.querySelectorAll('.ac-item');
+    const cur=drop.querySelector('.ac-item.focused');
+    if(e.key==='ArrowDown'){
+      e.preventDefault();
+      if(!drop.classList.contains('open')) renderDrop(inp.value);
+      const next=cur?cur.nextElementSibling:items[0];
+      if(cur) cur.classList.remove('focused');
+      if(next) next.classList.add('focused');
+    } else if(e.key==='ArrowUp'){
+      e.preventDefault();
+      const prev=cur?cur.previousElementSibling:null;
+      if(cur) cur.classList.remove('focused');
+      if(prev) prev.classList.add('focused');
+    } else if(e.key==='Enter'&&cur){
+      e.preventDefault();
+      const v=cur.getAttribute('data-val');
+      const p=Number(cur.getAttribute('data-price'))||0;
+      inp.value=v; drop.classList.remove('open');
+      onSelect(v,p);
+    } else if(e.key==='Escape'){
+      drop.classList.remove('open');
     }
+  });
 
-    function archiveStaffPerformance() {
-        let today = new Date().toDateString();
-        let staffPerf = {};
-        let activeBills = bills.filter(b => b.date === today && !b.archived);
-        if(activeBills.length === 0) return alert("No performance data!");
-        
-        activeBills.forEach(b => {
-            b.servs.concat(b.prods).forEach(item => {
-                let sName = item.s || "Direct Sale";
-                staffPerf[sName] = (staffPerf[sName] || 0) + item.p;
-            });
-        });
+  return {wrap, inp};
+}
 
-        staffHistory.push({ date: today, data: staffPerf });
-        localStorage.setItem("fls_staff_history", JSON.stringify(staffHistory));
-        bills.forEach(b => { if(b.date === today) b.archived = true; });
-        localStorage.setItem("fls_bills", JSON.stringify(bills));
-        alert("Report archived.");
+/* =============================================================
+   ADD BILLING ROWS
+   ============================================================= */
+function addRow(area){
+  const div=document.createElement('div');
+  div.className='row-group';
+
+  if(area==='prodArea'){
+    // Product AC
+    const {wrap:pw, inp:pi}=makeAC('product','📦 Product name...','',
+      (v,p)=>{ pi.value=v; const priceInp=div.querySelector('.p-price'); if(p>0)priceInp.value=p; calcPreview(); });
+    pw.style.flex='1.5'; pi.className+=' p-name';
+
+    // Price input
+    const priceInp=document.createElement('input');
+    priceInp.type='number'; priceInp.placeholder='₹ Price'; priceInp.className='p-price';
+    priceInp.style.flex='.7'; priceInp.style.minWidth='62px'; priceInp.style.margin='0';
+    priceInp.addEventListener('input',calcPreview);
+
+    // Staff AC
+    const {wrap:sw, inp:si}=makeAC('staff','👤 Staff...','',
+      (v)=>{ si.value=v; });
+    sw.style.flex='1'; si.className+=' p-staff';
+
+    const delBtn=document.createElement('button');
+    delBtn.className='abt abt-d'; delBtn.textContent='❌';
+    delBtn.onclick=()=>{ div.remove(); calcPreview(); };
+
+    div.appendChild(pw); div.appendChild(priceInp); div.appendChild(sw); div.appendChild(delBtn);
+
+  } else {
+    // Service AC
+    const {wrap:svw, inp:svi}=makeAC('service','✂️ Service name...','',
+      (v)=>{ svi.value=v; });
+    svw.style.flex='1.5'; svi.className+=' s-name';
+
+    // Price input
+    const priceInp=document.createElement('input');
+    priceInp.type='number'; priceInp.placeholder='₹ Price'; priceInp.className='s-price';
+    priceInp.style.flex='.7'; priceInp.style.minWidth='62px'; priceInp.style.margin='0';
+    priceInp.addEventListener('input',calcPreview);
+
+    // Staff AC
+    const {wrap:stw, inp:sti}=makeAC('staff','👤 Staff...','',
+      (v)=>{ sti.value=v; });
+    stw.style.flex='1'; sti.className+=' s-staff';
+
+    const delBtn=document.createElement('button');
+    delBtn.className='abt abt-d'; delBtn.textContent='❌';
+    delBtn.onclick=()=>{ div.remove(); calcPreview(); };
+
+    div.appendChild(svw); div.appendChild(priceInp); div.appendChild(stw); div.appendChild(delBtn);
+  }
+
+  document.getElementById(area).appendChild(div);
+}
+
+function refreshDropdowns(){
+  // dropdowns are now autocomplete — no refresh needed
+  // just update datalists if we add any
+}
+
+function calcPreview(){
+  let p=0,s=0;
+  document.querySelectorAll("#prodArea .p-price").forEach(i=>p+=Number(i.value||0));
+  document.querySelectorAll("#servArea .s-price").forEach(i=>s+=Number(i.value||0));
+  const prev=document.getElementById("billPreview"); if(!prev)return;
+  if(p+s>0){
+    prev.style.display="block";
+    document.getElementById("prevProd").textContent="₹"+p;
+    document.getElementById("prevServ").textContent="₹"+s;
+    document.getElementById("prevTotal").textContent="₹"+(p+s);
+  } else prev.style.display="none";
+}
+
+/* =============================================================
+   SAVE BILL
+   ============================================================= */
+function saveBill(){
+  const prods=[], servs=[];
+  document.querySelectorAll("#prodArea .row-group").forEach(r=>{
+    const n=(r.querySelector(".p-name")?.value||"").trim();
+    const p=Number(r.querySelector(".p-price")?.value||0);
+    const s=(r.querySelector(".p-staff")?.value||"").trim()||"Direct Sale";
+    if(n&&p) prods.push({n,p,s});
+  });
+  document.querySelectorAll("#servArea .row-group").forEach(r=>{
+    const n=(r.querySelector(".s-name")?.value||"").trim();
+    const p=Number(r.querySelector(".s-price")?.value||0);
+    const s=(r.querySelector(".s-staff")?.value||"").trim();
+    if(n&&p&&s) servs.push({n,p,s});
+  });
+  if(!prods.length&&!servs.length) return toast("❌ কোনো item নেই!");
+  bills.push({
+    id:"FLS-"+String(counter).padStart(4,"0"),
+    cust:document.getElementById("custName").value.trim()||"Walk-in",
+    phone:document.getElementById("custPhone").value.trim()||"",
+    prods, servs,
+    payMethod:document.getElementById("payMethod").value,
+    date:new Date().toDateString(), ts:new Date().toISOString(), archived:false
+  });
+  LS.set("fls_bills",bills);
+  localStorage.setItem("fls_counter",++counter);
+  document.getElementById("custName").value="";
+  document.getElementById("custPhone").value="";
+  document.getElementById("payMethod").value="Cash";
+  document.getElementById("prodArea").innerHTML="";
+  document.getElementById("servArea").innerHTML="";
+  document.getElementById("billPreview").style.display="none";
+  addRow('prodArea'); addRow('servArea');
+  toast("✅ Bill FLS-"+String(counter-1).padStart(4,"0")+" saved!"); renderAll();
+}
+
+/* =============================================================
+   BUILD PROFESSIONAL PDF (products only shown to customer)
+   ============================================================= */
+function buildInvoicePDF(b){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a5',orientation:'portrait'});
+  const W=148, H=210;
+  const pT=b.prods.reduce((a,c)=>a+c.p,0);
+  const hasServs=b.servs&&b.servs.length>0;
+
+  // Header bg
+  doc.setFillColor(13,27,42); doc.rect(0,0,W,38,'F');
+  // Gold bar
+  doc.setFillColor(255,170,0); doc.rect(0,38,W,2.5,'F');
+  // Salon name
+  doc.setFont('helvetica','bold'); doc.setFontSize(21); doc.setTextColor(0,212,255);
+  doc.text('Fancy Looks Salon',W/2,13,{align:'center'});
+  // Tagline
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(180,200,220);
+  doc.text('Premium Hair & Beauty Care',W/2,20,{align:'center'});
+  doc.text('+91 79802 83920',W/2,25,{align:'center'});
+  // INVOICE badge
+  doc.setFillColor(0,212,255); doc.roundedRect(W/2-18,29,36,7,2,2,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(13,27,42);
+  doc.text('INVOICE',W/2,34,{align:'center'});
+
+  // Customer box
+  let y=48;
+  doc.setFillColor(244,248,252); doc.roundedRect(8,y-4,W-16,24,2,2,'F');
+  doc.setDrawColor(210,225,240); doc.roundedRect(8,y-4,W-16,24,2,2,'S');
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(13,27,42);
+  doc.text('Bill To:',11,y+2);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(30,50,70);
+  doc.text(b.cust.substring(0,25),32,y+2);
+  doc.setFontSize(8); doc.setTextColor(80,100,120);
+  doc.text('Phone: '+(b.phone||'N/A'),11,y+8);
+  // Bill info right side
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(13,27,42);
+  doc.text('Bill No:',W-52,y+2); doc.text('Date:',W-52,y+8);
+  doc.setFont('helvetica','normal'); doc.setTextColor(0,100,180);
+  doc.text(b.id,W-28,y+2);
+  doc.setTextColor(30,50,70);
+  doc.text(b.date,W-28,y+8);
+  // payment badge
+  const pc=b.payMethod==='Cash'?[0,148,98]:b.payMethod==='Online'?[25,75,200]:[195,50,50];
+  doc.setFillColor(...pc); doc.roundedRect(11,y+13,32,6,1.5,1.5,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(255,255,255);
+  doc.text('Payment: '+b.payMethod,12.5,y+17.2);
+
+  // Items table
+  y=80;
+  doc.setFillColor(13,27,42); doc.rect(8,y,W-16,7,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(255,255,255);
+  doc.text('#',11,y+5); doc.text('Item',19,y+5); doc.text('Type',92,y+5); doc.text('Price',126,y+5);
+  y+=7;
+
+  const allItems=[
+    ...b.prods.map(p=>({name:p.n,type:'Product',price:'Rs.'+p.p,isServ:false})),
+    ...(hasServs?b.servs.map(s=>({name:s.n,type:'Service',price:'Complimentary',isServ:true})):[])
+  ];
+
+  allItems.forEach((item,i)=>{
+    const rh=8;
+    doc.setFillColor(i%2===0?248:255, i%2===0?252:255, 255);
+    doc.rect(8,y,W-16,rh,'F');
+    doc.setDrawColor(225,235,245); doc.rect(8,y,W-16,rh,'S');
+    doc.setFont('helvetica','normal'); doc.setFontSize(8);
+    doc.setTextColor(110,130,150); doc.text(String(i+1),11,y+5.5);
+    doc.setTextColor(20,40,60);
+    const nm=item.name.length>22?item.name.substring(0,22)+'…':item.name;
+    doc.text(nm,19,y+5.5);
+    if(item.type==='Product'){doc.setTextColor(22,101,52);}else{doc.setTextColor(133,77,14);}
+    doc.text(item.type,92,y+5.5);
+    if(item.isServ){doc.setTextColor(160,160,160); doc.setFont('helvetica','italic');}
+    else{doc.setFont('helvetica','bold'); doc.setTextColor(0,120,80);}
+    doc.text(item.price,126,y+5.5);
+    y+=rh;
+  });
+
+  // Divider
+  doc.setDrawColor(0,212,255); doc.setLineWidth(0.7);
+  doc.line(8,y+3,W-8,y+3); y+=8;
+
+  // Total box
+  doc.setFillColor(13,27,42); doc.roundedRect(W-62,y,54,15,2,2,'F');
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(0,212,255);
+  doc.text('TOTAL AMOUNT',W-58,y+6);
+  doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.setTextColor(255,170,0);
+  doc.text('Rs.'+pT,W-58,y+13);
+
+  // Footer
+  const fy=H-20;
+  doc.setFillColor(13,27,42); doc.rect(0,fy,W,20,'F');
+  doc.setFillColor(255,170,0); doc.rect(0,fy,W,1.2,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(0,212,255);
+  doc.text('Thank you for visiting Fancy Looks Salon!',W/2,fy+8,{align:'center'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(160,180,200);
+  doc.text('We hope to see you again soon  ✂',W/2,fy+13,{align:'center'});
+  doc.setTextColor(90,110,140);
+  doc.text('Powered by Fancy Looks Salon POS',W/2,fy+18,{align:'center'});
+
+  return doc;
+}
+
+/* =============================================================
+   PRINT / WHATSAPP
+   ============================================================= */
+async function handleBillAction(idx,type){
+  const b=bills[idx]; if(!b) return toast("❌ Bill not found");
+  const pT=b.prods.reduce((a,c)=>a+c.p,0);
+  const hasServs=b.servs&&b.servs.length>0;
+
+  // Populate HTML receipt (for print)
+  document.getElementById("rtInfo").innerHTML=
+    `<div><strong>Bill To:</strong> ${b.cust}<br><strong>Phone:</strong> ${b.phone||'N/A'}</div>
+     <div style="text-align:right;"><strong>Bill:</strong> ${b.id}<br><strong>Date:</strong> ${b.date}</div>`;
+  let rows="";
+  b.prods.forEach(p=>rows+=`<tr><td>${p.n}</td><td>Product</td><td>Rs.${p.p}</td></tr>`);
+  if(hasServs) b.servs.forEach(s=>rows+=`<tr><td>${s.n}</td><td>Service</td><td>—</td></tr>`);
+  document.getElementById("rtBody").innerHTML=rows;
+  document.getElementById("rtHead").innerHTML=`<th>Item</th><th>Type</th><th>Price</th>`;
+  document.getElementById("rtFooter").innerHTML=
+    `<div style="font-size:16px;"><strong>TOTAL: Rs.${pT}</strong></div><small>Payment: ${b.payMethod}</small>`;
+
+  if(type==='print'){ window.print(); return; }
+
+  /* ── WHATSAPP PDF FLOW ── */
+  if(!b.phone) return toast("❌ Phone নম্বর নেই!");
+  if(!window.jspdf) return toast("❌ PDF library লোড হয়নি, refresh করুন");
+
+  toast("📄 PDF তৈরি হচ্ছে...", 4000);
+
+  const doc=buildInvoicePDF(b);
+  const pdfBlob=doc.output('blob');
+  const fname=`FancyLooks_Invoice_${b.id}.pdf`;
+
+  // Normalise phone number
+  const ph=b.phone.replace(/\D/g,'');
+  const full=ph.startsWith('91')?ph:'91'+ph;
+
+  /* ── PATH 1: Mobile Web Share API → PDF directly into WhatsApp ── */
+  const pdfFile=new File([pdfBlob],fname,{type:'application/pdf'});
+  if(navigator.canShare && navigator.canShare({files:[pdfFile]})){
+    try{
+      await navigator.share({
+        files:[pdfFile],
+        title:`Fancy Looks Salon — Invoice ${b.id}`,
+        text:`হ্যালো ${b.cust}! আপনার bill (${b.id}) এর invoice attached আছে। ধন্যবাদ! 🙏`
+      });
+      toast("✅ Share করুন — WhatsApp বেছে নিন");
+      return;
+    } catch(e){
+      if(e.name!=='AbortError') console.warn('Share failed:',e);
     }
+  }
 
-    function saveFinance() {
-        finance.push({n: document.getElementById("expName").value, a: Number(document.getElementById("expAmt").value), t: document.getElementById("expType").value, date: new Date().toDateString()});
-        localStorage.setItem("fls_finance", JSON.stringify(finance)); updateUI();
+  /* ── PATH 2: Desktop — download PDF + open exact customer WhatsApp chat ── */
+  // Download PDF first
+  const url=URL.createObjectURL(pdfBlob);
+  const a=document.createElement('a'); a.href=url; a.download=fname; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 3000);
+
+  // Open the customer's WhatsApp chat directly (wa.me opens their specific number)
+  // On desktop this opens WhatsApp Web/Desktop to that contact
+  // On mobile if Share API not available, opens WhatsApp app to that contact
+  setTimeout(()=>{
+    // Open customer's WhatsApp directly — no message text, just opens the chat
+    // so user can immediately attach the downloaded PDF
+    window.open('https://wa.me/'+full,'_blank');
+    toast("📎 WhatsApp খুলছে — Downloaded PDF টি attach করুন");
+  }, 800);
+}
+
+/* =============================================================
+   SMART STAFF PERFORMANCE
+   Rule: service bill → count services; product-only bill → count products
+   ============================================================= */
+function calcStaffPerf(billsArr){
+  const perf={};
+  billsArr.forEach(b=>{
+    const hasServ=b.servs&&b.servs.length>0;
+    const hasProd=b.prods&&b.prods.length>0;
+    if(hasServ){
+      b.servs.forEach(item=>{
+        const sn=item.s||"Unassigned";
+        if(!perf[sn]) perf[sn]={total:0,actions:[]};
+        perf[sn].total+=item.p; perf[sn].actions.push(`✂️ ${item.n} (₹${item.p})`);
+      });
+    } else if(hasProd){
+      b.prods.forEach(item=>{
+        const sn=item.s||"Direct Sale";
+        if(!perf[sn]) perf[sn]={total:0,actions:[]};
+        perf[sn].total+=item.p; perf[sn].actions.push(`📦 ${item.n} (₹${item.p})`);
+      });
     }
+  });
+  return perf;
+}
 
-    function saveOnline() {
-        online.push({n: document.getElementById("onCust").value, a: Number(document.getElementById("onAmt").value), date: new Date().toDateString()});
-        localStorage.setItem("fls_online", JSON.stringify(online)); updateUI();
-    }
+function archivePerf(){
+  const today=new Date().toDateString();
+  const active=bills.filter(b=>b.date===today&&!b.archived);
+  if(!active.length) return toast("⚠️ Archive করার data নেই!");
+  const perf=calcStaffPerf(active);
+  const perfData={};
+  Object.entries(perf).forEach(([n,d])=>perfData[n]=d.total);
+  staffHist.push({date:today,data:perfData});
+  LS.set("fls_staff_history",staffHist);
+  bills.forEach(b=>{ if(b.date===today) b.archived=true; });
+  LS.set("fls_bills",bills);
+  toast("✅ Archived!"); renderAll();
+}
 
-    function updateUI() {
-        document.getElementById("billNoDisplay").innerText = "FLS-" + String(counter).padStart(4, "0");
-        let today = new Date().toDateString();
-        renderListTags();
+/* =============================================================
+   FINANCE / ONLINE
+   ============================================================= */
+function saveFinance(){
+  const n=document.getElementById("expName").value.trim();
+  const a=Number(document.getElementById("expAmt").value);
+  if(!n||!a) return toast("❌ সব field পূরণ করুন!");
+  fin.push({n,a,t:document.getElementById("expType").value,date:new Date().toDateString(),ts:new Date().toISOString()});
+  LS.set("fls_finance",fin);
+  document.getElementById("expName").value=""; document.getElementById("expAmt").value="";
+  toast("✅ Saved!"); renderAll();
+}
+function saveOnline(){
+  const n=document.getElementById("onCust").value.trim();
+  const a=Number(document.getElementById("onAmt").value);
+  if(!n||!a) return toast("❌ সব field পূরণ করুন!");
+  onl.push({n,a,date:new Date().toDateString(),ts:new Date().toISOString()});
+  LS.set("fls_online",onl);
+  document.getElementById("onCust").value=""; document.getElementById("onAmt").value="";
+  toast("✅ Online payment saved!"); renderAll();
+}
 
-        let tp = 0, ton = 0, tadv = 0, texp = 0;
-        bills.filter(b => b.date === today).forEach(b => b.prods.forEach(p => tp += p.p));
-        online.filter(o => o.date === today).forEach(o => ton += o.a);
-        finance.filter(f => f.date === today).forEach(f => {
-            if(f.t === 'advance') tadv += f.a; else texp += f.a;
-        });
-        document.getElementById("finalBalanceDisplay").innerText = "₹" + ((tp + ton) - tadv - texp);
-        document.getElementById("calcProd").innerText = "₹" + tp;
-        document.getElementById("calcOnline").innerText = "₹" + ton;
-        document.getElementById("calcAdv").innerText = "- ₹" + tadv;
-        document.getElementById("calcExp").innerText = "- ₹" + texp;
+/* =============================================================
+   FILTERS
+   ============================================================= */
+function clearFilters(){
+  ['searchFilter','payFilter','dateFilter'].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  renderBillTable();
+}
+function getFilteredBills(){
+  const s=(document.getElementById("searchFilter")?.value||"").toLowerCase().trim();
+  const pf=document.getElementById("payFilter")?.value||"";
+  const df=document.getElementById("dateFilter")?.value||"";
+  return bills.filter(b=>{
+    const ms=!s||b.cust.toLowerCase().includes(s)||b.id.toLowerCase().includes(s)||(b.phone&&b.phone.includes(s));
+    const mp=!pf||b.payMethod.includes(pf);
+    const md=!df||new Date(b.date).toLocaleDateString('en-CA')===df;
+    return ms&&mp&&md;
+  });
+}
 
-        let bTable = document.getElementById("billList");
-        bTable.innerHTML = "";
-        bills.slice().reverse().forEach((b, i) => {
-            let idx = bills.length - 1 - i;
-            let pDetail = b.prods.map(p => `<span class="badge-prod-info">${p.n} (₹${p.p}) [${p.s}]</span>`).join("");
-            let sDetail = b.servs.map(s => `<span class="badge-serv">${s.n} (₹${s.p}) [${s.s}]</span>`).join("");
-            let pTot = b.prods.reduce((a,c)=>a+c.p, 0);
-            let fTot = pTot + b.servs.reduce((a,c)=>a+c.p, 0);
-            
-            bTable.innerHTML += `<tr>
-                <td>${b.date}</td><td>${b.id}</td><td>${b.cust}<br>${b.phone}</td>
-                <td>${pDetail}${sDetail}</td><td>₹${pTot}</td><td>₹${fTot}</td>
-                <td><span class="badge-pay">${b.payMethod}</span></td>
-                <td>
-                    <button class="btn-print" onclick="handleBillAction(${idx}, 'print')">🖨️</button>
-                    <button class="btn-wa" onclick="handleBillAction(${idx}, 'wa')">📱</button>
-                    <button class="btn-del" onclick="initAction('DELETE_BILL', ${idx})">🗑️</button>
-                </td>
-            </tr>`;
-        });
+/* =============================================================
+   TODAY CALCULATIONS
+   ============================================================= */
+function calcToday(){
+  const today=new Date().toDateString();
+  const tb=bills.filter(b=>b.date===today);
+  let tp=0,ts=0,cashT=0,onT=0,dueT=0;
+  tb.forEach(b=>{
+    b.prods.forEach(p=>{ tp+=p.p; if(b.payMethod==="Cash")cashT+=p.p; if(b.payMethod==="Online")onT+=p.p; if(b.payMethod==="Due")dueT+=p.p; });
+    b.servs.forEach(s=>ts+=s.p);
+  });
+  let ton=0; onl.filter(o=>o.date===today).forEach(o=>ton+=o.a);
+  let tadv=0,texp=0; fin.filter(f=>f.date===today).forEach(f=>{ if(f.t==='advance')tadv+=f.a; else texp+=f.a; });
+  return {today,tb,tp,ts,cashT,onT,dueT,ton,tadv,texp,bal:(tp+ton)-tadv-texp};
+}
 
-        // Staff performance and history...
-        let staffPerf = {};
-        bills.filter(b => b.date === today && !b.archived).forEach(b => {
-            b.servs.concat(b.prods).forEach(item => {
-                let sName = item.s || "Direct Sale";
-                if(!staffPerf[sName]) staffPerf[sName] = { total: 0, actions: [] };
-                staffPerf[sName].total += item.p;
-                staffPerf[sName].actions.push(`${item.n} (₹${item.p})`);
-            });
-        });
-        let sHtml = "";
-        for(let s in staffPerf) {
-            sHtml += `<div class="staff-block"><div class="staff-header"><span>${s}</span><span>₹${staffPerf[s].total}</span></div><div style="font-size:11px;">${staffPerf[s].actions.join(", ")}</div></div>`;
-        }
-        document.getElementById("staffDetailedList").innerHTML = sHtml || "No active records.";
+/* =============================================================
+   AI BRAIN
+   ============================================================= */
+function getCtx(){
+  const c=calcToday();
+  const rawPerf=calcStaffPerf(c.tb.filter(b=>!b.archived));
+  const staffPerf={};
+  Object.entries(rawPerf).forEach(([n,d])=>{staffPerf[n]={total:d.total,items:d.actions};});
+  const dueBills=bills.filter(b=>b.payMethod==="Due"&&!b.duePaidDate);
+  return {...c,staffPerf,staffList,servList,prodList,
+    dueBillsCount:dueBills.length,
+    totalDue:dueBills.reduce((a,b)=>a+b.prods.reduce((x,y)=>x+y.p,0),0),
+    totalBills:bills.length,recentBills:bills.slice(-5),staffHist};
+}
 
-        let hHtml = "";
-        staffHistory.slice().reverse().forEach((h, i) => {
-            let idx = staffHistory.length - 1 - i;
-            let summ = ""; for(let s in h.data) { summ += `<li>${s}: ₹${h.data[s]}</li>`; }
-            hHtml += `<div class="history-item"><strong>Date: ${h.date}</strong><button class="btn-del" style="float:right; width:30px;" onclick="initAction('DELETE_STAFF_HIST', ${idx})">🗑️</button><ul style="font-size:13px;">${summ}</ul></div>`;
-        });
-        document.getElementById("staffHistoryList").innerHTML = hHtml || "No archived records.";
-    }
+const PATS=[
+  {t:q=>/আজ.*(বিক্রি|sale|total|মোট)|today.*(sale|total|earn)/.test(q),
+   r:c=>`📊 **আজকের Summary (${c.today})**\n\n📦 Product: ₹${c.tp}\n✂️ Service: ₹${c.ts}\n💰 Grand Total: ₹${c.tp+c.ts}\n🧾 মোট Bills: ${c.tb.length}টি`},
+  {t:q=>/balance|জমা|নেট/.test(q),
+   r:c=>`💰 **আজকের Balance**\n\n📦 Products: ₹${c.tp}\n📲 Online Manual: ₹${c.ton}\n💵 Advance: -₹${c.tadv}\n💸 Expense: -₹${c.texp}\n\n🏆 **Final: ₹${c.bal}**`},
+  {t:q=>/কয়টা|কতটা|bill.*(কত|count)|how many.*bill/.test(q),
+   r:c=>`🧾 **Bills**\n\nআজকে: **${c.tb.length}টি**\nসর্বমোট: **${c.totalBills}টি**`},
+  {t:q=>/staff.*perf|কে.*বেশি|বেশি.*কামা|performance/.test(q),
+   r:c=>{ const srt=Object.entries(c.staffPerf).sort((a,b)=>b[1].total-a[1].total); if(!srt.length)return "আজকে কোনো performance data নেই।"; let out="👥 **Staff Performance:**\n\n"; srt.forEach(([n,d],i)=>out+=`${i===0?'🏆':i===1?'🥈':'👤'} ${n}: **₹${d.total}**\n   ${d.items.join(' | ')}\n`); return out; }},
+  {t:q=>/best|top|সেরা|সবচেয়ে.*বেশি/.test(q),
+   r:c=>{ const srt=Object.entries(c.staffPerf).sort((a,b)=>b[1].total-a[1].total); if(!srt.length)return "আজকে data নেই।"; return `🏆 **সেরা Staff:**\n\n👑 ${srt[0][0]}: **₹${srt[0][1].total}**\nItems: ${srt[0][1].items.join(', ')}`; }},
+  {t:q=>/due|বাকি|পাওনা|ধার/.test(q),
+   r:c=>`⚠️ **Due Status**\n\nDue Bills: ${c.dueBillsCount}টি\nTotal Due: **₹${c.totalDue}**${c.totalDue===0?'\n\n✅ কোনো due নেই!':''}`},
+  {t:q=>/cash|নগদ/.test(q),
+   r:c=>`💵 **Cash (আজ)**\n\nCash Bills: ₹${c.cashT}\nOnline Bills: ₹${c.onT}\nDue Bills: ₹${c.dueT}\nManual Online: ₹${c.ton}`},
+  {t:q=>/product.*list|প্রোডাক্ট|কোন.*product/.test(q),
+   r:c=>c.prodList.length?"📦 **Products:**\n\n"+c.prodList.map(p=>`• ${p.name}${p.price?' (₹'+p.price+')':''}`).join('\n'):"📦 কোনো product নেই।"},
+  {t:q=>/service.*list|কোন.*service/.test(q),
+   r:c=>c.servList.length?"✂️ **Services:**\n\n"+c.servList.map(s=>`• ${s}`).join('\n'):"✂️ কোনো service নেই।"},
+  {t:q=>/staff.*list|কারা আছে|staff.*কে/.test(q),
+   r:c=>c.staffList.length?"👥 **Staff:**\n\n"+c.staffList.map(s=>`• ${s}`).join('\n'):"👥 কোনো staff নেই।"},
+  {t:q=>/recent|latest|সর্বশেষ|শেষ.*bill/.test(q),
+   r:c=>{ if(!c.recentBills.length)return "কোনো bill নেই।"; let out="📋 **সর্বশেষ Bills:**\n\n"; c.recentBills.slice().reverse().forEach(b=>{ const t=b.prods.reduce((a,x)=>a+x.p,0)+b.servs.reduce((a,x)=>a+x.p,0); out+=`🧾 ${b.id} — ${b.cust} — ₹${t} — ${b.payMethod}\n`; }); return out; }},
+  {t:q=>/expense|খরচ|advance/.test(q),
+   r:c=>`💸 **Finance (আজ)**\n\nAdvance: ₹${c.tadv}\nExpense: ₹${c.texp}\nTotal: ₹${c.tadv+c.texp}`},
+  {t:q=>/history|archive|পুরনো/.test(q),
+   r:c=>{ if(!c.staffHist.length)return "কোনো history নেই।"; let out="📜 **Staff History:**\n\n"; c.staffHist.slice(-3).reverse().forEach(h=>{ const tot=Object.values(h.data).reduce((a,b)=>a+b,0); out+=`📅 ${h.date} — ₹${tot}\n`; Object.entries(h.data).sort((a,b)=>b[1]-a[1]).forEach(([n,v])=>out+=`  👤 ${n}: ₹${v}\n`); out+='\n'; }); return out; }},
+  {t:q=>/help|সাহায্য|কী করতে/.test(q),
+   r:()=>"🤖 **কী জিজ্ঞেস করতে পারেন:**\n\n• আজকের বিক্রি কত?\n• Balance কত?\n• সেরা staff কে?\n• Due কত?\n• Bill count\n• Product / Service list\n• সর্বশেষ bills\n• Expense কত?\n• Staff history"},
+];
 
-    window.onload = () => { updateUI(); addRow('prodArea'); addRow('servArea'); };
+function aiReply(q){
+  const ql=q.toLowerCase();
+  const c=getCtx();
+  for(const p of PATS) if(p.t(ql)) return p.r(c);
+  return `🤔 বুঝতে পারিনি। "help" টাইপ করুন বা chip গুলো press করুন।`;
+}
+
+const CHIPS=["আজকের বিক্রি কত?","Balance কত?","সেরা staff কে?","Due কত আছে?","Bill count আজ","Staff list","Product list","সর্বশেষ bills","Expense কত?","Staff history"];
+
+function renderAIChips(){
+  const el=document.getElementById("aiChips"); if(!el)return;
+  el.innerHTML=CHIPS.map(q=>`<div class="ai-chip" onclick="chipAsk(this.textContent)">${q}</div>`).join('');
+}
+function chipAsk(q){ document.getElementById("aiInput").value=q; sendAI(); }
+
+function sendAI(){
+  const inp=document.getElementById("aiInput"), q=inp.value.trim(); if(!q)return;
+  const chat=document.getElementById("chatMessages");
+  chat.innerHTML+=`<div class="bubble bubble-u">${q}</div>`;
+  inp.value=""; chat.scrollTop=chat.scrollHeight;
+  const lid="ld_"+Date.now();
+  chat.innerHTML+=`<div class="bubble bubble-a" id="${lid}"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  chat.scrollTop=chat.scrollHeight;
+  setTimeout(()=>{
+    const ldEl=document.getElementById(lid); if(ldEl)ldEl.remove();
+    const reply=aiReply(q).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+    chat.innerHTML+=`<div class="bubble bubble-a">${reply}</div>`;
+    chat.scrollTop=chat.scrollHeight;
+  }, 550+Math.random()*350);
+}
+
+/* =============================================================
+   RENDER FUNCTIONS
+   ============================================================= */
+function renderStats(){
+  const el=document.getElementById("quickStats"); if(!el)return;
+  const c=calcToday();
+  el.innerHTML=[
+    {icon:"🧾",val:c.tb.length,lbl:"Bills Today"},
+    {icon:"📦",val:"₹"+c.tp,lbl:"Product Sales"},
+    {icon:"✂️",val:"₹"+c.ts,lbl:"Service Sales"},
+    {icon:"💰",val:"₹"+c.bal,lbl:"Balance"},
+  ].map(s=>`<div class="stat-box"><div class="stat-icon">${s.icon}</div><div class="stat-val">${s.val}</div><div class="stat-lbl">${s.lbl}</div></div>`).join('');
+}
+
+function renderBillTable(){
+  const el=document.getElementById("billList"); if(!el)return;
+  const fb=getFilteredBills().slice().reverse();
+  if(!fb.length){ el.innerHTML=`<tr><td colspan="8"><div class="empty-state">🔍 কোনো bill পাওয়া যায়নি</div></td></tr>`; return; }
+  el.innerHTML=fb.map(b=>{
+    const idx=bills.indexOf(b);
+    const pD=b.prods.map(p=>`<span class="badge b-prod">📦${p.n} ₹${p.p}[${p.s}]</span>`).join('');
+    const sD=b.servs.map(s=>`<span class="badge b-serv">✂️${s.n} ₹${s.p}[${s.s}]</span>`).join('');
+    const pT=b.prods.reduce((a,c)=>a+c.p,0);
+    const fT=pT+b.servs.reduce((a,c)=>a+c.p,0);
+    const pc=b.payMethod==="Cash"?"b-cash":b.payMethod==="Online"?"b-online":"b-due";
+    const pi=b.payMethod==="Cash"?"💵":b.payMethod==="Online"?"📱":"⚠️";
+    return `<tr>
+      <td style="font-size:11px;white-space:nowrap;">${b.date}</td>
+      <td><strong style="font-family:'JetBrains Mono',monospace;">${b.id}</strong></td>
+      <td><strong>${b.cust}</strong><br><span style="font-size:11px;color:var(--txt2);">${b.phone||'—'}</span></td>
+      <td>${pD}${sD}</td>
+      <td><strong>₹${pT}</strong></td>
+      <td><strong style="color:var(--ok);">₹${fT}</strong></td>
+      <td><span class="badge ${pc}">${pi} ${b.payMethod}</span></td>
+      <td style="white-space:nowrap;">
+        <button class="abt abt-p" title="Print"    onclick="handleBillAction(${idx},'print')">🖨️</button>
+        <button class="abt abt-w" title="WhatsApp" onclick="handleBillAction(${idx},'wa')">📱</button>
+        <button class="abt abt-d" title="Delete"   onclick="initAction('DELETE_BILL',${idx})">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderBalance(){
+  const c=calcToday();
+  const set=(id,v)=>{ const e=document.getElementById(id); if(e)e.textContent=v; };
+  set("finalBalanceDisplay","₹"+c.bal);
+  set("calcProd","₹"+c.tp); set("calcOnlineBills","₹"+c.onT);
+  set("calcOnline","₹"+c.ton); set("calcAdv","- ₹"+c.tadv);
+  set("calcExp","- ₹"+c.texp); set("calcFinal","₹"+c.bal);
+  const pbEl=document.getElementById("payBreakdown");
+  if(pbEl) pbEl.innerHTML=`
+    <div class="pay-box pay-cash"><div class="pb-val">₹${c.cashT}</div><div class="pb-lbl">💵 Cash</div></div>
+    <div class="pay-box pay-online"><div class="pb-val">₹${c.onT+c.ton}</div><div class="pb-lbl">📱 Online</div></div>
+    <div class="pay-box pay-due"><div class="pb-val">₹${c.dueT}</div><div class="pb-lbl">⚠️ Due</div></div>`;
+  const dsEl=document.getElementById("dateSummary");
+  if(dsEl){
+    const dm={};
+    bills.forEach(b=>{ if(!dm[b.date])dm[b.date]={bills:0,prod:0,serv:0}; dm[b.date].bills++;
+      b.prods.forEach(p=>dm[b.date].prod+=p.p); b.servs.forEach(s=>dm[b.date].serv+=s.p); });
+    const srt=Object.entries(dm).sort((a,b)=>new Date(b[0])-new Date(a[0]));
+    dsEl.innerHTML=srt.length?`<div class="tbl-wrap"><table style="min-width:440px;">
+      <thead><tr><th>Date</th><th>Bills</th><th>Products ₹</th><th>Services ₹</th><th>Total ₹</th><th>Del</th></tr></thead>
+      <tbody>${srt.map(([d,v])=>`<tr>
+        <td style="font-size:11px;white-space:nowrap;">${d}</td>
+        <td><strong>${v.bills}</strong></td>
+        <td style="color:var(--ok);">₹${v.prod}</td>
+        <td style="color:var(--wrn);">₹${v.serv}</td>
+        <td><strong>₹${v.prod+v.serv}</strong></td>
+        <td><button class="abt abt-d" onclick="initAction('DELETE_DATE_SUMMARY','${d}')" title="Delete">🗑️</button></td>
+      </tr>`).join('')}</tbody></table></div>`
+    :'<div class="empty-state">কোনো data নেই</div>';
+  }
+}
+
+function renderDues(){
+  const set=(id,v)=>{ const e=document.getElementById(id); if(e)e.textContent=v; };
+  const dEl=document.getElementById("dueList");
+  if(dEl){
+    const db=bills.filter(b=>b.payMethod==="Due"&&!b.duePaidDate);
+    const td=db.reduce((a,b)=>a+b.prods.reduce((x,y)=>x+y.p,0),0);
+    set("totalDueAmt","₹"+td);
+    dEl.innerHTML=db.length?db.map(b=>{
+      const idx=bills.indexOf(b);
+      const amt=b.prods.reduce((a,c)=>a+c.p,0);
+      return `<div class="due-item">
+        <div>
+          <strong>${b.cust}</strong> — <span style="font-family:'JetBrains Mono',monospace;">${b.id}</span><br>
+          <span style="font-size:11px;color:var(--txt2);">📅 ${b.date} | 📱 ${b.phone||'N/A'}</span>
+          <div class="pill-row">${b.prods.map(p=>`<span class="pill">📦${p.n} ₹${p.p}</span>`).join('')}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+          <div class="due-amount">₹${amt}</div>
+          <button class="btn btn-save btn-sm" onclick="initAction('MARK_DUE_PAID',${idx})">✅ Mark Paid</button>
+        </div>
+      </div>`;
+    }).join(''):'<div class="empty-state">✅ কোনো pending due নেই!</div>';
+  }
+  const cdEl=document.getElementById("clearedDueList");
+  if(cdEl){
+    const cd=bills.filter(b=>b.duePaidDate);
+    cdEl.innerHTML=cd.length?cd.slice().reverse().map(b=>{
+      const amt=b.prods.reduce((a,c)=>a+c.p,0);
+      return `<div class="history-item">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div><strong>${b.cust}</strong> <span class="badge b-cash">✅ Paid</span><br>
+            <span style="font-size:11px;color:var(--txt2);">${b.id} | Bill: ${b.date} | Paid: ${b.duePaidDate}</span></div>
+          <strong style="color:var(--ok);">₹${amt}</strong>
+        </div>
+      </div>`;
+    }).join(''):'<div class="empty-state">কোনো cleared due নেই</div>';
+  }
+}
+
+function renderReports(){
+  const today=new Date().toDateString();
+  const perf=calcStaffPerf(bills.filter(b=>b.date===today&&!b.archived));
+  const sdEl=document.getElementById("staffDetailedList");
+  if(sdEl){
+    const srt=Object.entries(perf).sort((a,b)=>b[1].total-a[1].total);
+    sdEl.innerHTML=srt.length?srt.map(([name,d],i)=>
+      `<div class="staff-block">
+        <div class="staff-header">
+          <span>${i===0?'🏆':i===1?'🥈':i===2?'🥉':'👤'} ${name}</span>
+          <span style="color:var(--ok);">₹${d.total}</span>
+        </div>
+        <div class="staff-items">${d.actions.join(' &nbsp;•&nbsp; ')}</div>
+      </div>`
+    ).join(''):'<div class="empty-state">আজকে এখনো কোনো record নেই</div>';
+  }
+  const shEl=document.getElementById("staffHistoryList");
+  if(shEl){
+    shEl.innerHTML=staffHist.length?staffHist.slice().reverse().map((h,i)=>{
+      const idx=staffHist.length-1-i;
+      const ent=Object.entries(h.data).sort((a,b)=>b[1]-a[1]);
+      const tot=ent.reduce((a,c)=>a+c[1],0);
+      return `<div class="history-item">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
+          <strong>📅 ${h.date} | মোট: ₹${tot}</strong>
+          <button class="abt abt-d" onclick="initAction('DELETE_STAFF_HIST',${idx})">🗑️</button>
+        </div>
+        <div class="pill-row">${ent.map(([n,v])=>`<span class="pill pill-g">👤 ${n}: ₹${v}</span>`).join('')}</div>
+      </div>`;
+    }).join(''):'<div class="empty-state">কোনো archived history নেই</div>';
+  }
+}
+
+function renderFinance(){
+  const el=document.getElementById("financeHistory"); if(!el)return;
+  const today=new Date().toDateString();
+  const tf=fin.filter(f=>f.date===today);
+  el.innerHTML=tf.length?tf.map(f=>{
+    const idx=fin.indexOf(f);
+    return `<div class="fin-item">
+      <div>${f.t==='expense'?'💸':'💵'} <strong>${f.n}</strong> <span class="badge b-info">${f.t}</span></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <strong style="color:${f.t==='expense'?'var(--err)':'var(--wrn)'};">₹${f.a}</strong>
+        <button class="abt abt-d" onclick="initAction('DELETE_FIN',${idx})">🗑️</button>
+      </div>
+    </div>`;
+  }).join(''):'<div class="empty-state">আজকে কোনো entry নেই</div>';
+}
+
+function renderOnline(){
+  const el=document.getElementById("onlineHistory"); if(!el)return;
+  const today=new Date().toDateString();
+  const to=onl.filter(o=>o.date===today);
+  el.innerHTML=to.length?to.map(o=>{
+    const idx=onl.indexOf(o);
+    return `<div class="fin-item">
+      <span>📲 <strong>${o.n}</strong></span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <strong style="color:#3b82f6;">₹${o.a}</strong>
+        <button class="abt abt-d" onclick="initAction('DELETE_ONL',${idx})">🗑️</button>
+      </div>
+    </div>`;
+  }).join(''):'<div class="empty-state">আজকে কোনো payment নেই</div>';
+}
+
+function renderAIPanel(){
+  const el=document.getElementById("aiDataPanel"); if(!el)return;
+  const c=getCtx();
+  el.innerHTML=`
+    <div class="ai-box">
+      <div class="ai-box-title">আজকের Summary</div>
+      <div class="ai-row"><span>📦 Products</span><strong>₹${c.tp}</strong></div>
+      <div class="ai-row"><span>✂️ Services</span><strong>₹${c.ts}</strong></div>
+      <div class="ai-row"><span>🧾 Bills</span><strong>${c.tb.length}টি</strong></div>
+      <div class="ai-row"><span>💰 Balance</span><strong>₹${c.bal}</strong></div>
+    </div>
+    <div class="ai-box">
+      <div class="ai-box-title">System Info</div>
+      <div class="ai-row"><span>👥 Staff</span><strong>${staffList.length}জন</strong></div>
+      <div class="ai-row"><span>✂️ Services</span><strong>${servList.length}টি</strong></div>
+      <div class="ai-row"><span>📦 Products</span><strong>${prodList.length}টি</strong></div>
+      <div class="ai-row"><span>⚠️ Due</span><strong style="color:var(--err);">₹${c.totalDue}</strong></div>
+    </div>`;
+}
+
+/* =============================================================
+   RENDER ALL
+   ============================================================= */
+function renderAll(){
+  const el=document.getElementById("billNoDisplay"); if(el)el.textContent="FLS-"+String(counter).padStart(4,"0");
+  renderTags(); renderStats(); renderBillTable(); renderBalance();
+  renderDues(); renderReports(); renderFinance(); renderOnline();
+  renderAIPanel(); renderAIChips();
+}
+
+/* =============================================================
+   INIT
+   ============================================================= */
+window.addEventListener('load',()=>{
+  renderAll();
+  addRow('prodArea');
+  addRow('servArea');
+  // Close dropdowns on outside click
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('.ac-wrap')) closeAllDropdowns();
+  });
+  // Enter keys
+  document.getElementById("securePass").addEventListener("keypress",e=>{ if(e.key==="Enter")doAction(); });
+  document.getElementById("newStaffName").addEventListener("keypress",e=>{ if(e.key==="Enter")addToList('staff'); });
+  document.getElementById("newServName").addEventListener("keypress",e=>{ if(e.key==="Enter")addToList('service'); });
+  document.getElementById("newProdName").addEventListener("keypress",e=>{ if(e.key==="Enter")addToList('product'); });
+  document.getElementById("expName").addEventListener("keypress",e=>{ if(e.key==="Enter")saveFinance(); });
+  document.getElementById("onCust").addEventListener("keypress",e=>{ if(e.key==="Enter")saveOnline(); });
+  console.log("%c✂️ Fancy Looks Salon POS — All Systems OK","color:#00d4ff;font-size:16px;font-weight:bold;");
+});
 </script>
 </body>
 </html>
