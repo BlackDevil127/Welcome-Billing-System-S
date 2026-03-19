@@ -4,89 +4,162 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fancy Looks Salon POS — Advanced AI Edition</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
+/* ============================================================
+   CSS VARIABLES & RESET
+   ============================================================ */
 :root{
-  --pri:#0d1b2a;--pri2:#1b3a5c;--acc:#00d4ff;--acc2:#0099cc;
-  --ok:#00c896;--err:#ff4757;--wrn:#ffaa00;--bg:#f0f4f8;
-  --card:#fff;--txt:#1a2a3a;--txt2:#5a6a7a;--bdr:#e0e8f0;
+  --pri:#0d1b2a; --pri2:#1b3a5c; --acc:#00d4ff; --acc2:#0099cc;
+  --ok:#00c896;  --err:#ff4757;  --wrn:#ffaa00; --bg:#f0f4f8;
+  --card:#fff;   --txt:#1a2a3a;  --txt2:#5a6a7a; --bdr:#e0e8f0;
   --grad:linear-gradient(135deg,#0d1b2a 0%,#1b3a5c 100%);
 }
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Sora',sans-serif;}
 body{background:var(--bg);color:var(--txt);overflow-x:hidden;}
-::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:#c0ccda;border-radius:10px;}
 
-/* LAYOUT */
+/* ============================================================
+   LAYOUT
+   ============================================================ */
 .app{display:flex;flex-direction:column;min-height:100vh;}
 @media(min-width:768px){.app{flex-direction:row;height:100vh;overflow:hidden;}}
 
-/* SIDEBAR */
-.sidebar{background:var(--grad);color:#fff;width:100%;flex-shrink:0;display:flex;flex-direction:column;}
-@media(min-width:768px){.sidebar{width:255px;height:100vh;overflow-y:auto;}}
-.brand{text-align:center;padding:20px 12px 14px;border-bottom:1px solid rgba(255,255,255,.1);}
-.brand-logo{font-size:22px;font-weight:800;color:var(--acc);letter-spacing:1px;text-shadow:0 0 20px rgba(0,212,255,.4);}
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+.sidebar{
+  background:var(--grad);color:#fff;
+  width:100%;flex-shrink:0;
+  display:flex;flex-direction:column;
+}
+@media(min-width:768px){.sidebar{width:260px;height:100vh;overflow-y:auto;}}
+
+.brand{text-align:center;padding:22px 14px 16px;border-bottom:1px solid rgba(255,255,255,.1);}
+.brand-logo{font-size:23px;font-weight:800;color:var(--acc);letter-spacing:1px;text-shadow:0 0 20px rgba(0,212,255,.4);}
 .brand-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:3px;letter-spacing:1px;text-transform:uppercase;}
-.bill-badge{display:inline-block;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.3);color:var(--acc);padding:3px 12px;border-radius:20px;font-size:11px;font-family:'JetBrains Mono',monospace;font-weight:600;margin-top:7px;}
-.nav-wrap{padding:10px 12px;flex:1;}
+.bill-badge{
+  display:inline-block;background:rgba(0,212,255,.15);
+  border:1px solid rgba(0,212,255,.3);color:var(--acc);
+  padding:3px 14px;border-radius:20px;font-size:11px;
+  font-family:'JetBrains Mono',monospace;font-weight:600;margin-top:8px;
+}
+
+.nav-wrap{padding:12px 12px;flex:1;}
 .nav-menu{list-style:none;display:flex;flex-wrap:wrap;gap:4px;}
 @media(min-width:768px){.nav-menu{flex-direction:column;gap:3px;}}
-.nav-item{padding:10px 13px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.65);transition:all .2s;display:flex;align-items:center;gap:8px;flex:1 1 42%;}
+
+.nav-item{
+  padding:11px 14px;border-radius:10px;cursor:pointer;
+  font-size:13px;font-weight:600;color:rgba(255,255,255,.65);
+  transition:all .2s;display:flex;align-items:center;gap:9px;
+  flex:1 1 42%;border:1px solid transparent;
+}
 @media(min-width:768px){.nav-item{flex:none;}}
-.nav-item:hover{background:rgba(255,255,255,.08);color:#fff;}
-.nav-item.active{background:rgba(0,212,255,.2);color:var(--acc);border:1px solid rgba(0,212,255,.3);}
-.nav-icon{font-size:15px;width:18px;text-align:center;flex-shrink:0;}
-.sidebar-footer{padding:12px 14px;border-top:1px solid rgba(255,255,255,.08);}
-.btn-reset-sys{width:100%;padding:10px;border:1px solid rgba(255,71,87,.4);background:rgba(255,71,87,.1);color:#ff6b78;border-radius:10px;cursor:pointer;font-size:12px;font-weight:700;transition:all .2s;}
+.nav-item:hover{background:rgba(255,255,255,.09);color:#fff;}
+.nav-item.active{background:rgba(0,212,255,.2);color:var(--acc);border-color:rgba(0,212,255,.3);}
+.nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+
+.sidebar-footer{padding:14px;border-top:1px solid rgba(255,255,255,.08);}
+.btn-reset-sys{
+  width:100%;padding:10px;border:1px solid rgba(255,71,87,.4);
+  background:rgba(255,71,87,.1);color:#ff6b78;border-radius:10px;
+  cursor:pointer;font-size:12px;font-weight:700;transition:all .2s;
+}
 .btn-reset-sys:hover{background:rgba(255,71,87,.28);}
 
-/* MAIN */
-.main{flex:1;padding:14px;overflow-y:auto;background:var(--bg);}
+/* ============================================================
+   MAIN
+   ============================================================ */
+.main{flex:1;padding:16px;overflow-y:auto;background:var(--bg);}
 @media(min-width:768px){.main{height:100vh;}}
 
-/* CARDS */
-.card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 2px 14px rgba(0,0,0,.06);border:1px solid var(--bdr);margin-bottom:16px;}
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card{
+  background:var(--card);border-radius:14px;padding:20px;
+  box-shadow:0 2px 14px rgba(0,0,0,.06);
+  border:1px solid var(--bdr);margin-bottom:16px;
+}
 .card-title{font-size:15px;font-weight:800;color:var(--txt);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
 
-/* STATS */
-.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:14px;}
+/* ============================================================
+   STATS
+   ============================================================ */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:16px;}
 @media(min-width:560px){.stats-grid{grid-template-columns:repeat(4,1fr);}}
-.stat-box{background:var(--card);border-radius:12px;padding:13px;text-align:center;border:1px solid var(--bdr);}
-.stat-icon{font-size:21px;margin-bottom:3px;}.stat-val{font-size:17px;font-weight:800;line-height:1.2;}
-.stat-lbl{font-size:10px;color:var(--txt2);margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.stat-box{
+  background:var(--card);border-radius:12px;padding:14px;
+  text-align:center;border:1px solid var(--bdr);
+  box-shadow:0 1px 8px rgba(0,0,0,.04);
+}
+.stat-icon{font-size:22px;margin-bottom:4px;}
+.stat-val{font-size:18px;font-weight:800;line-height:1.2;}
+.stat-lbl{font-size:10px;color:var(--txt2);margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
 
-/* FORMS */
-input,select,textarea{width:100%;padding:10px 13px;margin:4px 0;border:1.5px solid var(--bdr);border-radius:10px;font-size:13px;color:var(--txt);background:#f8fbff;transition:border-color .2s;outline:none;font-family:'Sora',sans-serif;}
-input:focus,select:focus,textarea:focus{border-color:var(--acc2);background:#fff;box-shadow:0 0 0 3px rgba(0,153,204,.1);}
+/* ============================================================
+   FORM ELEMENTS
+   ============================================================ */
+input,select,textarea{
+  width:100%;padding:10px 13px;margin:4px 0;
+  border:1.5px solid var(--bdr);border-radius:10px;
+  font-size:13px;color:var(--txt);background:#f8fbff;
+  transition:border-color .2s;outline:none;font-family:'Sora',sans-serif;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--acc2);background:#fff;
+  box-shadow:0 0 0 3px rgba(0,153,204,.1);
+}
 input::placeholder{color:#a0aec0;}
-.flbl{font-size:12px;font-weight:700;color:var(--txt2);display:block;margin:7px 0 2px;letter-spacing:.3px;}
+input[type="date"]{cursor:pointer;}
+.flbl{font-size:12px;font-weight:700;color:var(--txt2);display:block;margin:8px 0 2px;letter-spacing:.3px;}
 
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:11px 15px;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;transition:all .18s;font-family:'Sora',sans-serif;width:100%;}
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:11px 16px;border:none;border-radius:10px;font-weight:700;
+  cursor:pointer;font-size:13px;transition:all .18s;
+  font-family:'Sora',sans-serif;width:100%;
+}
 .btn:hover{filter:brightness(.92);transform:translateY(-1px);}
-.btn:active{transform:translateY(0);}
+.btn:active{transform:translateY(0);filter:brightness(.86);}
 .btn-add{background:#e0f7fe;color:#0272a8;margin-bottom:8px;}
 .btn-save{background:linear-gradient(135deg,var(--ok),#00a87a);color:#fff;}
 .btn-warn{background:linear-gradient(135deg,var(--wrn),#e68900);color:#fff;}
 .btn-blue{background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;}
+.btn-red{background:linear-gradient(135deg,var(--err),#cc2233);color:#fff;}
 .btn-ghost{background:#f1f5f9;color:#475569;border:1px solid var(--bdr);}
 .btn-sm{padding:7px 13px;width:auto;font-size:12px;}
-.abt{padding:8px 10px;border:none;border-radius:8px;cursor:pointer;font-size:13px;transition:all .15s;flex-shrink:0;}
-.abt:hover{transform:scale(1.06);}
-.abt-p{background:#f1f5f9;color:#475569;}.abt-w{background:#d1fae5;color:#065f46;}.abt-d{background:#fee2e2;color:#dc2626;}
 
-/* ── BILLING ROW WITH AUTOCOMPLETE ── */
-.row-group{display:flex;gap:6px;margin-bottom:7px;align-items:flex-start;flex-wrap:wrap;position:relative;}
-.row-group input,.row-group select{margin:0;flex:1;min-width:65px;}
-.ac-wrap{flex:1;min-width:65px;position:relative;}
+.abt{padding:8px 10px;border:none;border-radius:8px;cursor:pointer;font-size:13px;transition:all .15s;flex-shrink:0;}
+.abt:hover{transform:scale(1.07);}
+.abt-p{background:#f1f5f9;color:#475569;}
+.abt-w{background:#d1fae5;color:#065f46;}
+.abt-d{background:#fee2e2;color:#dc2626;}
+
+/* ============================================================
+   BILLING ROWS + AUTOCOMPLETE
+   ============================================================ */
+.row-group{
+  display:flex;gap:6px;margin-bottom:8px;
+  align-items:flex-start;flex-wrap:wrap;position:relative;
+}
+.row-group input,.row-group select{margin:0;flex:1;min-width:60px;}
+
+.ac-wrap{flex:1;min-width:80px;position:relative;}
 .ac-wrap input{width:100%;margin:0;}
+
 .ac-drop{
-  position:absolute;top:calc(100% + 2px);left:0;width:100%;min-width:180px;
+  position:absolute;top:calc(100% + 3px);left:0;width:100%;min-width:190px;
   background:#fff;border:1.5px solid var(--acc2);border-radius:10px;
-  box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:9999;
-  max-height:220px;overflow-y:auto;display:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.16);z-index:9999;
+  max-height:230px;overflow-y:auto;display:none;
 }
 .ac-drop.open{display:block;}
 .ac-item{
@@ -95,130 +168,280 @@ input::placeholder{color:#a0aec0;}
 }
 .ac-item:last-child{border-bottom:none;}
 .ac-item:hover,.ac-item.focused{background:#e0f7fe;color:#0272a8;}
-.ac-item .ac-price{font-size:11px;color:var(--ok);margin-left:5px;font-weight:700;}
-.ac-item .ac-sub{font-size:10px;color:var(--txt2);display:block;margin-top:1px;}
+.ac-sub{font-size:10px;color:var(--txt2);display:block;margin-top:2px;}
 .ac-empty{padding:10px 13px;font-size:12px;color:var(--txt2);text-align:center;}
 
-/* ROWS helper */
-.sec-title{font-size:11px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:1.2px;margin:12px 0 5px;padding-bottom:5px;border-bottom:2px solid var(--bdr);display:flex;align-items:center;gap:5px;}
+/* Discount input */
+.disc-inp{
+  border-color:var(--wrn)!important;background:#fffbf0!important;
+  flex:.4!important;min-width:56px!important;
+}
+.disc-inp:focus{border-color:#e68900!important;box-shadow:0 0 0 3px rgba(255,170,0,.14)!important;}
+.disc-calc{
+  flex-basis:100%;font-size:11px;color:#92400e;
+  padding:4px 9px 5px;font-weight:700;display:none;
+  background:linear-gradient(90deg,#fffbf0,#fef3c7);
+  border-radius:7px;margin-top:1px;border-left:3px solid var(--wrn);
+}
 
-/* TABLE */
+/* ============================================================
+   SECTION TITLES
+   ============================================================ */
+.sec-title{
+  font-size:11px;font-weight:800;color:var(--txt2);
+  text-transform:uppercase;letter-spacing:1.2px;
+  margin:14px 0 6px;padding-bottom:6px;
+  border-bottom:2px solid var(--bdr);
+  display:flex;align-items:center;gap:5px;
+}
+
+/* ============================================================
+   TABLE
+   ============================================================ */
 .tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--bdr);}
 table{width:100%;border-collapse:collapse;}
 thead tr{background:var(--pri);color:#fff;}
-th{padding:10px 13px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
-td{padding:10px 13px;border-bottom:1px solid var(--bdr);font-size:12px;vertical-align:top;}
+th{padding:11px 13px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
+td{padding:11px 13px;border-bottom:1px solid var(--bdr);font-size:12px;vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
 tbody tr:hover td{background:#f8fbff;}
 
-/* BADGES */
-.badge{padding:2px 7px;border-radius:6px;font-size:11px;font-weight:700;display:inline-block;margin:2px;}
-.b-prod{background:#dcfce7;color:#166534;}.b-serv{background:#fef3c7;color:#854d0e;}
-.b-cash{background:#d1fae5;color:#065f46;}.b-online{background:#dbeafe;color:#1e40af;}
-.b-due{background:#fee2e2;color:#991b1b;}.b-info{background:#e0f7fe;color:#0272a8;}
+/* ============================================================
+   BADGES
+   ============================================================ */
+.badge{padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;display:inline-block;margin:2px;}
+.b-prod{background:#dcfce7;color:#166534;}
+.b-serv{background:#fef3c7;color:#854d0e;}
+.b-cash{background:#d1fae5;color:#065f46;}
+.b-online{background:#dbeafe;color:#1e40af;}
+.b-due{background:#fee2e2;color:#991b1b;}
+.b-info{background:#e0f7fe;color:#0272a8;}
+.b-disc{background:#fef9c3;color:#78350f;}
+.b-wasdueok{background:#d1fae5;color:#065f46;}
 
-/* TAGS */
-.list-mgr{display:flex;flex-wrap:wrap;gap:5px;background:#f8fbff;padding:9px;border-radius:10px;min-height:42px;margin-top:5px;border:1px dashed var(--bdr);}
-.tag{background:var(--pri);color:#fff;padding:4px 9px;border-radius:20px;font-size:11px;display:flex;align-items:center;gap:4px;font-weight:600;}
-.tag-x{cursor:pointer;color:#f87171;font-weight:900;}.tag-x:hover{color:#fff;}
+/* ============================================================
+   TAGS (Staff/Service/Product manager)
+   ============================================================ */
+.list-mgr{
+  display:flex;flex-wrap:wrap;gap:5px;background:#f8fbff;
+  padding:10px;border-radius:10px;min-height:44px;
+  margin-top:6px;border:1px dashed var(--bdr);
+}
+.tag{
+  background:var(--pri);color:#fff;padding:4px 10px;
+  border-radius:20px;font-size:11px;display:flex;
+  align-items:center;gap:4px;font-weight:600;
+}
+.tag-x{cursor:pointer;color:#f87171;font-weight:900;margin-left:2px;}
+.tag-x:hover{color:#fff;}
 .tag-empty{font-size:11px;color:#a0aec0;align-self:center;}
-.list-search{width:100%;padding:7px 11px;margin-bottom:5px;border:1.5px solid var(--bdr);border-radius:8px;font-size:12px;background:#f8fbff;outline:none;font-family:'Sora',sans-serif;}
+.list-search{
+  width:100%;padding:7px 11px;margin-bottom:6px;
+  border:1.5px solid var(--bdr);border-radius:8px;
+  font-size:12px;background:#f8fbff;outline:none;font-family:'Sora',sans-serif;
+}
 .list-search:focus{border-color:var(--acc2);background:#fff;}
 
-/* STAFF */
-.staff-block{border:1px solid var(--bdr);border-radius:12px;padding:13px;margin-bottom:9px;background:#fafcff;}
-.staff-header{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px;color:var(--pri);border-bottom:2px solid var(--acc);padding-bottom:7px;margin-bottom:7px;}
-.staff-items{font-size:11px;color:var(--txt2);line-height:1.7;}
-.history-item{background:var(--card);border:1px solid var(--bdr);border-left:4px solid var(--acc);border-radius:12px;padding:14px;margin-bottom:11px;}
+/* ============================================================
+   STAFF / HISTORY
+   ============================================================ */
+.staff-block{border:1px solid var(--bdr);border-radius:12px;padding:14px;margin-bottom:10px;background:#fafcff;}
+.staff-header{
+  display:flex;justify-content:space-between;align-items:center;
+  font-weight:800;font-size:14px;color:var(--pri);
+  border-bottom:2px solid var(--acc);padding-bottom:8px;margin-bottom:8px;
+}
+.staff-items{font-size:11px;color:var(--txt2);line-height:1.8;}
+.history-item{
+  background:var(--card);border:1px solid var(--bdr);
+  border-left:4px solid var(--acc);border-radius:12px;
+  padding:14px;margin-bottom:12px;
+}
 
-/* DUES */
-.due-item{background:#fff5f5;border:1px solid #fecaca;border-left:4px solid var(--err);border-radius:12px;padding:13px;margin-bottom:9px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
-.due-amount{font-size:18px;font-weight:800;color:var(--err);}
+/* ============================================================
+   DUES
+   ============================================================ */
+.due-item{
+  background:#fff5f5;border:1px solid #fecaca;
+  border-left:4px solid var(--err);border-radius:12px;
+  padding:14px;margin-bottom:10px;
+  display:flex;justify-content:space-between;
+  align-items:center;gap:10px;flex-wrap:wrap;
+}
+.due-amount{font-size:19px;font-weight:800;color:var(--err);}
 
-/* BALANCE */
-.balance-hero{text-align:center;padding:26px 20px 18px;background:linear-gradient(135deg,#f0f9ff,#e0f7fe);border-radius:14px;margin-bottom:16px;border:1px solid #bae6fd;}
-.balance-big{font-size:40px;font-weight:800;color:var(--pri);font-family:'JetBrains Mono',monospace;}
-.balance-lbl{font-size:11px;color:var(--txt2);margin-bottom:7px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
-.bal-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-size:13px;border-bottom:1px solid var(--bdr);}
+/* ============================================================
+   BALANCE
+   ============================================================ */
+.balance-hero{
+  text-align:center;padding:28px 20px 20px;
+  background:linear-gradient(135deg,#f0f9ff,#e0f7fe);
+  border-radius:14px;margin-bottom:16px;border:1px solid #bae6fd;
+}
+.balance-big{font-size:42px;font-weight:800;color:var(--pri);font-family:'JetBrains Mono',monospace;}
+.balance-lbl{font-size:11px;color:var(--txt2);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.bal-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:11px 14px;font-size:13px;border-bottom:1px solid var(--bdr);
+}
 .bal-row:last-child{border-bottom:none;font-weight:800;font-size:15px;}
 
 /* PAY BREAKDOWN */
-.pay-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:10px;}
-@media(max-width:400px){.pay-grid{grid-template-columns:1fr;}}
-.pay-box{border-radius:10px;padding:13px;text-align:center;}
-.pb-val{font-size:19px;font-weight:800;}.pb-lbl{font-size:11px;margin-top:3px;font-weight:600;}
-.pay-cash{background:#d1fae5;color:#065f46;}.pay-online{background:#dbeafe;color:#1e40af;}.pay-due{background:#fee2e2;color:#991b1b;}
+.pay-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px;}
+@media(max-width:420px){.pay-grid{grid-template-columns:1fr;}}
+.pay-box{border-radius:11px;padding:14px;text-align:center;}
+.pb-val{font-size:20px;font-weight:800;}
+.pb-lbl{font-size:11px;margin-top:3px;font-weight:600;}
+.pay-cash{background:#d1fae5;color:#065f46;}
+.pay-online{background:#dbeafe;color:#1e40af;}
+.pay-due{background:#fee2e2;color:#991b1b;}
 
-/* AI CHAT */
-.chat-wrap{display:flex;flex-direction:column;height:440px;}
-.chat-msgs{flex:1;overflow-y:auto;padding:12px;background:#f8fbff;border-radius:12px;border:1px solid var(--bdr);margin-bottom:9px;display:flex;flex-direction:column;gap:9px;}
-.bubble{max-width:86%;padding:11px 14px;border-radius:12px;font-size:13px;line-height:1.65;white-space:pre-wrap;}
+/* ============================================================
+   BILL PREVIEW
+   ============================================================ */
+.bill-preview{
+  background:linear-gradient(135deg,#f0fdf4,#dcfce7);
+  border:1px solid #86efac;border-radius:12px;
+  padding:14px;margin-bottom:12px;display:none;
+}
+.prev-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:4px 0;}
+.prev-total{
+  display:flex;justify-content:space-between;font-size:17px;
+  font-weight:800;color:var(--ok);
+  margin-top:8px;padding-top:8px;border-top:2px solid #86efac;
+}
+.grand-disc-row{
+  display:flex;align-items:center;gap:8px;
+  margin-top:6px;padding:7px 0;border-top:1px dashed #86efac;
+}
+.grand-disc-row label{font-size:12px;font-weight:700;color:#065f46;white-space:nowrap;flex-shrink:0;}
+.grand-disc-row input{
+  width:80px!important;padding:5px 9px!important;font-size:12px!important;
+  margin:0!important;border-color:#f59e0b!important;background:#fffbf0!important;flex:none!important;
+}
+.grand-disc-info{font-size:11px;color:#b45309;font-weight:700;flex:1;min-width:0;}
+
+/* ============================================================
+   AI CHAT
+   ============================================================ */
+.chat-wrap{display:flex;flex-direction:column;height:460px;}
+.chat-msgs{
+  flex:1;overflow-y:auto;padding:13px;background:#f8fbff;
+  border-radius:12px;border:1px solid var(--bdr);
+  margin-bottom:10px;display:flex;flex-direction:column;gap:10px;
+}
+.bubble{max-width:87%;padding:12px 15px;border-radius:12px;font-size:13px;line-height:1.7;white-space:pre-wrap;}
 .bubble-u{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;font-weight:600;align-self:flex-end;border-bottom-right-radius:3px;}
 .bubble-a{background:#fff;border:1px solid var(--bdr);align-self:flex-start;border-bottom-left-radius:3px;}
-.chat-row{display:flex;gap:8px;}.chat-row input{margin:0;flex:1;}
+.chat-row{display:flex;gap:8px;}
+.chat-row input{margin:0;flex:1;}
 .chat-row button{width:auto;padding:11px 17px;flex-shrink:0;}
-.ai-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
-.ai-chip{background:#e0f7fe;color:#0272a8;padding:5px 11px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid #bae6fd;transition:all .15s;}
+
+.ai-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px;}
+.ai-chip{
+  background:#e0f7fe;color:#0272a8;padding:5px 12px;
+  border-radius:20px;font-size:11px;font-weight:700;
+  cursor:pointer;border:1px solid #bae6fd;transition:all .15s;
+}
 .ai-chip:hover{background:#0272a8;color:#fff;}
+
 .typing-dots span{display:inline-block;width:5px;height:5px;background:var(--txt2);border-radius:50%;animation:tb 1.2s infinite;margin:0 2px;}
-.typing-dots span:nth-child(2){animation-delay:.2s;}.typing-dots span:nth-child(3){animation-delay:.4s;}
+.typing-dots span:nth-child(2){animation-delay:.2s;}
+.typing-dots span:nth-child(3){animation-delay:.4s;}
 @keyframes tb{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+
 .ai-panel{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
-@media(max-width:480px){.ai-panel{grid-template-columns:1fr;}}
-.ai-box{background:#f8fbff;border:1px solid var(--bdr);border-radius:12px;padding:13px;}
-.ai-box-title{font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+@media(max-width:500px){.ai-panel{grid-template-columns:1fr;}}
+.ai-box{background:#f8fbff;border:1px solid var(--bdr);border-radius:12px;padding:14px;}
+.ai-box-title{font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px;}
 .ai-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--bdr);}
 .ai-row:last-child{border-bottom:none;}
 
-/* BILL PREVIEW */
-.bill-preview{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac;border-radius:12px;padding:13px;margin-bottom:11px;display:none;}
-.prev-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;}
-.prev-total{display:flex;justify-content:space-between;font-size:16px;font-weight:800;color:var(--ok);margin-top:7px;padding-top:7px;border-top:1px solid #86efac;}
-
-/* LAYOUT HELPERS */
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
-.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;}
+/* ============================================================
+   LAYOUT HELPERS
+   ============================================================ */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
 @media(max-width:700px){.three-col{grid-template-columns:1fr 1fr;}}
 @media(max-width:440px){.three-col,.two-col{grid-template-columns:1fr;}}
-.filter-bar{display:flex;gap:7px;margin-bottom:13px;flex-wrap:wrap;align-items:center;}
+
+.filter-bar{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
 .filter-bar input,.filter-bar select{margin:0;flex:1;min-width:110px;}
+
 .divider{height:1px;background:var(--bdr);margin:12px 0;}
-.pill-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
-.pill{background:#e0f7fe;color:#0272a8;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.pill-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;}
+.pill{background:#e0f7fe;color:#0272a8;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
 .pill-g{background:#dcfce7;color:#166534;}
-.empty-state{text-align:center;padding:26px;color:#94a3b8;font-size:14px;}
-.fin-item{display:flex;justify-content:space-between;align-items:center;padding:11px;border-bottom:1px solid var(--bdr);}
+.pill-r{background:#fee2e2;color:#991b1b;}
+
+.empty-state{text-align:center;padding:28px;color:#94a3b8;font-size:14px;}
+
+.fin-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid var(--bdr);}
 .fin-item:last-child{border-bottom:none;}
-.tab-content{display:none;}.tab-content.active-tab{display:block;}
 
-/* MODAL */
-#passModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;justify-content:center;align-items:center;backdrop-filter:blur(6px);}
-.modal-box{background:#fff;padding:24px;border-radius:16px;width:310px;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:mPop .2s ease;}
+.tab-content{display:none;}
+.tab-content.active-tab{display:block;}
+
+.tip-bar{font-size:11px;color:#92400e;background:#fffbf0;padding:6px 10px;border-radius:8px;margin-bottom:8px;border-left:3px solid var(--wrn);}
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+#passModal{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.65);z-index:99999;
+  justify-content:center;align-items:center;backdrop-filter:blur(6px);
+}
+.modal-box{
+  background:#fff;padding:26px;border-radius:16px;width:320px;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);animation:mPop .2s ease;
+}
 @keyframes mPop{from{transform:scale(.9);opacity:0;}to{transform:scale(1);opacity:1;}}
-.pass-wrap{position:relative;}.pass-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;}
-.modal-btns{display:flex;gap:9px;margin-top:11px;}
+.pass-wrap{position:relative;}
+.pass-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:17px;}
+.modal-btns{display:flex;gap:9px;margin-top:12px;}
 
-/* TOAST */
-#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--pri);color:#fff;padding:11px 22px;border-radius:50px;font-size:13px;font-weight:700;z-index:99999;transition:transform .3s;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.3);}
+/* ============================================================
+   TOAST
+   ============================================================ */
+#toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%) translateY(90px);
+  background:var(--pri);color:#fff;padding:12px 24px;
+  border-radius:50px;font-size:13px;font-weight:700;z-index:999999;
+  transition:transform .3s;pointer-events:none;
+  box-shadow:0 4px 20px rgba(0,0,0,.3);
+}
 #toast.show{transform:translateX(-50%) translateY(0);}
 
-/* PRINT */
-@media print{body *{visibility:hidden;}#printReceipt,#printReceipt *{visibility:visible;}#printReceipt{position:fixed;left:0;top:0;width:100%;}}
-#printReceipt{position:absolute;top:-10000px;left:-10000px;width:380px;padding:20px;background:#fff;font-family:'Courier New',monospace;}
-.rct-header{text-align:center;border-bottom:2px solid #1a2a3a;padding-bottom:10px;margin-bottom:13px;}
-.rct-info{display:flex;justify-content:space-between;font-size:11px;margin-bottom:13px;}
+/* ============================================================
+   PRINT RECEIPT
+   ============================================================ */
+@media print{
+  body *{visibility:hidden;}
+  #printReceipt,#printReceipt *{visibility:visible;}
+  #printReceipt{position:fixed;left:0;top:0;width:100%;}
+}
+#printReceipt{
+  position:absolute;top:-10000px;left:-10000px;
+  width:390px;padding:22px;background:#fff;font-family:'Courier New',monospace;
+}
+.rct-header{text-align:center;border-bottom:2px solid #1a2a3a;padding-bottom:11px;margin-bottom:14px;}
+.rct-info{display:flex;justify-content:space-between;font-size:11px;margin-bottom:14px;}
 .rct-table{width:100%;border-collapse:collapse;font-size:11px;}
 .rct-table th,.rct-table td{text-align:left;padding:7px;border-bottom:1px solid #eee;}
-.rct-footer{margin-top:12px;text-align:right;border-top:2px solid #333;padding-top:10px;}
-.rct-thanks{text-align:center;margin-top:12px;font-size:10px;color:#666;}
+.rct-footer{margin-top:13px;text-align:right;border-top:2px solid #333;padding-top:10px;}
+.rct-thanks{text-align:center;margin-top:13px;font-size:10px;color:#666;}
 </style>
 </head>
 <body>
 
-<!-- PRINT RECEIPT -->
+<!-- ============================================================
+     HIDDEN PRINT RECEIPT
+     ============================================================ -->
 <div id="printReceipt">
   <div class="rct-header">
-    <div style="font-size:20px;font-weight:900;color:#0d1b2a;letter-spacing:2px;">✂ Fancy Looks Salon</div>
+    <div style="font-size:21px;font-weight:900;color:#0d1b2a;letter-spacing:2px;">✂ Fancy Looks Salon</div>
     <div style="font-size:10px;margin-top:3px;">Premium Hair &amp; Beauty Care</div>
     <div style="font-size:10px;">+91 79802 83920</div>
   </div>
@@ -231,11 +454,13 @@ tbody tr:hover td{background:#f8fbff;}
   <div class="rct-thanks"><p>Thank you for visiting Fancy Looks Salon!</p></div>
 </div>
 
-<!-- MODAL -->
+<!-- ============================================================
+     PASSWORD MODAL
+     ============================================================ -->
 <div id="passModal">
   <div class="modal-box">
-    <p style="font-size:17px;font-weight:800;margin-bottom:4px;">🔒 Secure Access</p>
-    <p style="font-size:12px;color:var(--txt2);margin-bottom:11px;">Master password দিন</p>
+    <p style="font-size:18px;font-weight:800;margin-bottom:4px;">🔒 Secure Access</p>
+    <p style="font-size:12px;color:var(--txt2);margin-bottom:12px;">Master password দিন</p>
     <div class="pass-wrap">
       <input type="password" id="securePass" placeholder="Password...">
       <span class="pass-eye" onclick="togglePV()">👁️</span>
@@ -249,7 +474,12 @@ tbody tr:hover td{background:#f8fbff;}
 
 <div id="toast"></div>
 
+<!-- ============================================================
+     APP SHELL
+     ============================================================ -->
 <div class="app">
+
+  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-logo">✂ Fancy Looks</div>
@@ -258,13 +488,27 @@ tbody tr:hover td{background:#f8fbff;}
     </div>
     <div class="nav-wrap">
       <ul class="nav-menu">
-        <li class="nav-item active" id="btn-billing" onclick="switchTab('billing')"><span class="nav-icon">🛒</span>Billing</li>
-        <li class="nav-item" id="btn-reports" onclick="switchTab('reports')"><span class="nav-icon">📊</span>Reports</li>
-        <li class="nav-item" id="btn-balance" onclick="switchTab('balance')"><span class="nav-icon">💰</span>Balance</li>
-        <li class="nav-item" id="btn-dues"    onclick="switchTab('dues')"><span class="nav-icon">⚠️</span>Dues</li>
-        <li class="nav-item" id="btn-finance" onclick="switchTab('finance')"><span class="nav-icon">💸</span>Expense</li>
-        <li class="nav-item" id="btn-online"  onclick="switchTab('online')"><span class="nav-icon">💳</span>Online</li>
-        <li class="nav-item" id="btn-ai"      onclick="switchTab('ai')"><span class="nav-icon">🤖</span>AI Brain</li>
+        <li class="nav-item active" id="btn-billing" onclick="switchTab('billing')">
+          <span class="nav-icon">🛒</span>Billing
+        </li>
+        <li class="nav-item" id="btn-reports" onclick="switchTab('reports')">
+          <span class="nav-icon">📊</span>Reports
+        </li>
+        <li class="nav-item" id="btn-balance" onclick="switchTab('balance')">
+          <span class="nav-icon">💰</span>Balance
+        </li>
+        <li class="nav-item" id="btn-dues" onclick="switchTab('dues')">
+          <span class="nav-icon">⚠️</span>Dues
+        </li>
+        <li class="nav-item" id="btn-finance" onclick="switchTab('finance')">
+          <span class="nav-icon">💸</span>Expense
+        </li>
+        <li class="nav-item" id="btn-online" onclick="switchTab('online')">
+          <span class="nav-icon">💵</span>Add Cash
+        </li>
+        <li class="nav-item" id="btn-ai" onclick="switchTab('ai')">
+          <span class="nav-icon">🤖</span>AI Brain
+        </li>
       </ul>
     </div>
     <div class="sidebar-footer">
@@ -272,69 +516,129 @@ tbody tr:hover td{background:#f8fbff;}
     </div>
   </aside>
 
+  <!-- MAIN CONTENT -->
   <main class="main">
 
-    <!-- BILLING -->
+    <!-- ========================================================
+         TAB: BILLING
+         ======================================================== -->
     <div id="billing" class="tab-content active-tab">
+
+      <!-- Quick stats -->
       <div id="quickStats" class="stats-grid"></div>
+
+      <!-- New Bill Card -->
       <div class="card">
         <div class="card-title"><span>🧾</span> New Bill</div>
+
         <div class="two-col">
-          <div><label class="flbl">👤 Customer Name</label><input id="custName" type="text" placeholder="Walk-in / Name"></div>
-          <div><label class="flbl">📱 Phone</label><input id="custPhone" type="text" placeholder="10-digit number"></div>
+          <div>
+            <label class="flbl">👤 Customer Name</label>
+            <input id="custName" type="text" placeholder="Walk-in / Name">
+          </div>
+          <div>
+            <label class="flbl">📱 Phone</label>
+            <input id="custPhone" type="text" placeholder="10-digit number">
+          </div>
         </div>
-        <div class="sec-title">📦 Products <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--ok);margin-left:4px;">(Balance-এ যাবে)</span></div>
+
+        <div class="two-col" style="margin-top:8px;">
+          <div>
+            <label class="flbl">📅 Bill Date <span style="color:var(--ok);font-weight:400;">(default: আজকের তারিখ)</span></label>
+            <input id="billDate" type="date">
+          </div>
+          <div>
+            <label class="flbl">💳 Payment Method</label>
+            <select id="payMethod">
+              <option value="Cash">💵 Cash</option>
+              <option value="Online">📱 Online (UPI / Card)</option>
+              <option value="Due">⚠️ Due (Credit)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Products -->
+        <div class="sec-title">
+          📦 Products
+          <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--ok);margin-left:4px;">(Balance-এ যাবে)</span>
+        </div>
+        <div class="tip-bar">💡 <strong>Disc%</strong> field optional — discount percentage দিলে system আপনাআপনি calculate করে দেখাবে</div>
         <div id="prodArea"></div>
-        <button class="btn btn-add btn-sm" onclick="addRow('prodArea')">+ Product Row</button>
-        <label class="flbl" style="margin-top:10px;">💳 Payment Method</label>
-        <select id="payMethod">
-          <option value="Cash">💵 Cash</option>
-          <option value="Online">📱 Online (UPI / Card)</option>
-          <option value="Due">⚠️ Due (Credit)</option>
-        </select>
-        <div class="sec-title" style="margin-top:12px;">✂️ Services <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--wrn);margin-left:4px;">(Staff Report এ যাবে)</span></div>
-        <div id="servArea"></div>
-        <button class="btn btn-add btn-sm" onclick="addRow('servArea')">+ Service Row</button>
-        <div class="bill-preview" id="billPreview">
-          <div class="prev-row"><span>📦 Products:</span><strong id="prevProd">₹0</strong></div>
-          <div class="prev-row"><span>✂️ Services:</span><strong id="prevServ">₹0</strong></div>
-          <div class="prev-total"><span>💰 Grand Total:</span><span id="prevTotal">₹0</span></div>
+        <button class="btn btn-add btn-sm" onclick="addRow('prodArea')">➕ Product Row</button>
+
+        <!-- Services -->
+        <div class="sec-title" style="margin-top:14px;">
+          ✂️ Services
+          <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--wrn);margin-left:4px;">(Staff Report-এ যাবে)</span>
         </div>
-        <button class="btn btn-save" onclick="saveBill()" style="margin-top:6px;">💾 Save Bill</button>
+        <div id="servArea"></div>
+        <button class="btn btn-add btn-sm" onclick="addRow('servArea')">➕ Service Row</button>
+
+        <!-- Bill Preview -->
+        <div class="bill-preview" id="billPreview">
+          <div class="prev-row">
+            <span>📦 Products (after item discounts):</span>
+            <strong id="prevProd">₹0</strong>
+          </div>
+          <div class="prev-row">
+            <span>✂️ Services (after item discounts):</span>
+            <strong id="prevServ">₹0</strong>
+          </div>
+          <div class="prev-row" style="color:var(--txt2);font-size:12px;">
+            <span>Sub Total:</span>
+            <strong id="prevSub">₹0</strong>
+          </div>
+          <div class="grand-disc-row">
+            <label>🎟️ Grand Discount (optional):</label>
+            <input type="number" id="grandDisc" placeholder="%" min="0" max="100" oninput="calcPreview()">
+            <span class="grand-disc-info" id="grandDiscCalc"></span>
+          </div>
+          <div class="prev-total">
+            <span>💰 Grand Total:</span>
+            <span id="prevTotal">₹0</span>
+          </div>
+        </div>
+
+        <button class="btn btn-save" onclick="saveBill()" style="margin-top:8px;">💾 Save Bill</button>
       </div>
 
+      <!-- Manage Lists Card -->
       <div class="card">
         <div class="card-title"><span>🛠️</span> Manage Staff, Services &amp; Products</div>
         <div class="three-col">
+          <!-- Staff -->
           <div>
             <div class="sec-title">👤 Staff</div>
             <input id="newStaffName" type="text" placeholder="Staff Name">
-            <button class="btn btn-add btn-sm" onclick="addToList('staff')">+ Add</button>
-            <input type="text" class="list-search" id="searchStaff" placeholder="🔍 Search staff..." oninput="filterTags('staff')">
+            <button class="btn btn-add btn-sm" style="margin-top:4px;" onclick="addToList('staff')">+ Add Staff</button>
+            <input type="text" class="list-search" id="searchStaff" placeholder="🔍 Search..." oninput="filterTags('staff')">
             <div id="staffTags" class="list-mgr"><span class="tag-empty">Empty</span></div>
           </div>
+          <!-- Services -->
           <div>
             <div class="sec-title">✂️ Services</div>
             <input id="newServName" type="text" placeholder="Service Name">
-            <button class="btn btn-add btn-sm" onclick="addToList('service')">+ Add</button>
-            <input type="text" class="list-search" id="searchService" placeholder="🔍 Search service..." oninput="filterTags('service')">
+            <button class="btn btn-add btn-sm" style="margin-top:4px;" onclick="addToList('service')">+ Add Service</button>
+            <input type="text" class="list-search" id="searchService" placeholder="🔍 Search..." oninput="filterTags('service')">
             <div id="serviceTags" class="list-mgr"><span class="tag-empty">Empty</span></div>
           </div>
+          <!-- Products -->
           <div>
             <div class="sec-title">📦 Products</div>
             <input id="newProdName" type="text" placeholder="Product Name">
             <input id="newProdPrice" type="number" placeholder="Default ₹ (optional)">
-            <button class="btn btn-add btn-sm" onclick="addToList('product')">+ Add</button>
-            <input type="text" class="list-search" id="searchProduct" placeholder="🔍 Search product..." oninput="filterTags('product')">
+            <button class="btn btn-add btn-sm" style="margin-top:4px;" onclick="addToList('product')">+ Add Product</button>
+            <input type="text" class="list-search" id="searchProduct" placeholder="🔍 Search..." oninput="filterTags('product')">
             <div id="productTags" class="list-mgr"><span class="tag-empty">Empty</span></div>
           </div>
         </div>
       </div>
 
+      <!-- Bill History Card -->
       <div class="card">
         <div class="card-title"><span>📋</span> Bill History</div>
         <div class="filter-bar">
-          <input type="text" id="searchFilter" placeholder="🔍 Name / Bill No..." oninput="renderBillTable()">
+          <input type="text" id="searchFilter" placeholder="🔍 Name / Bill No / Phone..." oninput="renderBillTable()">
           <select id="payFilter" onchange="renderBillTable()">
             <option value="">All Payments</option>
             <option value="Cash">Cash</option>
@@ -345,15 +649,23 @@ tbody tr:hover td{background:#f8fbff;}
           <button class="btn btn-ghost btn-sm" onclick="clearFilters()">✕ Clear</button>
         </div>
         <div class="tbl-wrap">
-          <table style="min-width:820px;">
-            <thead><tr><th>Date</th><th>Bill No</th><th>Customer</th><th>Details</th><th>Prod ₹</th><th>Total ₹</th><th>Pay</th><th>Actions</th></tr></thead>
+          <table style="min-width:900px;">
+            <thead>
+              <tr>
+                <th>Date</th><th>Bill No</th><th>Customer</th>
+                <th>Details</th><th>Prod ₹</th><th>Total ₹</th>
+                <th>Payment</th><th>Actions</th>
+              </tr>
+            </thead>
             <tbody id="billList"></tbody>
           </table>
         </div>
       </div>
-    </div>
+    </div><!-- /billing -->
 
-    <!-- REPORTS -->
+    <!-- ========================================================
+         TAB: REPORTS
+         ======================================================== -->
     <div id="reports" class="tab-content">
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
@@ -366,9 +678,11 @@ tbody tr:hover td{background:#f8fbff;}
         <div class="card-title"><span>📜</span> Staff Performance History</div>
         <div id="staffHistoryList"></div>
       </div>
-    </div>
+    </div><!-- /reports -->
 
-    <!-- BALANCE -->
+    <!-- ========================================================
+         TAB: BALANCE
+         ======================================================== -->
     <div id="balance" class="tab-content">
       <div class="card">
         <div class="card-title"><span>💰</span> Today's Balance</div>
@@ -376,83 +690,120 @@ tbody tr:hover td{background:#f8fbff;}
           <div class="balance-lbl">Final Cash Balance</div>
           <div class="balance-big" id="finalBalanceDisplay">₹0</div>
         </div>
-        <div class="bal-row"><span>📦 Product Sales:</span><strong id="calcProd" style="color:var(--ok);">₹0</strong></div>
-        <div class="bal-row"><span>📱 Online (Bills):</span><strong id="calcOnlineBills" style="color:#3b82f6;">₹0</strong></div>
-        <div class="bal-row"><span>📲 Online (Manual):</span><strong id="calcOnline" style="color:#3b82f6;">₹0</strong></div>
-        <div class="bal-row" style="color:var(--err);"><span>💵 Staff Advance:</span><strong id="calcAdv">- ₹0</strong></div>
-        <div class="bal-row" style="color:var(--err);"><span>💸 Expense:</span><strong id="calcExp">- ₹0</strong></div>
+        <div class="bal-row">
+          <span>📦 Product Sales (net):</span>
+          <strong id="calcProd" style="color:var(--ok);">₹0</strong>
+        </div>
+        <div class="bal-row">
+          <span>📱 Online Bills:</span>
+          <strong id="calcOnlineBills" style="color:#3b82f6;">₹0</strong>
+        </div>
+        <div class="bal-row">
+          <span>💵 Cash Added (Manual):</span>
+          <strong id="calcOnline" style="color:#3b82f6;">₹0</strong>
+        </div>
+        <div class="bal-row" style="color:var(--err);">
+          <span>💵 Staff Advance:</span>
+          <strong id="calcAdv">- ₹0</strong>
+        </div>
+        <div class="bal-row" style="color:var(--err);">
+          <span>💸 Expense:</span>
+          <strong id="calcExp">- ₹0</strong>
+        </div>
         <div class="divider"></div>
-        <div class="bal-row"><span>🏆 Net Balance:</span><strong id="calcFinal" style="font-size:17px;color:var(--pri);">₹0</strong></div>
+        <div class="bal-row">
+          <span>🏆 Net Balance:</span>
+          <strong id="calcFinal" style="font-size:17px;color:var(--pri);">₹0</strong>
+        </div>
       </div>
+
       <div class="card">
         <div class="card-title"><span>🔵</span> Payment Breakdown (Today)</div>
         <div class="pay-grid" id="payBreakdown"></div>
       </div>
+
       <div class="card">
         <div class="card-title"><span>📅</span> Date-wise Summary</div>
         <div id="dateSummary"></div>
       </div>
-    </div>
+    </div><!-- /balance -->
 
-    <!-- DUES -->
+    <!-- ========================================================
+         TAB: DUES
+         ======================================================== -->
     <div id="dues" class="tab-content">
       <div class="card">
         <div class="card-title"><span>⚠️</span> Pending Dues</div>
         <div id="dueList"></div>
         <div class="divider"></div>
-        <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:800;color:var(--err);padding:6px 2px;">
-          <span>Total Pending:</span><span id="totalDueAmt">₹0</span>
+        <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;color:var(--err);padding:7px 2px;">
+          <span>Total Pending:</span>
+          <span id="totalDueAmt">₹0</span>
         </div>
       </div>
       <div class="card">
         <div class="card-title"><span>✅</span> Cleared Dues</div>
         <div id="clearedDueList"></div>
       </div>
-    </div>
+    </div><!-- /dues -->
 
-    <!-- FINANCE -->
+    <!-- ========================================================
+         TAB: FINANCE / EXPENSE
+         ======================================================== -->
     <div id="finance" class="tab-content">
       <div class="card">
         <div class="card-title"><span>💸</span> Expense / Advance Entry</div>
         <label class="flbl">Name / Reason</label>
-        <input id="expName" type="text" placeholder="e.g. Shampoo supply / Staff advance">
+        <input id="expName" type="text" placeholder="e.g. Shampoo supply / Staff advance name">
         <label class="flbl">Amount (₹)</label>
-        <input id="expAmt" type="number" placeholder="0">
+        <input id="expAmt" type="number" placeholder="0" min="0">
         <label class="flbl">Type</label>
         <select id="expType">
           <option value="expense">💸 Expense</option>
           <option value="advance">💵 Staff Advance</option>
         </select>
-        <button class="btn btn-save" style="margin-top:10px;" onclick="saveFinance()">💾 Save</button>
+        <button class="btn btn-save" style="margin-top:12px;" onclick="saveFinance()">💾 Save Entry</button>
       </div>
       <div class="card">
         <div class="card-title"><span>📋</span> Today's Finance Records</div>
         <div id="financeHistory"></div>
       </div>
-    </div>
+      <div class="card">
+        <div class="card-title"><span>📅</span> All Finance Records</div>
+        <div id="financeAllHistory"></div>
+      </div>
+    </div><!-- /finance -->
 
-    <!-- ONLINE -->
+    <!-- ========================================================
+         TAB: ADD CASH (was Online)
+         ======================================================== -->
     <div id="online" class="tab-content">
       <div class="card">
-        <div class="card-title"><span>💳</span> Manual Online Payment</div>
-        <p style="font-size:12px;color:var(--txt2);margin-bottom:11px;">Bill-এর বাইরে সরাসরি UPI/Card payment লিখুন।</p>
+        <div class="card-title"><span>💵</span> Add Cash to Balance</div>
+        <p style="font-size:12px;color:var(--txt2);margin-bottom:12px;">
+          Bill-এর বাইরে সরাসরি নগদ / UPI / যেকোনো extra amount Balance-এ যোগ করুন।
+        </p>
         <label class="flbl">Customer / Reference</label>
-        <input id="onCust" type="text" placeholder="Name or UPI ref">
+        <input id="onCust" type="text" placeholder="Name or reference note">
         <label class="flbl">Amount (₹)</label>
-        <input id="onAmt" type="number" placeholder="0">
-        <button class="btn btn-save" style="margin-top:10px;" onclick="saveOnline()">💾 Save</button>
+        <input id="onAmt" type="number" placeholder="0" min="0">
+        <button class="btn btn-save" style="margin-top:12px;" onclick="saveOnline()">💾 Add to Balance</button>
       </div>
       <div class="card">
-        <div class="card-title"><span>📋</span> Today's Online Records</div>
+        <div class="card-title"><span>📋</span> Today's Cash Added Records</div>
         <div id="onlineHistory"></div>
       </div>
-    </div>
+    </div><!-- /online -->
 
-    <!-- AI BRAIN -->
+    <!-- ========================================================
+         TAB: AI BRAIN
+         ======================================================== -->
     <div id="ai" class="tab-content">
       <div class="card">
         <div class="card-title"><span>🤖</span> Fancy Looks AI Brain</div>
-        <p style="font-size:13px;color:var(--txt2);margin-bottom:13px;">বাংলায় বা English-এ প্রশ্ন করুন — সব data আমার কাছে আছে!</p>
+        <p style="font-size:13px;color:var(--txt2);margin-bottom:13px;">
+          বাংলায় বা English-এ প্রশ্ন করুন — সব data আমার কাছে আছে!
+        </p>
         <div class="ai-chips" id="aiChips"></div>
         <div class="chat-wrap">
           <div class="chat-msgs" id="chatMessages">
@@ -464,7 +815,8 @@ tbody tr:hover td{background:#f8fbff;}
               • Balance কত?<br>
               • Due কত আছে?<br>
               • Product / Service list দাও<br>
-              • সর্বশেষ bills দেখাও<br><br>
+              • সর্বশেষ bills দেখাও<br>
+              • Expense কত হয়েছে?<br><br>
               অথবা নিচের chip গুলো press করুন 👇
             </div>
           </div>
@@ -478,19 +830,20 @@ tbody tr:hover td{background:#f8fbff;}
         <div class="card-title"><span>📊</span> Live Data Overview</div>
         <div class="ai-panel" id="aiDataPanel"></div>
       </div>
-    </div>
+    </div><!-- /ai -->
 
   </main>
-</div>
+</div><!-- /app -->
 
 <script>
-/* =============================================================
-   DATA LAYER
-   ============================================================= */
-const PW = "Fancy2003";
+/* ================================================================
+   DATA LAYER  (localStorage persistence)
+   ================================================================ */
+const MASTER_PW = "Fancy2003";
+
 const LS = {
-  get:(k,d=[])=>{ try{return JSON.parse(localStorage.getItem(k))||d;}catch(e){return d;} },
-  set:(k,v)=>{ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
+  get : (k, d=[]) => { try{ return JSON.parse(localStorage.getItem(k)) || d; }catch(e){ return d; } },
+  set : (k, v)    => { try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 };
 
 let bills     = LS.get("fls_bills"),
@@ -502,537 +855,716 @@ let bills     = LS.get("fls_bills"),
     prodList  = LS.get("fls_product_list"),
     counter   = Number(localStorage.getItem("fls_counter")) || 1;
 
-let curAct=null, curIdx=null;
+let curAct = null, curIdx = null;
 
-/* =============================================================
+/* ================================================================
    TOAST
-   ============================================================= */
-function toast(msg, ms=2800){
-  const t=document.getElementById("toast");
-  t.textContent=msg; t.classList.add("show");
-  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),ms);
+   ================================================================ */
+function toast(msg, ms = 2800){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove("show"), ms);
 }
 
-/* =============================================================
-   TAB
-   ============================================================= */
+/* ================================================================
+   TAB SWITCHING
+   ================================================================ */
 function switchTab(id){
-  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active-tab'));
-  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
-  const tc=document.getElementById(id), nb=document.getElementById('btn-'+id);
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active-tab'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const tc = document.getElementById(id);
+  const nb = document.getElementById('btn-' + id);
   if(tc) tc.classList.add('active-tab');
   if(nb) nb.classList.add('active');
   closeAllDropdowns();
   renderAll();
 }
 
-/* =============================================================
-   MODAL
-   ============================================================= */
-function togglePV(){ const p=document.getElementById("securePass"); p.type=p.type==="password"?"text":"password"; }
-function initAction(type,idx=null){
-  curAct=type; curIdx=idx;
-  document.getElementById("passModal").style.display="flex";
-  document.getElementById("securePass").value="";
-  setTimeout(()=>document.getElementById("securePass").focus(),80);
+/* ================================================================
+   PASSWORD MODAL
+   ================================================================ */
+function togglePV(){
+  const p = document.getElementById("securePass");
+  p.type = p.type === "password" ? "text" : "password";
 }
-function closeModal(){ document.getElementById("passModal").style.display="none"; }
+
+function initAction(type, idx = null){
+  curAct = type; curIdx = idx;
+  document.getElementById("passModal").style.display = "flex";
+  document.getElementById("securePass").value = "";
+  setTimeout(() => document.getElementById("securePass").focus(), 80);
+}
+
+function closeModal(){
+  document.getElementById("passModal").style.display = "none";
+}
 
 function doAction(){
-  if(document.getElementById("securePass").value!==PW){
-    toast("❌ ভুল Password!"); document.getElementById("securePass").value=""; return;
+  if(document.getElementById("securePass").value !== MASTER_PW){
+    toast("❌ ভুল Password!");
+    document.getElementById("securePass").value = "";
+    return;
   }
+  closeModal();
+
   switch(curAct){
     case 'DELETE_BILL':
-      bills.splice(curIdx,1); LS.set("fls_bills",bills); toast("🗑️ Bill deleted"); break;
+      bills.splice(curIdx, 1);
+      LS.set("fls_bills", bills);
+      toast("🗑️ Bill deleted");
+      break;
+
     case 'RESET_ALL':
-      localStorage.clear(); location.reload(); return;
+      localStorage.clear();
+      location.reload();
+      return;
+
     case 'REFRESH_REPORT':
-      archivePerf(); break;
+      archivePerf();
+      break;
+
     case 'DELETE_STAFF_HIST':
-      staffHist.splice(curIdx,1); LS.set("fls_staff_history",staffHist); toast("🗑️ History deleted"); break;
+      staffHist.splice(curIdx, 1);
+      LS.set("fls_staff_history", staffHist);
+      toast("🗑️ History deleted");
+      break;
+
     case 'MARK_DUE_PAID':
-      bills[curIdx].payMethod="Cash (was Due)";
-      bills[curIdx].duePaidDate=new Date().toDateString();
-      LS.set("fls_bills",bills); toast("✅ Due marked paid!"); break;
+      bills[curIdx].payMethod   = "Cash (was Due)";
+      bills[curIdx].duePaidDate = new Date().toDateString();
+      LS.set("fls_bills", bills);
+      toast("✅ Due marked as paid!");
+      break;
+
     case 'DELETE_FIN':
-      fin.splice(curIdx,1); LS.set("fls_finance",fin); toast("🗑️ Deleted"); break;
+      fin.splice(curIdx, 1);
+      LS.set("fls_finance", fin);
+      toast("🗑️ Finance entry deleted");
+      break;
+
     case 'DELETE_ONL':
-      onl.splice(curIdx,1); LS.set("fls_online",onl); toast("🗑️ Deleted"); break;
+      onl.splice(curIdx, 1);
+      LS.set("fls_online", onl);
+      toast("🗑️ Cash entry deleted");
+      break;
+
     case 'DELETE_DATE_SUMMARY':
-      bills=bills.filter(b=>b.date!==curIdx);
-      LS.set("fls_bills",bills); toast("🗑️ Date summary deleted"); break;
+      bills = bills.filter(b => b.date !== curIdx);
+      LS.set("fls_bills", bills);
+      toast("🗑️ Date summary deleted");
+      break;
   }
-  closeModal(); renderAll();
+  renderAll();
 }
 
-/* =============================================================
-   LIST MANAGEMENT
-   ============================================================= */
+/* ================================================================
+   LIST MANAGEMENT  (Staff / Service / Product)
+   ================================================================ */
 function addToList(type){
-  if(type==='staff'){
-    const el=document.getElementById("newStaffName"), v=el.value.trim();
+  if(type === 'staff'){
+    const el = document.getElementById("newStaffName");
+    const v  = el.value.trim();
     if(!v) return toast("❌ Staff name দিন!");
-    staffList.push(v); LS.set("fls_staff_list",staffList); el.value="";
-  } else if(type==='service'){
-    const el=document.getElementById("newServName"), v=el.value.trim();
-    if(!v) return toast("❌ Service name দিন!");
-    servList.push(v); LS.set("fls_service_list",servList); el.value="";
-  } else if(type==='product'){
-    const nEl=document.getElementById("newProdName"), pEl=document.getElementById("newProdPrice");
-    const v=nEl.value.trim(); if(!v) return toast("❌ Product name দিন!");
-    prodList.push({name:v,price:Number(pEl.value)||0});
-    LS.set("fls_product_list",prodList); nEl.value=""; pEl.value="";
+    if(staffList.includes(v)) return toast("⚠️ Already exists!");
+    staffList.push(v);
+    LS.set("fls_staff_list", staffList);
+    el.value = "";
   }
-  toast("✅ Added!"); renderTags(); refreshDropdowns();
+  else if(type === 'service'){
+    const el = document.getElementById("newServName");
+    const v  = el.value.trim();
+    if(!v) return toast("❌ Service name দিন!");
+    if(servList.includes(v)) return toast("⚠️ Already exists!");
+    servList.push(v);
+    LS.set("fls_service_list", servList);
+    el.value = "";
+  }
+  else if(type === 'product'){
+    const nEl = document.getElementById("newProdName");
+    const pEl = document.getElementById("newProdPrice");
+    const v   = nEl.value.trim();
+    if(!v) return toast("❌ Product name দিন!");
+    if(prodList.some(p => p.name === v)) return toast("⚠️ Already exists!");
+    prodList.push({ name: v, price: Number(pEl.value) || 0 });
+    LS.set("fls_product_list", prodList);
+    nEl.value = "";
+    pEl.value = "";
+  }
+  toast("✅ Added successfully!"); renderTags();
 }
 
-function removeFromList(type,key){
-  const name=decodeURIComponent(key);
-  if(type==='staff')   staffList=staffList.filter(n=>n!==name);
-  if(type==='service') servList=servList.filter(n=>n!==name);
-  if(type==='product') prodList=prodList.filter(p=>p.name!==name);
-  LS.set("fls_staff_list",staffList);
-  LS.set("fls_service_list",servList);
-  LS.set("fls_product_list",prodList);
-  toast("🗑️ Removed"); renderTags(); refreshDropdowns();
+function removeFromList(type, key){
+  const name = decodeURIComponent(key);
+  if(type === 'staff')   staffList = staffList.filter(n => n !== name);
+  if(type === 'service') servList  = servList.filter(n => n !== name);
+  if(type === 'product') prodList  = prodList.filter(p => p.name !== name);
+  LS.set("fls_staff_list",   staffList);
+  LS.set("fls_service_list", servList);
+  LS.set("fls_product_list", prodList);
+  toast("🗑️ Removed"); renderTags();
 }
 
 function renderTags(){
-  const mk=(items,type,isObj)=>{
-    if(!items.length) return '<span class="tag-empty">Empty</span>';
-    return items.map(n=>{
-      const lbl=isObj?`${n.name}${n.price?' ₹'+n.price:''}`:n;
-      const key=encodeURIComponent(isObj?n.name:n);
-      return `<div class="tag">${lbl} <span class="tag-x" onclick="removeFromList('${type}','${key}')">×</span></div>`;
+  const mkTags = (items, type, isObj) => {
+    if(!items.length) return '<span class="tag-empty">Empty — add some!</span>';
+    return items.map(n => {
+      const lbl = isObj ? `${n.name}${n.price ? ' ₹'+n.price : ''}` : n;
+      const key = encodeURIComponent(isObj ? n.name : n);
+      return `<div class="tag">${lbl}<span class="tag-x" onclick="removeFromList('${type}','${key}')">×</span></div>`;
     }).join('');
   };
-  const st=document.getElementById("staffTags");
-  const sv=document.getElementById("serviceTags");
-  const pt=document.getElementById("productTags");
-  if(st) st.innerHTML=mk(staffList,'staff',false);
-  if(sv) sv.innerHTML=mk(servList,'service',false);
-  if(pt) pt.innerHTML=mk(prodList,'product',true);
+  const st = document.getElementById("staffTags");
+  const sv = document.getElementById("serviceTags");
+  const pt = document.getElementById("productTags");
+  if(st) st.innerHTML = mkTags(staffList, 'staff',   false);
+  if(sv) sv.innerHTML = mkTags(servList,  'service', false);
+  if(pt) pt.innerHTML = mkTags(prodList,  'product', true);
 }
 
 function filterTags(type){
-  const idMap={staff:'searchStaff',service:'searchService',product:'searchProduct'};
-  const elMap={staff:'staffTags',service:'serviceTags',product:'productTags'};
-  const q=(document.getElementById(idMap[type])?.value||'').toLowerCase().trim();
-  const el=document.getElementById(elMap[type]); if(!el) return;
-  let items=[], isObj=false;
-  if(type==='staff')   items=staffList;
-  if(type==='service') items=servList;
-  if(type==='product'){ items=prodList; isObj=true; }
-  const filtered=items.filter(n=>{ const lbl=isObj?n.name.toLowerCase():n.toLowerCase(); return !q||lbl.includes(q); });
-  if(!filtered.length){ el.innerHTML='<span class="tag-empty">No match</span>'; return; }
-  el.innerHTML=filtered.map(n=>{
-    const lbl=isObj?`${n.name}${n.price?' ₹'+n.price:''}`:n;
-    const key=encodeURIComponent(isObj?n.name:n);
-    return `<div class="tag">${lbl} <span class="tag-x" onclick="removeFromList('${type}','${key}')">×</span></div>`;
+  const idMap = { staff:'searchStaff', service:'searchService', product:'searchProduct' };
+  const elMap = { staff:'staffTags',   service:'serviceTags',   product:'productTags'   };
+  const q     = (document.getElementById(idMap[type])?.value || '').toLowerCase().trim();
+  const el    = document.getElementById(elMap[type]); if(!el) return;
+  let items = [], isObj = false;
+  if(type === 'staff')   items = staffList;
+  if(type === 'service') items = servList;
+  if(type === 'product'){ items = prodList; isObj = true; }
+  const filtered = items.filter(n => {
+    const lbl = isObj ? n.name.toLowerCase() : n.toLowerCase();
+    return !q || lbl.includes(q);
+  });
+  if(!filtered.length){ el.innerHTML = '<span class="tag-empty">No match</span>'; return; }
+  el.innerHTML = filtered.map(n => {
+    const lbl = isObj ? `${n.name}${n.price ? ' ₹'+n.price : ''}` : n;
+    const key = encodeURIComponent(isObj ? n.name : n);
+    return `<div class="tag">${lbl}<span class="tag-x" onclick="removeFromList('${type}','${key}')">×</span></div>`;
   }).join('');
 }
 
-/* =============================================================
-   AUTOCOMPLETE ENGINE (for billing rows)
-   ============================================================= */
-let _acActive=null; // currently open dropdown element
-
+/* ================================================================
+   AUTOCOMPLETE ENGINE
+   ================================================================ */
 function closeAllDropdowns(){
-  document.querySelectorAll('.ac-drop.open').forEach(d=>d.classList.remove('open'));
-  _acActive=null;
+  document.querySelectorAll('.ac-drop.open').forEach(d => d.classList.remove('open'));
 }
 
-// Create a searchable autocomplete input wrapper
-// type: 'product' | 'service' | 'staff'
-// extraCls: extra CSS classes on the input
-// placeholder
-// onSelect(value, price): callback when item selected
-function makeAC(type, placeholder, extraCls, onSelect){
-  const wrap=document.createElement('div');
-  wrap.className='ac-wrap '+extraCls;
-  wrap.style.position='relative';
+function makeAC(type, placeholder, onSelect){
+  const wrap = document.createElement('div');
+  wrap.className = 'ac-wrap';
 
-  const inp=document.createElement('input');
-  inp.type='text'; inp.placeholder=placeholder; inp.className='ac-inp-'+type;
+  const inp  = document.createElement('input');
+  inp.type        = 'text';
+  inp.placeholder = placeholder;
+  inp.className   = 'ac-inp-' + type;
 
-  const drop=document.createElement('div');
-  drop.className='ac-drop';
+  const drop = document.createElement('div');
+  drop.className  = 'ac-drop';
 
-  wrap.appendChild(inp); wrap.appendChild(drop);
+  wrap.appendChild(inp);
+  wrap.appendChild(drop);
 
   function getList(){
-    if(type==='product') return prodList.map(p=>({label:p.name+(p.price?` (₹${p.price})`:''),value:p.name,price:p.price,sub:'📦 Product'}));
-    if(type==='service') return servList.map(s=>({label:s,value:s,price:0,sub:'✂️ Service'}));
-    if(type==='staff')   return staffList.map(s=>({label:s,value:s,price:0,sub:'👤 Staff'}));
+    if(type === 'product') return prodList.map(p => ({
+      label : p.name + (p.price ? ` (₹${p.price})` : ''),
+      value : p.name, price: p.price, sub: '📦 Product'
+    }));
+    if(type === 'service') return servList.map(s => ({
+      label: s, value: s, price: 0, sub: '✂️ Service'
+    }));
+    if(type === 'staff') return staffList.map(s => ({
+      label: s, value: s, price: 0, sub: '👤 Staff'
+    }));
     return [];
   }
 
   function renderDrop(q){
-    const list=getList();
-    const filtered=!q?list:list.filter(i=>i.label.toLowerCase().includes(q.toLowerCase()));
+    const list     = getList();
+    const filtered = !q ? list : list.filter(i => i.label.toLowerCase().includes(q.toLowerCase()));
     if(!filtered.length){
-      drop.innerHTML='<div class="ac-empty">No results</div>';
+      drop.innerHTML = '<div class="ac-empty">No results found</div>';
     } else {
-      drop.innerHTML=filtered.map((item,i)=>
-        `<div class="ac-item" data-val="${item.value}" data-price="${item.price}" tabindex="-1">
-          ${item.label.replace(q?new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig'):/.^/,'<strong>$1</strong>')}
-          ${item.sub?`<span class="ac-sub">${item.sub}</span>`:''}
-        </div>`
-      ).join('');
-      drop.querySelectorAll('.ac-item').forEach(el=>{
-        el.addEventListener('mousedown',e=>{
+      const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      drop.innerHTML = filtered.map(item => {
+        const hl = q
+          ? item.label.replace(new RegExp('('+esc(q)+')','ig'),'<strong>$1</strong>')
+          : item.label;
+        return `<div class="ac-item" data-val="${item.value}" data-price="${item.price}">
+          ${hl}<span class="ac-sub">${item.sub}</span>
+        </div>`;
+      }).join('');
+      drop.querySelectorAll('.ac-item').forEach(el => {
+        el.addEventListener('mousedown', e => {
           e.preventDefault();
-          const v=el.getAttribute('data-val');
-          const p=Number(el.getAttribute('data-price'))||0;
-          inp.value=v;
+          const v = el.getAttribute('data-val');
+          const p = Number(el.getAttribute('data-price')) || 0;
+          inp.value = v;
           drop.classList.remove('open');
-          _acActive=null;
-          onSelect(v,p);
+          onSelect(v, p);
         });
       });
     }
     drop.classList.add('open');
-    _acActive=drop;
   }
 
-  inp.addEventListener('focus',()=>renderDrop(inp.value));
-  inp.addEventListener('input',()=>renderDrop(inp.value));
-  inp.addEventListener('blur',()=>setTimeout(()=>{ drop.classList.remove('open'); },200));
-  inp.addEventListener('keydown',e=>{
-    const items=drop.querySelectorAll('.ac-item');
-    const cur=drop.querySelector('.ac-item.focused');
-    if(e.key==='ArrowDown'){
+  inp.addEventListener('focus',  () => renderDrop(inp.value));
+  inp.addEventListener('input',  () => renderDrop(inp.value));
+  inp.addEventListener('blur',   () => setTimeout(() => drop.classList.remove('open'), 220));
+  inp.addEventListener('keydown', e => {
+    const items = [...drop.querySelectorAll('.ac-item')];
+    const cur   = drop.querySelector('.ac-item.focused');
+    if(e.key === 'ArrowDown'){
       e.preventDefault();
       if(!drop.classList.contains('open')) renderDrop(inp.value);
-      const next=cur?cur.nextElementSibling:items[0];
-      if(cur) cur.classList.remove('focused');
-      if(next) next.classList.add('focused');
-    } else if(e.key==='ArrowUp'){
+      const next = cur ? cur.nextElementSibling : items[0];
+      cur?.classList.remove('focused');
+      next?.classList.add('focused');
+    } else if(e.key === 'ArrowUp'){
       e.preventDefault();
-      const prev=cur?cur.previousElementSibling:null;
-      if(cur) cur.classList.remove('focused');
-      if(prev) prev.classList.add('focused');
-    } else if(e.key==='Enter'&&cur){
+      const prev = cur ? cur.previousElementSibling : null;
+      cur?.classList.remove('focused');
+      prev?.classList.add('focused');
+    } else if(e.key === 'Enter' && cur){
       e.preventDefault();
-      const v=cur.getAttribute('data-val');
-      const p=Number(cur.getAttribute('data-price'))||0;
-      inp.value=v; drop.classList.remove('open');
-      onSelect(v,p);
-    } else if(e.key==='Escape'){
+      const v = cur.getAttribute('data-val');
+      const p = Number(cur.getAttribute('data-price')) || 0;
+      inp.value = v; drop.classList.remove('open');
+      onSelect(v, p);
+    } else if(e.key === 'Escape'){
       drop.classList.remove('open');
     }
   });
 
-  return {wrap, inp};
+  return { wrap, inp };
 }
 
-/* =============================================================
-   ADD BILLING ROWS
-   ============================================================= */
+/* ================================================================
+   DISCOUNT INLINE CALCULATOR
+   ================================================================ */
+function updateDiscCalc(rowDiv){
+  const priceEl = rowDiv.querySelector('.p-price, .s-price');
+  const discEl  = rowDiv.querySelector('.p-disc,  .s-disc');
+  const calcDiv = rowDiv.querySelector('.disc-calc');
+  if(!priceEl || !discEl || !calcDiv) return;
+  const price = Number(priceEl.value) || 0;
+  const disc  = Number(discEl.value)  || 0;
+  if(price > 0 && disc > 0 && disc <= 100){
+    const saving = Math.round(price * disc / 100);
+    const final  = price - saving;
+    calcDiv.textContent = `💡 ₹${price} তে ${disc}% ছাড় দিলে ₹${saving} কম → চূড়ান্ত দাম ₹${final}`;
+    calcDiv.style.display = 'block';
+  } else {
+    calcDiv.textContent    = '';
+    calcDiv.style.display  = 'none';
+  }
+}
+
+/* ================================================================
+   ADD BILLING ROWS  (product & service)
+   ================================================================ */
 function addRow(area){
-  const div=document.createElement('div');
-  div.className='row-group';
+  const div = document.createElement('div');
+  div.className = 'row-group';
 
-  if(area==='prodArea'){
-    // Product AC
-    const {wrap:pw, inp:pi}=makeAC('product','📦 Product name...','',
-      (v,p)=>{ pi.value=v; const priceInp=div.querySelector('.p-price'); if(p>0)priceInp.value=p; calcPreview(); });
-    pw.style.flex='1.5'; pi.className+=' p-name';
+  if(area === 'prodArea'){
+    /* ── Product row ── */
+    const { wrap: pw, inp: pi } = makeAC('product', '📦 Product name...', (v, p) => {
+      pi.value = v;
+      const priceInp = div.querySelector('.p-price');
+      if(p > 0) priceInp.value = p;
+      updateDiscCalc(div); calcPreview();
+    });
+    pw.style.flex = '1.8'; pi.className += ' p-name';
 
-    // Price input
-    const priceInp=document.createElement('input');
-    priceInp.type='number'; priceInp.placeholder='₹ Price'; priceInp.className='p-price';
-    priceInp.style.flex='.7'; priceInp.style.minWidth='62px'; priceInp.style.margin='0';
-    priceInp.addEventListener('input',calcPreview);
+    const priceInp = document.createElement('input');
+    priceInp.type        = 'number';
+    priceInp.placeholder = '₹ Price';
+    priceInp.className   = 'p-price';
+    priceInp.style.cssText = 'flex:.8;min-width:62px;margin:0;';
+    priceInp.addEventListener('input', () => { updateDiscCalc(div); calcPreview(); });
 
-    // Staff AC
-    const {wrap:sw, inp:si}=makeAC('staff','👤 Staff...','',
-      (v)=>{ si.value=v; });
-    sw.style.flex='1'; si.className+=' p-staff';
+    const discInp = document.createElement('input');
+    discInp.type        = 'number';
+    discInp.placeholder = 'Disc%';
+    discInp.className   = 'p-disc disc-inp';
+    discInp.min = '0'; discInp.max = '100';
+    discInp.title = 'Discount % (optional)';
+    discInp.style.cssText = 'flex:.45;min-width:56px;margin:0;';
+    discInp.addEventListener('input', () => { updateDiscCalc(div); calcPreview(); });
 
-    const delBtn=document.createElement('button');
-    delBtn.className='abt abt-d'; delBtn.textContent='❌';
-    delBtn.onclick=()=>{ div.remove(); calcPreview(); };
+    const { wrap: sw, inp: si } = makeAC('staff', '👤 Staff...', v => si.value = v);
+    sw.style.flex = '1.1'; si.className += ' p-staff';
 
-    div.appendChild(pw); div.appendChild(priceInp); div.appendChild(sw); div.appendChild(delBtn);
+    const delBtn = document.createElement('button');
+    delBtn.className = 'abt abt-d'; delBtn.textContent = '❌';
+    delBtn.onclick = () => { div.remove(); calcPreview(); };
+
+    const calcDiv = document.createElement('div');
+    calcDiv.className = 'disc-calc';
+
+    div.append(pw, priceInp, discInp, sw, delBtn, calcDiv);
 
   } else {
-    // Service AC
-    const {wrap:svw, inp:svi}=makeAC('service','✂️ Service name...','',
-      (v)=>{ svi.value=v; });
-    svw.style.flex='1.5'; svi.className+=' s-name';
+    /* ── Service row ── */
+    const { wrap: svw, inp: svi } = makeAC('service', '✂️ Service name...', v => svi.value = v);
+    svw.style.flex = '1.8'; svi.className += ' s-name';
 
-    // Price input
-    const priceInp=document.createElement('input');
-    priceInp.type='number'; priceInp.placeholder='₹ Price'; priceInp.className='s-price';
-    priceInp.style.flex='.7'; priceInp.style.minWidth='62px'; priceInp.style.margin='0';
-    priceInp.addEventListener('input',calcPreview);
+    const priceInp = document.createElement('input');
+    priceInp.type        = 'number';
+    priceInp.placeholder = '₹ Price';
+    priceInp.className   = 's-price';
+    priceInp.style.cssText = 'flex:.8;min-width:62px;margin:0;';
+    priceInp.addEventListener('input', () => { updateDiscCalc(div); calcPreview(); });
 
-    // Staff AC
-    const {wrap:stw, inp:sti}=makeAC('staff','👤 Staff...','',
-      (v)=>{ sti.value=v; });
-    stw.style.flex='1'; sti.className+=' s-staff';
+    const discInp = document.createElement('input');
+    discInp.type        = 'number';
+    discInp.placeholder = 'Disc%';
+    discInp.className   = 's-disc disc-inp';
+    discInp.min = '0'; discInp.max = '100';
+    discInp.title = 'Discount % (optional)';
+    discInp.style.cssText = 'flex:.45;min-width:56px;margin:0;';
+    discInp.addEventListener('input', () => { updateDiscCalc(div); calcPreview(); });
 
-    const delBtn=document.createElement('button');
-    delBtn.className='abt abt-d'; delBtn.textContent='❌';
-    delBtn.onclick=()=>{ div.remove(); calcPreview(); };
+    const { wrap: stw, inp: sti } = makeAC('staff', '👤 Staff...', v => sti.value = v);
+    stw.style.flex = '1.1'; sti.className += ' s-staff';
 
-    div.appendChild(svw); div.appendChild(priceInp); div.appendChild(stw); div.appendChild(delBtn);
+    const delBtn = document.createElement('button');
+    delBtn.className = 'abt abt-d'; delBtn.textContent = '❌';
+    delBtn.onclick = () => { div.remove(); calcPreview(); };
+
+    const calcDiv = document.createElement('div');
+    calcDiv.className = 'disc-calc';
+
+    div.append(svw, priceInp, discInp, stw, delBtn, calcDiv);
   }
 
   document.getElementById(area).appendChild(div);
 }
 
-function refreshDropdowns(){
-  // dropdowns are now autocomplete — no refresh needed
-  // just update datalists if we add any
-}
-
+/* ================================================================
+   BILL PREVIEW CALCULATOR
+   ================================================================ */
 function calcPreview(){
-  let p=0,s=0;
-  document.querySelectorAll("#prodArea .p-price").forEach(i=>p+=Number(i.value||0));
-  document.querySelectorAll("#servArea .s-price").forEach(i=>s+=Number(i.value||0));
-  const prev=document.getElementById("billPreview"); if(!prev)return;
-  if(p+s>0){
-    prev.style.display="block";
-    document.getElementById("prevProd").textContent="₹"+p;
-    document.getElementById("prevServ").textContent="₹"+s;
-    document.getElementById("prevTotal").textContent="₹"+(p+s);
-  } else prev.style.display="none";
+  let p = 0, s = 0;
+
+  document.querySelectorAll("#prodArea .row-group").forEach(row => {
+    const price = Number(row.querySelector(".p-price")?.value || 0);
+    const disc  = Number(row.querySelector(".p-disc")?.value  || 0);
+    p += (disc > 0 && disc <= 100) ? price - Math.round(price * disc / 100) : price;
+  });
+
+  document.querySelectorAll("#servArea .row-group").forEach(row => {
+    const price = Number(row.querySelector(".s-price")?.value || 0);
+    const disc  = Number(row.querySelector(".s-disc")?.value  || 0);
+    s += (disc > 0 && disc <= 100) ? price - Math.round(price * disc / 100) : price;
+  });
+
+  const sub     = p + s;
+  const gdPct   = Number(document.getElementById("grandDisc")?.value || 0);
+  const gdSave  = (gdPct > 0 && gdPct <= 100) ? Math.round(sub * gdPct / 100) : 0;
+  const grand   = sub - gdSave;
+
+  const prev = document.getElementById("billPreview"); if(!prev) return;
+
+  if(sub > 0){
+    prev.style.display = "block";
+    setText("prevProd",  "₹" + p);
+    setText("prevServ",  "₹" + s);
+    setText("prevSub",   "₹" + sub);
+    setText("prevTotal", "₹" + grand);
+    const gcEl = document.getElementById("grandDiscCalc");
+    if(gcEl) gcEl.textContent = (gdPct > 0) ? `💡 ₹${sub} তে ${gdPct}% ছাড় = ₹${gdSave} কম` : '';
+  } else {
+    prev.style.display = "none";
+    const gcEl = document.getElementById("grandDiscCalc");
+    if(gcEl) gcEl.textContent = '';
+  }
 }
 
-/* =============================================================
+/* ================================================================
    SAVE BILL
-   ============================================================= */
+   ================================================================ */
 function saveBill(){
-  const prods=[], servs=[];
-  document.querySelectorAll("#prodArea .row-group").forEach(r=>{
-    const n=(r.querySelector(".p-name")?.value||"").trim();
-    const p=Number(r.querySelector(".p-price")?.value||0);
-    const s=(r.querySelector(".p-staff")?.value||"").trim()||"Direct Sale";
-    if(n&&p) prods.push({n,p,s});
+  const prods = [], servs = [];
+
+  document.querySelectorAll("#prodArea .row-group").forEach(r => {
+    const n     = (r.querySelector(".p-name")?.value  || "").trim();
+    const origP = Number(r.querySelector(".p-price")?.value || 0);
+    const disc  = Number(r.querySelector(".p-disc")?.value  || 0);
+    const p     = (disc > 0 && disc <= 100) ? origP - Math.round(origP * disc / 100) : origP;
+    const st    = (r.querySelector(".p-staff")?.value || "").trim() || "Direct Sale";
+    if(n && origP) prods.push({ n, p, origP, disc, s: st });
   });
-  document.querySelectorAll("#servArea .row-group").forEach(r=>{
-    const n=(r.querySelector(".s-name")?.value||"").trim();
-    const p=Number(r.querySelector(".s-price")?.value||0);
-    const s=(r.querySelector(".s-staff")?.value||"").trim();
-    if(n&&p&&s) servs.push({n,p,s});
+
+  document.querySelectorAll("#servArea .row-group").forEach(r => {
+    const n     = (r.querySelector(".s-name")?.value  || "").trim();
+    const origP = Number(r.querySelector(".s-price")?.value || 0);
+    const disc  = Number(r.querySelector(".s-disc")?.value  || 0);
+    const p     = (disc > 0 && disc <= 100) ? origP - Math.round(origP * disc / 100) : origP;
+    const st    = (r.querySelector(".s-staff")?.value || "").trim();
+    if(n && origP && st) servs.push({ n, p, origP, disc, s: st });
   });
-  if(!prods.length&&!servs.length) return toast("❌ কোনো item নেই!");
-  bills.push({
-    id:"FLS-"+String(counter).padStart(4,"0"),
-    cust:document.getElementById("custName").value.trim()||"Walk-in",
-    phone:document.getElementById("custPhone").value.trim()||"",
+
+  if(!prods.length && !servs.length) return toast("❌ কমপক্ষে একটি item যোগ করুন!");
+
+  const gdPct   = Number(document.getElementById("grandDisc")?.value || 0);
+  const subTotal = prods.reduce((a,c) => a+c.p, 0) + servs.reduce((a,c) => a+c.p, 0);
+  const gdAmt   = (gdPct > 0 && gdPct <= 100) ? Math.round(subTotal * gdPct / 100) : 0;
+
+  // Bill date
+  const bdEl   = document.getElementById("billDate");
+  const bdVal  = bdEl?.value;
+  const billDate = bdVal ? new Date(bdVal + 'T00:00:00').toDateString() : new Date().toDateString();
+
+  const bill = {
+    id           : "FLS-" + String(counter).padStart(4, "0"),
+    cust         : document.getElementById("custName").value.trim() || "Walk-in",
+    phone        : document.getElementById("custPhone").value.trim() || "",
     prods, servs,
-    payMethod:document.getElementById("payMethod").value,
-    date:new Date().toDateString(), ts:new Date().toISOString(), archived:false
-  });
-  LS.set("fls_bills",bills);
-  localStorage.setItem("fls_counter",++counter);
-  document.getElementById("custName").value="";
-  document.getElementById("custPhone").value="";
-  document.getElementById("payMethod").value="Cash";
-  document.getElementById("prodArea").innerHTML="";
-  document.getElementById("servArea").innerHTML="";
-  document.getElementById("billPreview").style.display="none";
+    grandDiscPct : gdPct,
+    grandDiscAmt : gdAmt,
+    payMethod    : document.getElementById("payMethod").value,
+    date         : billDate,
+    ts           : new Date().toISOString(),
+    archived     : false
+  };
+
+  bills.push(bill);
+  LS.set("fls_bills", bills);
+  localStorage.setItem("fls_counter", ++counter);
+
+  // Reset form
+  document.getElementById("custName").value  = "";
+  document.getElementById("custPhone").value = "";
+  document.getElementById("payMethod").value = "Cash";
+  document.getElementById("prodArea").innerHTML = "";
+  document.getElementById("servArea").innerHTML = "";
+  document.getElementById("billPreview").style.display = "none";
+  const gdEl = document.getElementById("grandDisc");   if(gdEl) gdEl.value = "";
+  const gcEl = document.getElementById("grandDiscCalc"); if(gcEl) gcEl.textContent = "";
+  if(bdEl) bdEl.value = todayInputVal();
+
   addRow('prodArea'); addRow('servArea');
-  toast("✅ Bill FLS-"+String(counter-1).padStart(4,"0")+" saved!"); renderAll();
+  toast(`✅ Bill ${bill.id} saved! (${bill.date})`);
+  renderAll();
 }
 
-/* =============================================================
-   BUILD PROFESSIONAL PDF (products only shown to customer)
-   ============================================================= */
+/* ================================================================
+   PDF BUILDER
+   ================================================================ */
 function buildInvoicePDF(b){
-  const {jsPDF}=window.jspdf;
-  const doc=new jsPDF({unit:'mm',format:'a5',orientation:'portrait'});
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'mm', format:'a5', orientation:'portrait' });
   const W=148, H=210;
-  const pT=b.prods.reduce((a,c)=>a+c.p,0);
-  const hasServs=b.servs&&b.servs.length>0;
 
-  // Header bg
+  const prodNet    = b.prods.reduce((a,c) => a+c.p, 0);
+  const servNet    = b.servs ? b.servs.reduce((a,c) => a+c.p, 0) : 0;
+  const gdAmt      = b.grandDiscAmt || 0;
+  const gdPct      = b.grandDiscPct || 0;
+  const totalShown = prodNet - gdAmt;
+  const hasServs   = b.servs && b.servs.length > 0;
+  const hasDisc    = b.prods.some(p => p.disc > 0) || (b.servs||[]).some(s => s.disc > 0) || gdAmt > 0;
+
+  // Header
   doc.setFillColor(13,27,42); doc.rect(0,0,W,38,'F');
-  // Gold bar
   doc.setFillColor(255,170,0); doc.rect(0,38,W,2.5,'F');
-  // Salon name
   doc.setFont('helvetica','bold'); doc.setFontSize(21); doc.setTextColor(0,212,255);
-  doc.text('Fancy Looks Salon',W/2,13,{align:'center'});
-  // Tagline
+  doc.text('Fancy Looks Salon', W/2, 13, {align:'center'});
   doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(180,200,220);
-  doc.text('Premium Hair & Beauty Care',W/2,20,{align:'center'});
-  doc.text('+91 79802 83920',W/2,25,{align:'center'});
-  // INVOICE badge
+  doc.text('Premium Hair & Beauty Care', W/2, 20, {align:'center'});
+  doc.text('+91 79802 83920', W/2, 25, {align:'center'});
   doc.setFillColor(0,212,255); doc.roundedRect(W/2-18,29,36,7,2,2,'F');
   doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(13,27,42);
-  doc.text('INVOICE',W/2,34,{align:'center'});
+  doc.text('INVOICE', W/2, 34, {align:'center'});
 
   // Customer box
-  let y=48;
+  let y = 48;
   doc.setFillColor(244,248,252); doc.roundedRect(8,y-4,W-16,24,2,2,'F');
   doc.setDrawColor(210,225,240); doc.roundedRect(8,y-4,W-16,24,2,2,'S');
   doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(13,27,42);
-  doc.text('Bill To:',11,y+2);
-  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(30,50,70);
-  doc.text(b.cust.substring(0,25),32,y+2);
+  doc.text('Bill To:', 11, y+2);
+  doc.setFont('helvetica','normal'); doc.setTextColor(30,50,70);
+  doc.text(b.cust.substring(0,25), 32, y+2);
   doc.setFontSize(8); doc.setTextColor(80,100,120);
-  doc.text('Phone: '+(b.phone||'N/A'),11,y+8);
-  // Bill info right side
+  doc.text('Phone: '+(b.phone||'N/A'), 11, y+8);
   doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(13,27,42);
-  doc.text('Bill No:',W-52,y+2); doc.text('Date:',W-52,y+8);
+  doc.text('Bill No:', W-52, y+2); doc.text('Date:', W-52, y+8);
   doc.setFont('helvetica','normal'); doc.setTextColor(0,100,180);
-  doc.text(b.id,W-28,y+2);
+  doc.text(b.id, W-26, y+2);
   doc.setTextColor(30,50,70);
-  doc.text(b.date,W-28,y+8);
-  // payment badge
-  const pc=b.payMethod==='Cash'?[0,148,98]:b.payMethod==='Online'?[25,75,200]:[195,50,50];
+  doc.text(b.date, W-26, y+8);
+  const pc = b.payMethod==='Cash'?[0,148,98]:b.payMethod==='Online'?[25,75,200]:[195,50,50];
   doc.setFillColor(...pc); doc.roundedRect(11,y+13,32,6,1.5,1.5,'F');
   doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(255,255,255);
-  doc.text('Payment: '+b.payMethod,12.5,y+17.2);
+  doc.text('Payment: '+b.payMethod, 12.5, y+17.2);
 
-  // Items table
-  y=80;
+  // Table header
+  y = 80;
   doc.setFillColor(13,27,42); doc.rect(8,y,W-16,7,'F');
   doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(255,255,255);
-  doc.text('#',11,y+5); doc.text('Item',19,y+5); doc.text('Type',92,y+5); doc.text('Price',126,y+5);
-  y+=7;
+  doc.text('#', 11, y+5);
+  doc.text('Item', 19, y+5);
+  doc.text('Type', 82, y+5);
+  if(hasDisc){
+    doc.text('Orig', 105, y+5);
+    doc.text('Disc', 118, y+5);
+    doc.text('Price', 128, y+5);
+  } else {
+    doc.text('Price', 126, y+5);
+  }
+  y += 7;
 
-  const allItems=[
-    ...b.prods.map(p=>({name:p.n,type:'Product',price:'Rs.'+p.p,isServ:false})),
-    ...(hasServs?b.servs.map(s=>({name:s.n,type:'Service',price:'Complimentary',isServ:true})):[])
+  const allItems = [
+    ...b.prods.map(p => ({ name:p.n, type:'Product', origP:p.origP||p.p, disc:p.disc||0, price:p.p, serv:false })),
+    ...(hasServs ? b.servs.map(s => ({ name:s.n, type:'Service', origP:s.origP||s.p, disc:s.disc||0, price:s.p, serv:true })) : [])
   ];
 
-  allItems.forEach((item,i)=>{
-    const rh=8;
+  allItems.forEach((item, i) => {
+    const rh = 8;
     doc.setFillColor(i%2===0?248:255, i%2===0?252:255, 255);
-    doc.rect(8,y,W-16,rh,'F');
-    doc.setDrawColor(225,235,245); doc.rect(8,y,W-16,rh,'S');
+    doc.rect(8, y, W-16, rh, 'F');
+    doc.setDrawColor(225,235,245); doc.rect(8, y, W-16, rh, 'S');
     doc.setFont('helvetica','normal'); doc.setFontSize(8);
-    doc.setTextColor(110,130,150); doc.text(String(i+1),11,y+5.5);
+    doc.setTextColor(110,130,150); doc.text(String(i+1), 11, y+5.5);
     doc.setTextColor(20,40,60);
-    const nm=item.name.length>22?item.name.substring(0,22)+'…':item.name;
-    doc.text(nm,19,y+5.5);
-    if(item.type==='Product'){doc.setTextColor(22,101,52);}else{doc.setTextColor(133,77,14);}
-    doc.text(item.type,92,y+5.5);
-    if(item.isServ){doc.setTextColor(160,160,160); doc.setFont('helvetica','italic');}
-    else{doc.setFont('helvetica','bold'); doc.setTextColor(0,120,80);}
-    doc.text(item.price,126,y+5.5);
-    y+=rh;
+    const nm = item.name.length > 20 ? item.name.slice(0,20)+'…' : item.name;
+    doc.text(nm, 19, y+5.5);
+    item.type==='Product' ? doc.setTextColor(22,101,52) : doc.setTextColor(133,77,14);
+    doc.text(item.type, 82, y+5.5);
+    if(hasDisc){
+      doc.setFont('helvetica','normal'); doc.setTextColor(110,130,150);
+      doc.text('Rs.'+item.origP, 105, y+5.5);
+      if(item.disc > 0){ doc.setTextColor(180,80,0); doc.text(item.disc+'%', 118, y+5.5); }
+      else { doc.text('—', 118, y+5.5); }
+      if(item.serv){ doc.setTextColor(160,160,160); doc.setFont('helvetica','italic'); doc.text('Comp.', 128, y+5.5); }
+      else { doc.setFont('helvetica','bold'); doc.setTextColor(0,120,80); doc.text('Rs.'+item.price, 128, y+5.5); }
+    } else {
+      if(item.serv){ doc.setTextColor(160,160,160); doc.setFont('helvetica','italic'); doc.text('Complimentary', 126, y+5.5); }
+      else { doc.setFont('helvetica','bold'); doc.setTextColor(0,120,80); doc.text('Rs.'+item.price, 126, y+5.5); }
+    }
+    y += rh;
   });
 
-  // Divider
-  doc.setDrawColor(0,212,255); doc.setLineWidth(0.7);
-  doc.line(8,y+3,W-8,y+3); y+=8;
+  // Grand discount row
+  if(gdAmt > 0){
+    doc.setFillColor(255,251,235); doc.rect(8,y,W-16,8,'F');
+    doc.setDrawColor(253,211,77); doc.rect(8,y,W-16,8,'S');
+    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(133,77,14);
+    doc.text(`Grand Discount (${gdPct}% off):`, 11, y+5.5);
+    doc.setTextColor(180,60,0);
+    doc.text('- Rs.'+gdAmt, W-10, y+5.5, {align:'right'});
+    y += 8;
+  }
 
-  // Total box
-  doc.setFillColor(13,27,42); doc.roundedRect(W-62,y,54,15,2,2,'F');
+  // Divider + Total
+  doc.setDrawColor(0,212,255); doc.setLineWidth(0.7);
+  doc.line(8, y+3, W-8, y+3); y += 8;
+  doc.setFillColor(13,27,42); doc.roundedRect(W-64,y,56,15,2,2,'F');
   doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(0,212,255);
-  doc.text('TOTAL AMOUNT',W-58,y+6);
+  doc.text('TOTAL AMOUNT', W-60, y+6);
   doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.setTextColor(255,170,0);
-  doc.text('Rs.'+pT,W-58,y+13);
+  doc.text('Rs.'+totalShown, W-60, y+13);
 
   // Footer
-  const fy=H-20;
+  const fy = H-20;
   doc.setFillColor(13,27,42); doc.rect(0,fy,W,20,'F');
   doc.setFillColor(255,170,0); doc.rect(0,fy,W,1.2,'F');
   doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(0,212,255);
-  doc.text('Thank you for visiting Fancy Looks Salon!',W/2,fy+8,{align:'center'});
+  doc.text('Thank you for visiting Fancy Looks Salon!', W/2, fy+8, {align:'center'});
   doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(160,180,200);
-  doc.text('We hope to see you again soon  ✂',W/2,fy+13,{align:'center'});
+  doc.text('We hope to see you again soon  ✂', W/2, fy+13, {align:'center'});
   doc.setTextColor(90,110,140);
-  doc.text('Powered by Fancy Looks Salon POS',W/2,fy+18,{align:'center'});
-
+  doc.text('Powered by Fancy Looks Salon POS', W/2, fy+18, {align:'center'});
   return doc;
 }
 
-/* =============================================================
+/* ================================================================
    PRINT / WHATSAPP
-   ============================================================= */
-async function handleBillAction(idx,type){
-  const b=bills[idx]; if(!b) return toast("❌ Bill not found");
-  const pT=b.prods.reduce((a,c)=>a+c.p,0);
-  const hasServs=b.servs&&b.servs.length>0;
+   ================================================================ */
+async function handleBillAction(idx, type){
+  const b = bills[idx]; if(!b) return toast("❌ Bill not found");
+  const prodNet = b.prods.reduce((a,c) => a+c.p, 0);
+  const gdAmt   = b.grandDiscAmt || 0;
+  const pT      = prodNet - gdAmt;
+  const fT      = pT + (b.servs || []).reduce((a,c) => a+c.p, 0);
+  const hasServs= b.servs && b.servs.length > 0;
 
-  // Populate HTML receipt (for print)
-  document.getElementById("rtInfo").innerHTML=
+  // Populate hidden print receipt
+  document.getElementById("rtInfo").innerHTML =
     `<div><strong>Bill To:</strong> ${b.cust}<br><strong>Phone:</strong> ${b.phone||'N/A'}</div>
-     <div style="text-align:right;"><strong>Bill:</strong> ${b.id}<br><strong>Date:</strong> ${b.date}</div>`;
-  let rows="";
-  b.prods.forEach(p=>rows+=`<tr><td>${p.n}</td><td>Product</td><td>Rs.${p.p}</td></tr>`);
-  if(hasServs) b.servs.forEach(s=>rows+=`<tr><td>${s.n}</td><td>Service</td><td>—</td></tr>`);
-  document.getElementById("rtBody").innerHTML=rows;
-  document.getElementById("rtHead").innerHTML=`<th>Item</th><th>Type</th><th>Price</th>`;
-  document.getElementById("rtFooter").innerHTML=
+     <div style="text-align:right"><strong>Bill:</strong> ${b.id}<br><strong>Date:</strong> ${b.date}</div>`;
+  let rows = "";
+  b.prods.forEach(p => {
+    let pr = `Rs.${p.p}`;
+    if(p.disc && p.disc > 0) pr = `Rs.${p.origP||p.p} - ${p.disc}% = Rs.${p.p}`;
+    rows += `<tr><td>${p.n}</td><td>Product</td><td>${pr}</td></tr>`;
+  });
+  if(hasServs) b.servs.forEach(s => { rows += `<tr><td>${s.n}</td><td>Service</td><td>—</td></tr>`; });
+  if(gdAmt > 0) rows += `<tr><td colspan="2"><em>Grand Discount (${b.grandDiscPct}%)</em></td><td>-Rs.${gdAmt}</td></tr>`;
+  document.getElementById("rtBody").innerHTML = rows;
+  document.getElementById("rtHead").innerHTML = `<th>Item</th><th>Type</th><th>Price</th>`;
+  document.getElementById("rtFooter").innerHTML =
     `<div style="font-size:16px;"><strong>TOTAL: Rs.${pT}</strong></div><small>Payment: ${b.payMethod}</small>`;
 
-  if(type==='print'){ window.print(); return; }
+  if(type === 'print'){ window.print(); return; }
 
-  /* ── WHATSAPP PDF FLOW ── */
+  /* WhatsApp PDF flow */
   if(!b.phone) return toast("❌ Phone নম্বর নেই!");
   if(!window.jspdf) return toast("❌ PDF library লোড হয়নি, refresh করুন");
 
   toast("📄 PDF তৈরি হচ্ছে...", 4000);
+  const doc  = buildInvoicePDF(b);
+  const blob = doc.output('blob');
+  const fname= `FancyLooks_Invoice_${b.id}.pdf`;
+  const ph   = b.phone.replace(/\D/g,'');
+  const full = ph.startsWith('91') ? ph : '91' + ph;
 
-  const doc=buildInvoicePDF(b);
-  const pdfBlob=doc.output('blob');
-  const fname=`FancyLooks_Invoice_${b.id}.pdf`;
-
-  // Normalise phone number
-  const ph=b.phone.replace(/\D/g,'');
-  const full=ph.startsWith('91')?ph:'91'+ph;
-
-  /* ── PATH 1: Mobile Web Share API → PDF directly into WhatsApp ── */
-  const pdfFile=new File([pdfBlob],fname,{type:'application/pdf'});
-  if(navigator.canShare && navigator.canShare({files:[pdfFile]})){
+  const file = new File([blob], fname, { type:'application/pdf' });
+  if(navigator.canShare && navigator.canShare({ files:[file] })){
     try{
       await navigator.share({
-        files:[pdfFile],
-        title:`Fancy Looks Salon — Invoice ${b.id}`,
-        text:`হ্যালো ${b.cust}! আপনার bill (${b.id}) এর invoice attached আছে। ধন্যবাদ! 🙏`
+        files: [file],
+        title: `Fancy Looks Salon — Invoice ${b.id}`,
+        text : `হ্যালো ${b.cust}! Bill ${b.id} — ₹${pT} — ${b.payMethod}। ধন্যবাদ! 🙏`
       });
       toast("✅ Share করুন — WhatsApp বেছে নিন");
       return;
-    } catch(e){
-      if(e.name!=='AbortError') console.warn('Share failed:',e);
-    }
+    } catch(e){ if(e.name !== 'AbortError') console.warn('Share failed:', e); }
   }
 
-  /* ── PATH 2: Desktop — download PDF + open exact customer WhatsApp chat ── */
-  // Download PDF first
-  const url=URL.createObjectURL(pdfBlob);
-  const a=document.createElement('a'); a.href=url; a.download=fname; a.click();
-  setTimeout(()=>URL.revokeObjectURL(url), 3000);
-
-  // Open the customer's WhatsApp chat directly (wa.me opens their specific number)
-  // On desktop this opens WhatsApp Web/Desktop to that contact
-  // On mobile if Share API not available, opens WhatsApp app to that contact
-  setTimeout(()=>{
-    // Open customer's WhatsApp directly — no message text, just opens the chat
-    // so user can immediately attach the downloaded PDF
-    window.open('https://wa.me/'+full,'_blank');
-    toast("📎 WhatsApp খুলছে — Downloaded PDF টি attach করুন");
-  }, 800);
+  // Desktop fallback
+  const url = URL.createObjectURL(blob);
+  const a   = document.createElement('a'); a.href = url; a.download = fname; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+  setTimeout(() => {
+    window.open('https://wa.me/'+full, '_blank');
+    toast("📎 WhatsApp খুলছে — PDF attach করুন");
+  }, 900);
 }
 
-/* =============================================================
-   SMART STAFF PERFORMANCE
-   Rule: service bill → count services; product-only bill → count products
-   ============================================================= */
+/* ================================================================
+   STAFF PERFORMANCE CALCULATOR
+   ================================================================ */
 function calcStaffPerf(billsArr){
-  const perf={};
-  billsArr.forEach(b=>{
-    const hasServ=b.servs&&b.servs.length>0;
-    const hasProd=b.prods&&b.prods.length>0;
+  const perf = {};
+  billsArr.forEach(b => {
+    const hasServ = b.servs && b.servs.length > 0;
+    const hasProd = b.prods && b.prods.length > 0;
     if(hasServ){
-      b.servs.forEach(item=>{
-        const sn=item.s||"Unassigned";
-        if(!perf[sn]) perf[sn]={total:0,actions:[]};
-        perf[sn].total+=item.p; perf[sn].actions.push(`✂️ ${item.n} (₹${item.p})`);
+      b.servs.forEach(item => {
+        const sn = item.s || "Unassigned";
+        if(!perf[sn]) perf[sn] = { total:0, actions:[] };
+        perf[sn].total += item.p;
+        perf[sn].actions.push(`✂️ ${item.n} (₹${item.p}${item.disc>0?' -'+item.disc+'%':''})`);
       });
     } else if(hasProd){
-      b.prods.forEach(item=>{
-        const sn=item.s||"Direct Sale";
-        if(!perf[sn]) perf[sn]={total:0,actions:[]};
-        perf[sn].total+=item.p; perf[sn].actions.push(`📦 ${item.n} (₹${item.p})`);
+      b.prods.forEach(item => {
+        const sn = item.s || "Direct Sale";
+        if(!perf[sn]) perf[sn] = { total:0, actions:[] };
+        perf[sn].total += item.p;
+        perf[sn].actions.push(`📦 ${item.n} (₹${item.p}${item.disc>0?' -'+item.disc+'%':''})`);
       });
     }
   });
@@ -1040,188 +1572,292 @@ function calcStaffPerf(billsArr){
 }
 
 function archivePerf(){
-  const today=new Date().toDateString();
-  const active=bills.filter(b=>b.date===today&&!b.archived);
-  if(!active.length) return toast("⚠️ Archive করার data নেই!");
-  const perf=calcStaffPerf(active);
-  const perfData={};
-  Object.entries(perf).forEach(([n,d])=>perfData[n]=d.total);
-  staffHist.push({date:today,data:perfData});
-  LS.set("fls_staff_history",staffHist);
-  bills.forEach(b=>{ if(b.date===today) b.archived=true; });
-  LS.set("fls_bills",bills);
-  toast("✅ Archived!"); renderAll();
+  const today  = new Date().toDateString();
+  const active = bills.filter(b => b.date === today && !b.archived);
+  if(!active.length) return toast("⚠️ Archive করার কোনো data নেই!");
+  const perf     = calcStaffPerf(active);
+  const perfData = {};
+  Object.entries(perf).forEach(([n,d]) => perfData[n] = d.total);
+  staffHist.push({ date: today, data: perfData });
+  LS.set("fls_staff_history", staffHist);
+  bills.forEach(b => { if(b.date === today) b.archived = true; });
+  LS.set("fls_bills", bills);
+  toast("✅ আজকের data archived!");
+  renderAll();
 }
 
-/* =============================================================
-   FINANCE / ONLINE
-   ============================================================= */
+/* ================================================================
+   FINANCE / EXPENSE
+   ================================================================ */
 function saveFinance(){
-  const n=document.getElementById("expName").value.trim();
-  const a=Number(document.getElementById("expAmt").value);
-  if(!n||!a) return toast("❌ সব field পূরণ করুন!");
-  fin.push({n,a,t:document.getElementById("expType").value,date:new Date().toDateString(),ts:new Date().toISOString()});
-  LS.set("fls_finance",fin);
-  document.getElementById("expName").value=""; document.getElementById("expAmt").value="";
-  toast("✅ Saved!"); renderAll();
-}
-function saveOnline(){
-  const n=document.getElementById("onCust").value.trim();
-  const a=Number(document.getElementById("onAmt").value);
-  if(!n||!a) return toast("❌ সব field পূরণ করুন!");
-  onl.push({n,a,date:new Date().toDateString(),ts:new Date().toISOString()});
-  LS.set("fls_online",onl);
-  document.getElementById("onCust").value=""; document.getElementById("onAmt").value="";
-  toast("✅ Online payment saved!"); renderAll();
+  const n = document.getElementById("expName").value.trim();
+  const a = Number(document.getElementById("expAmt").value);
+  if(!n || !a) return toast("❌ Name ও Amount দিন!");
+  fin.push({
+    n, a,
+    t    : document.getElementById("expType").value,
+    date : new Date().toDateString(),
+    ts   : new Date().toISOString()
+  });
+  LS.set("fls_finance", fin);
+  document.getElementById("expName").value = "";
+  document.getElementById("expAmt").value  = "";
+  toast("✅ Finance entry saved!");
+  renderAll();
 }
 
-/* =============================================================
-   FILTERS
-   ============================================================= */
+/* ================================================================
+   ADD CASH (was Online)
+   ================================================================ */
+function saveOnline(){
+  const n = document.getElementById("onCust").value.trim();
+  const a = Number(document.getElementById("onAmt").value);
+  if(!n || !a) return toast("❌ Reference ও Amount দিন!");
+  onl.push({
+    n, a,
+    date : new Date().toDateString(),
+    ts   : new Date().toISOString()
+  });
+  LS.set("fls_online", onl);
+  document.getElementById("onCust").value = "";
+  document.getElementById("onAmt").value  = "";
+  toast("✅ Cash added to balance!");
+  renderAll();
+}
+
+/* ================================================================
+   FILTER HELPERS
+   ================================================================ */
 function clearFilters(){
-  ['searchFilter','payFilter','dateFilter'].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  ['searchFilter','payFilter','dateFilter'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = "";
+  });
   renderBillTable();
 }
+
 function getFilteredBills(){
-  const s=(document.getElementById("searchFilter")?.value||"").toLowerCase().trim();
-  const pf=document.getElementById("payFilter")?.value||"";
-  const df=document.getElementById("dateFilter")?.value||"";
-  return bills.filter(b=>{
-    const ms=!s||b.cust.toLowerCase().includes(s)||b.id.toLowerCase().includes(s)||(b.phone&&b.phone.includes(s));
-    const mp=!pf||b.payMethod.includes(pf);
-    const md=!df||new Date(b.date).toLocaleDateString('en-CA')===df;
-    return ms&&mp&&md;
+  const s  = (document.getElementById("searchFilter")?.value || "").toLowerCase().trim();
+  const pf = document.getElementById("payFilter")?.value || "";
+  const df = document.getElementById("dateFilter")?.value || "";
+  return bills.filter(b => {
+    const ms = !s || b.cust.toLowerCase().includes(s) || b.id.toLowerCase().includes(s) || (b.phone && b.phone.includes(s));
+    const mp = !pf || b.payMethod.includes(pf);
+    const md = !df || new Date(b.date).toLocaleDateString('en-CA') === df;
+    return ms && mp && md;
   });
 }
 
-/* =============================================================
-   TODAY CALCULATIONS
-   ============================================================= */
+/* ================================================================
+   TODAY CALCULATIONS  (grand-discount aware)
+   ================================================================ */
 function calcToday(){
-  const today=new Date().toDateString();
-  const tb=bills.filter(b=>b.date===today);
-  let tp=0,ts=0,cashT=0,onT=0,dueT=0;
-  tb.forEach(b=>{
-    b.prods.forEach(p=>{ tp+=p.p; if(b.payMethod==="Cash")cashT+=p.p; if(b.payMethod==="Online")onT+=p.p; if(b.payMethod==="Due")dueT+=p.p; });
-    b.servs.forEach(s=>ts+=s.p);
+  const today = new Date().toDateString();
+  const tb    = bills.filter(b => b.date === today);
+  let tp=0, ts=0, cashT=0, onT=0, dueT=0;
+  tb.forEach(b => {
+    const gd = b.grandDiscAmt || 0;
+    let bProd = 0;
+    b.prods.forEach(p => bProd += p.p);
+    bProd -= gd; // apply grand discount to product total
+    tp += bProd;
+    b.servs.forEach(s => ts += s.p);
+    if(b.payMethod === "Cash")   cashT += bProd;
+    if(b.payMethod === "Online") onT   += bProd;
+    if(b.payMethod === "Due")    dueT  += bProd;
   });
-  let ton=0; onl.filter(o=>o.date===today).forEach(o=>ton+=o.a);
-  let tadv=0,texp=0; fin.filter(f=>f.date===today).forEach(f=>{ if(f.t==='advance')tadv+=f.a; else texp+=f.a; });
-  return {today,tb,tp,ts,cashT,onT,dueT,ton,tadv,texp,bal:(tp+ton)-tadv-texp};
+  let ton=0;  onl.filter(o => o.date === today).forEach(o => ton += o.a);
+  let tadv=0, texp=0;
+  fin.filter(f => f.date === today).forEach(f => {
+    if(f.t === 'advance') tadv += f.a; else texp += f.a;
+  });
+  return { today, tb, tp, ts, cashT, onT, dueT, ton, tadv, texp, bal:(tp+ton)-tadv-texp };
 }
 
-/* =============================================================
+/* ================================================================
    AI BRAIN
-   ============================================================= */
+   ================================================================ */
 function getCtx(){
-  const c=calcToday();
-  const rawPerf=calcStaffPerf(c.tb.filter(b=>!b.archived));
-  const staffPerf={};
-  Object.entries(rawPerf).forEach(([n,d])=>{staffPerf[n]={total:d.total,items:d.actions};});
-  const dueBills=bills.filter(b=>b.payMethod==="Due"&&!b.duePaidDate);
-  return {...c,staffPerf,staffList,servList,prodList,
-    dueBillsCount:dueBills.length,
-    totalDue:dueBills.reduce((a,b)=>a+b.prods.reduce((x,y)=>x+y.p,0),0),
-    totalBills:bills.length,recentBills:bills.slice(-5),staffHist};
+  const c       = calcToday();
+  const rawPerf = calcStaffPerf(c.tb.filter(b => !b.archived));
+  const staffPerf = {};
+  Object.entries(rawPerf).forEach(([n,d]) => staffPerf[n] = { total:d.total, items:d.actions });
+  const dueBills = bills.filter(b => b.payMethod === "Due" && !b.duePaidDate);
+  const totalDue = dueBills.reduce((a,b) => a + b.prods.reduce((x,y) => x+y.p, 0) - (b.grandDiscAmt||0), 0);
+  return { ...c, staffPerf, staffList, servList, prodList,
+    dueBillsCount: dueBills.length, totalDue,
+    totalBills: bills.length, recentBills: bills.slice(-5), staffHist };
 }
 
-const PATS=[
-  {t:q=>/আজ.*(বিক্রি|sale|total|মোট)|today.*(sale|total|earn)/.test(q),
-   r:c=>`📊 **আজকের Summary (${c.today})**\n\n📦 Product: ₹${c.tp}\n✂️ Service: ₹${c.ts}\n💰 Grand Total: ₹${c.tp+c.ts}\n🧾 মোট Bills: ${c.tb.length}টি`},
-  {t:q=>/balance|জমা|নেট/.test(q),
-   r:c=>`💰 **আজকের Balance**\n\n📦 Products: ₹${c.tp}\n📲 Online Manual: ₹${c.ton}\n💵 Advance: -₹${c.tadv}\n💸 Expense: -₹${c.texp}\n\n🏆 **Final: ₹${c.bal}**`},
-  {t:q=>/কয়টা|কতটা|bill.*(কত|count)|how many.*bill/.test(q),
-   r:c=>`🧾 **Bills**\n\nআজকে: **${c.tb.length}টি**\nসর্বমোট: **${c.totalBills}টি**`},
-  {t:q=>/staff.*perf|কে.*বেশি|বেশি.*কামা|performance/.test(q),
-   r:c=>{ const srt=Object.entries(c.staffPerf).sort((a,b)=>b[1].total-a[1].total); if(!srt.length)return "আজকে কোনো performance data নেই।"; let out="👥 **Staff Performance:**\n\n"; srt.forEach(([n,d],i)=>out+=`${i===0?'🏆':i===1?'🥈':'👤'} ${n}: **₹${d.total}**\n   ${d.items.join(' | ')}\n`); return out; }},
-  {t:q=>/best|top|সেরা|সবচেয়ে.*বেশি/.test(q),
-   r:c=>{ const srt=Object.entries(c.staffPerf).sort((a,b)=>b[1].total-a[1].total); if(!srt.length)return "আজকে data নেই।"; return `🏆 **সেরা Staff:**\n\n👑 ${srt[0][0]}: **₹${srt[0][1].total}**\nItems: ${srt[0][1].items.join(', ')}`; }},
-  {t:q=>/due|বাকি|পাওনা|ধার/.test(q),
-   r:c=>`⚠️ **Due Status**\n\nDue Bills: ${c.dueBillsCount}টি\nTotal Due: **₹${c.totalDue}**${c.totalDue===0?'\n\n✅ কোনো due নেই!':''}`},
-  {t:q=>/cash|নগদ/.test(q),
-   r:c=>`💵 **Cash (আজ)**\n\nCash Bills: ₹${c.cashT}\nOnline Bills: ₹${c.onT}\nDue Bills: ₹${c.dueT}\nManual Online: ₹${c.ton}`},
-  {t:q=>/product.*list|প্রোডাক্ট|কোন.*product/.test(q),
-   r:c=>c.prodList.length?"📦 **Products:**\n\n"+c.prodList.map(p=>`• ${p.name}${p.price?' (₹'+p.price+')':''}`).join('\n'):"📦 কোনো product নেই।"},
-  {t:q=>/service.*list|কোন.*service/.test(q),
-   r:c=>c.servList.length?"✂️ **Services:**\n\n"+c.servList.map(s=>`• ${s}`).join('\n'):"✂️ কোনো service নেই।"},
-  {t:q=>/staff.*list|কারা আছে|staff.*কে/.test(q),
-   r:c=>c.staffList.length?"👥 **Staff:**\n\n"+c.staffList.map(s=>`• ${s}`).join('\n'):"👥 কোনো staff নেই।"},
-  {t:q=>/recent|latest|সর্বশেষ|শেষ.*bill/.test(q),
-   r:c=>{ if(!c.recentBills.length)return "কোনো bill নেই।"; let out="📋 **সর্বশেষ Bills:**\n\n"; c.recentBills.slice().reverse().forEach(b=>{ const t=b.prods.reduce((a,x)=>a+x.p,0)+b.servs.reduce((a,x)=>a+x.p,0); out+=`🧾 ${b.id} — ${b.cust} — ₹${t} — ${b.payMethod}\n`; }); return out; }},
-  {t:q=>/expense|খরচ|advance/.test(q),
-   r:c=>`💸 **Finance (আজ)**\n\nAdvance: ₹${c.tadv}\nExpense: ₹${c.texp}\nTotal: ₹${c.tadv+c.texp}`},
-  {t:q=>/history|archive|পুরনো/.test(q),
-   r:c=>{ if(!c.staffHist.length)return "কোনো history নেই।"; let out="📜 **Staff History:**\n\n"; c.staffHist.slice(-3).reverse().forEach(h=>{ const tot=Object.values(h.data).reduce((a,b)=>a+b,0); out+=`📅 ${h.date} — ₹${tot}\n`; Object.entries(h.data).sort((a,b)=>b[1]-a[1]).forEach(([n,v])=>out+=`  👤 ${n}: ₹${v}\n`); out+='\n'; }); return out; }},
-  {t:q=>/help|সাহায্য|কী করতে/.test(q),
-   r:()=>"🤖 **কী জিজ্ঞেস করতে পারেন:**\n\n• আজকের বিক্রি কত?\n• Balance কত?\n• সেরা staff কে?\n• Due কত?\n• Bill count\n• Product / Service list\n• সর্বশেষ bills\n• Expense কত?\n• Staff history"},
+const AI_PATTERNS = [
+  { t: q => /আজ.*(বিক্রি|sale|total|মোট)|today.*(sale|total|earn)/.test(q),
+    r: c => `📊 **আজকের Summary (${c.today})**\n\n📦 Product (net): ₹${c.tp}\n✂️ Service: ₹${c.ts}\n💰 Grand Total: ₹${c.tp+c.ts}\n🧾 মোট Bills: ${c.tb.length}টি` },
+  { t: q => /balance|জমা|নেট|bal/.test(q),
+    r: c => `💰 **আজকের Balance**\n\n📦 Products: ₹${c.tp}\n💵 Cash Added: ₹${c.ton}\n💵 Advance: -₹${c.tadv}\n💸 Expense: -₹${c.texp}\n\n🏆 **Final Balance: ₹${c.bal}**` },
+  { t: q => /কয়টা|কতটা|bill.*(কত|count)|how many.*bill/.test(q),
+    r: c => `🧾 **Bills**\n\nআজকে: **${c.tb.length}টি**\nসর্বমোট: **${c.totalBills}টি**` },
+  { t: q => /staff.*perf|কে.*বেশি|বেশি.*কামা|performance/.test(q),
+    r: c => {
+      const srt = Object.entries(c.staffPerf).sort((a,b) => b[1].total-a[1].total);
+      if(!srt.length) return "আজকে কোনো performance data নেই।";
+      let out = "👥 **Staff Performance (Today):**\n\n";
+      srt.forEach(([n,d],i) => out += `${['🏆','🥈','🥉'][i]||'👤'} ${n}: **₹${d.total}**\n   ${d.items.join(' | ')}\n`);
+      return out;
+    }
+  },
+  { t: q => /best|top|সেরা|সবচেয়ে.*বেশি/.test(q),
+    r: c => {
+      const srt = Object.entries(c.staffPerf).sort((a,b) => b[1].total-a[1].total);
+      if(!srt.length) return "আজকে data নেই।";
+      return `🏆 **সেরা Staff:**\n\n👑 ${srt[0][0]}: **₹${srt[0][1].total}**\nItems: ${srt[0][1].items.join(', ')}`;
+    }
+  },
+  { t: q => /due|বাকি|পাওনা|ধার/.test(q),
+    r: c => `⚠️ **Due Status**\n\nDue Bills: ${c.dueBillsCount}টি\nTotal Due Amount: **₹${c.totalDue}**${c.totalDue===0?'\n\n✅ কোনো pending due নেই!':''}` },
+  { t: q => /cash|নগদ/.test(q),
+    r: c => `💵 **Cash Breakdown (আজ)**\n\nCash Bills: ₹${c.cashT}\nOnline Bills: ₹${c.onT}\nDue Bills: ₹${c.dueT}\nCash Added Manual: ₹${c.ton}` },
+  { t: q => /product.*list|প্রোডাক্ট লিস্ট|কোন.*product/.test(q),
+    r: c => c.prodList.length ? "📦 **Product List:**\n\n" + c.prodList.map(p=>`• ${p.name}${p.price?' (₹'+p.price+')':''}`).join('\n') : "📦 কোনো product নেই।" },
+  { t: q => /service.*list|সার্ভিস লিস্ট|কোন.*service/.test(q),
+    r: c => c.servList.length ? "✂️ **Service List:**\n\n" + c.servList.map(s=>`• ${s}`).join('\n') : "✂️ কোনো service নেই।" },
+  { t: q => /staff.*list|কারা আছে|staff.*কে/.test(q),
+    r: c => c.staffList.length ? "👥 **Staff List:**\n\n" + c.staffList.map(s=>`• ${s}`).join('\n') : "👥 কোনো staff নেই।" },
+  { t: q => /recent|latest|সর্বশেষ|শেষ.*bill/.test(q),
+    r: c => {
+      if(!c.recentBills.length) return "কোনো bill নেই।";
+      let out = "📋 **সর্বশেষ Bills:**\n\n";
+      c.recentBills.slice().reverse().forEach(b => {
+        const t = b.prods.reduce((a,x)=>a+x.p,0) + b.servs.reduce((a,x)=>a+x.p,0) - (b.grandDiscAmt||0);
+        out += `🧾 ${b.id} — ${b.cust} — ₹${t} — ${b.payMethod} — ${b.date}\n`;
+      });
+      return out;
+    }
+  },
+  { t: q => /expense|খরচ|advance/.test(q),
+    r: c => `💸 **Finance (আজ)**\n\nAdvance: ₹${c.tadv}\nExpense: ₹${c.texp}\nTotal Deducted: ₹${c.tadv+c.texp}` },
+  { t: q => /history|archive|পুরনো/.test(q),
+    r: c => {
+      if(!c.staffHist.length) return "কোনো archived history নেই।";
+      let out = "📜 **Staff History (Last 3):**\n\n";
+      c.staffHist.slice(-3).reverse().forEach(h => {
+        const tot = Object.values(h.data).reduce((a,b)=>a+b,0);
+        out += `📅 ${h.date} — Total: ₹${tot}\n`;
+        Object.entries(h.data).sort((a,b)=>b[1]-a[1]).forEach(([n,v]) => out += `  👤 ${n}: ₹${v}\n`);
+        out += '\n';
+      });
+      return out;
+    }
+  },
+  { t: q => /help|সাহায্য|কী করতে|ki korte/.test(q),
+    r: () => "🤖 **কী জিজ্ঞেস করতে পারেন:**\n\n• আজকের বিক্রি কত?\n• Balance কত?\n• সেরা staff কে?\n• Due কত আছে?\n• Bill count\n• Product / Service / Staff list\n• সর্বশেষ bills\n• Expense কত?\n• Staff history" }
 ];
 
 function aiReply(q){
-  const ql=q.toLowerCase();
-  const c=getCtx();
-  for(const p of PATS) if(p.t(ql)) return p.r(c);
-  return `🤔 বুঝতে পারিনি। "help" টাইপ করুন বা chip গুলো press করুন।`;
+  const ql = q.toLowerCase();
+  const c  = getCtx();
+  for(const p of AI_PATTERNS) if(p.t(ql)) return p.r(c);
+  return `🤔 বুঝতে পারিনি।\n\n"help" লিখুন অথবা chip গুলো press করুন।\n\nঅথবা এভাবে জিজ্ঞেস করুন:\n• "আজকের বিক্রি কত?"\n• "balance কত?"\n• "due কত?"`;
 }
 
-const CHIPS=["আজকের বিক্রি কত?","Balance কত?","সেরা staff কে?","Due কত আছে?","Bill count আজ","Staff list","Product list","সর্বশেষ bills","Expense কত?","Staff history"];
+const AI_CHIPS = [
+  "আজকের বিক্রি কত?", "Balance কত?", "সেরা staff কে?",
+  "Due কত আছে?", "Bill count আজ", "Staff list",
+  "Product list", "সর্বশেষ bills", "Expense কত?", "Staff history"
+];
 
 function renderAIChips(){
-  const el=document.getElementById("aiChips"); if(!el)return;
-  el.innerHTML=CHIPS.map(q=>`<div class="ai-chip" onclick="chipAsk(this.textContent)">${q}</div>`).join('');
+  const el = document.getElementById("aiChips"); if(!el) return;
+  el.innerHTML = AI_CHIPS.map(q =>
+    `<div class="ai-chip" onclick="chipAsk('${q}')">${q}</div>`
+  ).join('');
 }
-function chipAsk(q){ document.getElementById("aiInput").value=q; sendAI(); }
+
+function chipAsk(q){ document.getElementById("aiInput").value = q; sendAI(); }
 
 function sendAI(){
-  const inp=document.getElementById("aiInput"), q=inp.value.trim(); if(!q)return;
-  const chat=document.getElementById("chatMessages");
-  chat.innerHTML+=`<div class="bubble bubble-u">${q}</div>`;
-  inp.value=""; chat.scrollTop=chat.scrollHeight;
-  const lid="ld_"+Date.now();
-  chat.innerHTML+=`<div class="bubble bubble-a" id="${lid}"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
-  chat.scrollTop=chat.scrollHeight;
-  setTimeout(()=>{
-    const ldEl=document.getElementById(lid); if(ldEl)ldEl.remove();
-    const reply=aiReply(q).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-    chat.innerHTML+=`<div class="bubble bubble-a">${reply}</div>`;
-    chat.scrollTop=chat.scrollHeight;
-  }, 550+Math.random()*350);
+  const inp = document.getElementById("aiInput");
+  const q   = inp.value.trim(); if(!q) return;
+  const chat = document.getElementById("chatMessages");
+  chat.innerHTML += `<div class="bubble bubble-u">${q}</div>`;
+  inp.value = ""; chat.scrollTop = chat.scrollHeight;
+  const lid = "ld_" + Date.now();
+  chat.innerHTML += `<div class="bubble bubble-a" id="${lid}"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  chat.scrollTop = chat.scrollHeight;
+  setTimeout(() => {
+    const ldEl = document.getElementById(lid); if(ldEl) ldEl.remove();
+    const raw   = aiReply(q);
+    const reply = raw.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g,'<br>');
+    chat.innerHTML += `<div class="bubble bubble-a">${reply}</div>`;
+    chat.scrollTop = chat.scrollHeight;
+  }, 500 + Math.random() * 400);
 }
 
-/* =============================================================
+/* ================================================================
    RENDER FUNCTIONS
-   ============================================================= */
+   ================================================================ */
+function setText(id, v){
+  const e = document.getElementById(id); if(e) e.textContent = v;
+}
+
 function renderStats(){
-  const el=document.getElementById("quickStats"); if(!el)return;
-  const c=calcToday();
-  el.innerHTML=[
-    {icon:"🧾",val:c.tb.length,lbl:"Bills Today"},
-    {icon:"📦",val:"₹"+c.tp,lbl:"Product Sales"},
-    {icon:"✂️",val:"₹"+c.ts,lbl:"Service Sales"},
-    {icon:"💰",val:"₹"+c.bal,lbl:"Balance"},
-  ].map(s=>`<div class="stat-box"><div class="stat-icon">${s.icon}</div><div class="stat-val">${s.val}</div><div class="stat-lbl">${s.lbl}</div></div>`).join('');
+  const el = document.getElementById("quickStats"); if(!el) return;
+  const c  = calcToday();
+  el.innerHTML = [
+    { icon:"🧾", val: c.tb.length, lbl:"Bills Today" },
+    { icon:"📦", val: "₹"+c.tp,   lbl:"Product Sales" },
+    { icon:"✂️", val: "₹"+c.ts,   lbl:"Service Sales" },
+    { icon:"💰", val: "₹"+c.bal,  lbl:"Balance" },
+  ].map(s => `<div class="stat-box">
+    <div class="stat-icon">${s.icon}</div>
+    <div class="stat-val">${s.val}</div>
+    <div class="stat-lbl">${s.lbl}</div>
+  </div>`).join('');
 }
 
 function renderBillTable(){
-  const el=document.getElementById("billList"); if(!el)return;
-  const fb=getFilteredBills().slice().reverse();
-  if(!fb.length){ el.innerHTML=`<tr><td colspan="8"><div class="empty-state">🔍 কোনো bill পাওয়া যায়নি</div></td></tr>`; return; }
-  el.innerHTML=fb.map(b=>{
-    const idx=bills.indexOf(b);
-    const pD=b.prods.map(p=>`<span class="badge b-prod">📦${p.n} ₹${p.p}[${p.s}]</span>`).join('');
-    const sD=b.servs.map(s=>`<span class="badge b-serv">✂️${s.n} ₹${s.p}[${s.s}]</span>`).join('');
-    const pT=b.prods.reduce((a,c)=>a+c.p,0);
-    const fT=pT+b.servs.reduce((a,c)=>a+c.p,0);
-    const pc=b.payMethod==="Cash"?"b-cash":b.payMethod==="Online"?"b-online":"b-due";
-    const pi=b.payMethod==="Cash"?"💵":b.payMethod==="Online"?"📱":"⚠️";
+  const el = document.getElementById("billList"); if(!el) return;
+  const fb = getFilteredBills().slice().reverse();
+  if(!fb.length){
+    el.innerHTML = `<tr><td colspan="8"><div class="empty-state">🔍 কোনো bill পাওয়া যায়নি</div></td></tr>`;
+    return;
+  }
+  el.innerHTML = fb.map(b => {
+    const idx  = bills.indexOf(b);
+    const gd   = b.grandDiscAmt || 0;
+    const pNet = b.prods.reduce((a,c) => a+c.p, 0) - gd;
+    const fT   = pNet + b.servs.reduce((a,c) => a+c.p, 0);
+
+    const pD = b.prods.map(p => {
+      let lbl = `📦 ${p.n} ₹${p.p}`;
+      if(p.disc > 0) lbl += ` <em style="color:#d97706;font-size:10px;">(${p.disc}%↓)</em>`;
+      return `<span class="badge b-prod">${lbl} [${p.s}]</span>`;
+    }).join('');
+    const sD = b.servs.map(s => {
+      let lbl = `✂️ ${s.n} ₹${s.p}`;
+      if(s.disc > 0) lbl += ` <em style="color:#d97706;font-size:10px;">(${s.disc}%↓)</em>`;
+      return `<span class="badge b-serv">${lbl} [${s.s}]</span>`;
+    }).join('');
+    const gdBadge = gd>0 ? `<span class="badge b-disc">🎟️ Grand ${b.grandDiscPct}% −₹${gd}</span>` : '';
+
+    const pc = b.payMethod==="Cash" ? "b-cash" : b.payMethod==="Online" ? "b-online" : "b-due";
+    const pi = b.payMethod==="Cash" ? "💵"      : b.payMethod==="Online" ? "📱"       : "⚠️";
+    // check if was-due
+    const wasdue = b.payMethod.includes("was Due") ? `<br><span style="font-size:10px;color:var(--ok);">✅ Paid ${b.duePaidDate||''}</span>` : '';
+
     return `<tr>
       <td style="font-size:11px;white-space:nowrap;">${b.date}</td>
-      <td><strong style="font-family:'JetBrains Mono',monospace;">${b.id}</strong></td>
-      <td><strong>${b.cust}</strong><br><span style="font-size:11px;color:var(--txt2);">${b.phone||'—'}</span></td>
-      <td>${pD}${sD}</td>
-      <td><strong>₹${pT}</strong></td>
-      <td><strong style="color:var(--ok);">₹${fT}</strong></td>
-      <td><span class="badge ${pc}">${pi} ${b.payMethod}</span></td>
-      <td style="white-space:nowrap;">
+      <td><strong style="font-family:'JetBrains Mono',monospace;font-size:12px;">${b.id}</strong></td>
+      <td>
+        <strong>${b.cust}</strong>
+        <br><span style="font-size:11px;color:var(--txt2);">${b.phone||'—'}</span>
+      </td>
+      <td style="max-width:280px;">${pD}${sD}${gdBadge}</td>
+      <td><strong style="color:var(--ok);">₹${pNet}</strong></td>
+      <td><strong style="color:var(--pri);">₹${fT}</strong></td>
+      <td>
+        <span class="badge ${pc}">${pi} ${b.payMethod}</span>
+        ${wasdue}
+      </td>
+      <td style="white-space:nowrap;display:flex;gap:4px;flex-wrap:wrap;">
         <button class="abt abt-p" title="Print"    onclick="handleBillAction(${idx},'print')">🖨️</button>
         <button class="abt abt-w" title="WhatsApp" onclick="handleBillAction(${idx},'wa')">📱</button>
         <button class="abt abt-d" title="Delete"   onclick="initAction('DELETE_BILL',${idx})">🗑️</button>
@@ -1231,151 +1867,235 @@ function renderBillTable(){
 }
 
 function renderBalance(){
-  const c=calcToday();
-  const set=(id,v)=>{ const e=document.getElementById(id); if(e)e.textContent=v; };
-  set("finalBalanceDisplay","₹"+c.bal);
-  set("calcProd","₹"+c.tp); set("calcOnlineBills","₹"+c.onT);
-  set("calcOnline","₹"+c.ton); set("calcAdv","- ₹"+c.tadv);
-  set("calcExp","- ₹"+c.texp); set("calcFinal","₹"+c.bal);
-  const pbEl=document.getElementById("payBreakdown");
-  if(pbEl) pbEl.innerHTML=`
-    <div class="pay-box pay-cash"><div class="pb-val">₹${c.cashT}</div><div class="pb-lbl">💵 Cash</div></div>
-    <div class="pay-box pay-online"><div class="pb-val">₹${c.onT+c.ton}</div><div class="pb-lbl">📱 Online</div></div>
-    <div class="pay-box pay-due"><div class="pb-val">₹${c.dueT}</div><div class="pb-lbl">⚠️ Due</div></div>`;
-  const dsEl=document.getElementById("dateSummary");
+  const c = calcToday();
+  setText("finalBalanceDisplay", "₹"+c.bal);
+  setText("calcProd",        "₹"+c.tp);
+  setText("calcOnlineBills", "₹"+c.onT);
+  setText("calcOnline",      "₹"+c.ton);
+  setText("calcAdv",         "- ₹"+c.tadv);
+  setText("calcExp",         "- ₹"+c.texp);
+  setText("calcFinal",       "₹"+c.bal);
+
+  const pbEl = document.getElementById("payBreakdown");
+  if(pbEl) pbEl.innerHTML = `
+    <div class="pay-box pay-cash">
+      <div class="pb-val">₹${c.cashT}</div>
+      <div class="pb-lbl">💵 Cash Bills</div>
+    </div>
+    <div class="pay-box pay-online">
+      <div class="pb-val">₹${c.onT + c.ton}</div>
+      <div class="pb-lbl">📱 Online + Added</div>
+    </div>
+    <div class="pay-box pay-due">
+      <div class="pb-val">₹${c.dueT}</div>
+      <div class="pb-lbl">⚠️ Due</div>
+    </div>`;
+
+  const dsEl = document.getElementById("dateSummary");
   if(dsEl){
-    const dm={};
-    bills.forEach(b=>{ if(!dm[b.date])dm[b.date]={bills:0,prod:0,serv:0}; dm[b.date].bills++;
-      b.prods.forEach(p=>dm[b.date].prod+=p.p); b.servs.forEach(s=>dm[b.date].serv+=s.p); });
-    const srt=Object.entries(dm).sort((a,b)=>new Date(b[0])-new Date(a[0]));
-    dsEl.innerHTML=srt.length?`<div class="tbl-wrap"><table style="min-width:440px;">
-      <thead><tr><th>Date</th><th>Bills</th><th>Products ₹</th><th>Services ₹</th><th>Total ₹</th><th>Del</th></tr></thead>
-      <tbody>${srt.map(([d,v])=>`<tr>
-        <td style="font-size:11px;white-space:nowrap;">${d}</td>
-        <td><strong>${v.bills}</strong></td>
-        <td style="color:var(--ok);">₹${v.prod}</td>
-        <td style="color:var(--wrn);">₹${v.serv}</td>
-        <td><strong>₹${v.prod+v.serv}</strong></td>
-        <td><button class="abt abt-d" onclick="initAction('DELETE_DATE_SUMMARY','${d}')" title="Delete">🗑️</button></td>
-      </tr>`).join('')}</tbody></table></div>`
-    :'<div class="empty-state">কোনো data নেই</div>';
+    const dm = {};
+    bills.forEach(b => {
+      if(!dm[b.date]) dm[b.date] = { bills:0, prod:0, serv:0 };
+      dm[b.date].bills++;
+      const gd = b.grandDiscAmt||0;
+      b.prods.forEach(p => dm[b.date].prod += p.p);
+      b.servs.forEach(s => dm[b.date].serv += s.p);
+      dm[b.date].prod -= gd;
+    });
+    const srt = Object.entries(dm).sort((a,b) => new Date(b[0]) - new Date(a[0]));
+    dsEl.innerHTML = srt.length
+      ? `<div class="tbl-wrap"><table style="min-width:480px;">
+          <thead><tr><th>Date</th><th>Bills</th><th>Products ₹</th><th>Services ₹</th><th>Total ₹</th><th>Del</th></tr></thead>
+          <tbody>${srt.map(([d,v]) => `<tr>
+            <td style="font-size:11px;white-space:nowrap;">${d}</td>
+            <td><strong>${v.bills}</strong></td>
+            <td style="color:var(--ok);">₹${v.prod}</td>
+            <td style="color:var(--wrn);">₹${v.serv}</td>
+            <td><strong>₹${v.prod+v.serv}</strong></td>
+            <td><button class="abt abt-d" onclick="initAction('DELETE_DATE_SUMMARY','${d}')">🗑️</button></td>
+          </tr>`).join('')}</tbody>
+        </table></div>`
+      : '<div class="empty-state">কোনো data নেই</div>';
   }
 }
 
 function renderDues(){
-  const set=(id,v)=>{ const e=document.getElementById(id); if(e)e.textContent=v; };
-  const dEl=document.getElementById("dueList");
+  const dEl = document.getElementById("dueList");
   if(dEl){
-    const db=bills.filter(b=>b.payMethod==="Due"&&!b.duePaidDate);
-    const td=db.reduce((a,b)=>a+b.prods.reduce((x,y)=>x+y.p,0),0);
-    set("totalDueAmt","₹"+td);
-    dEl.innerHTML=db.length?db.map(b=>{
-      const idx=bills.indexOf(b);
-      const amt=b.prods.reduce((a,c)=>a+c.p,0);
-      return `<div class="due-item">
-        <div>
-          <strong>${b.cust}</strong> — <span style="font-family:'JetBrains Mono',monospace;">${b.id}</span><br>
-          <span style="font-size:11px;color:var(--txt2);">📅 ${b.date} | 📱 ${b.phone||'N/A'}</span>
-          <div class="pill-row">${b.prods.map(p=>`<span class="pill">📦${p.n} ₹${p.p}</span>`).join('')}</div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
-          <div class="due-amount">₹${amt}</div>
-          <button class="btn btn-save btn-sm" onclick="initAction('MARK_DUE_PAID',${idx})">✅ Mark Paid</button>
-        </div>
-      </div>`;
-    }).join(''):'<div class="empty-state">✅ কোনো pending due নেই!</div>';
+    const db  = bills.filter(b => b.payMethod === "Due" && !b.duePaidDate);
+    const td  = db.reduce((a,b) => a + b.prods.reduce((x,y) => x+y.p, 0) - (b.grandDiscAmt||0), 0);
+    setText("totalDueAmt", "₹"+td);
+    if(!db.length){
+      dEl.innerHTML = '<div class="empty-state">✅ কোনো pending due নেই!</div>';
+    } else {
+      dEl.innerHTML = db.map(b => {
+        const idx = bills.indexOf(b);
+        const amt = b.prods.reduce((a,c) => a+c.p, 0) - (b.grandDiscAmt||0);
+        const gdBadge = b.grandDiscAmt>0 ? `<span class="pill pill-r">🎟️ Grand -₹${b.grandDiscAmt}</span>` : '';
+        return `<div class="due-item">
+          <div>
+            <strong style="font-size:14px;">${b.cust}</strong>
+            &nbsp;<span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--txt2);">${b.id}</span>
+            <br><span style="font-size:11px;color:var(--txt2);">📅 ${b.date} &nbsp;|&nbsp; 📱 ${b.phone||'N/A'}</span>
+            <div class="pill-row">
+              ${b.prods.map(p=>`<span class="pill">📦 ${p.n} ₹${p.p}${p.disc>0?' ('+p.disc+'%↓)':''}</span>`).join('')}
+              ${gdBadge}
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:7px;">
+            <div class="due-amount">₹${amt}</div>
+            <button class="btn btn-save btn-sm" onclick="initAction('MARK_DUE_PAID',${idx})">✅ Mark Paid</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
   }
-  const cdEl=document.getElementById("clearedDueList");
+
+  const cdEl = document.getElementById("clearedDueList");
   if(cdEl){
-    const cd=bills.filter(b=>b.duePaidDate);
-    cdEl.innerHTML=cd.length?cd.slice().reverse().map(b=>{
-      const amt=b.prods.reduce((a,c)=>a+c.p,0);
-      return `<div class="history-item">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div><strong>${b.cust}</strong> <span class="badge b-cash">✅ Paid</span><br>
-            <span style="font-size:11px;color:var(--txt2);">${b.id} | Bill: ${b.date} | Paid: ${b.duePaidDate}</span></div>
-          <strong style="color:var(--ok);">₹${amt}</strong>
-        </div>
-      </div>`;
-    }).join(''):'<div class="empty-state">কোনো cleared due নেই</div>';
+    const cd = bills.filter(b => b.duePaidDate);
+    if(!cd.length){
+      cdEl.innerHTML = '<div class="empty-state">কোনো cleared due নেই</div>';
+    } else {
+      cdEl.innerHTML = cd.slice().reverse().map(b => {
+        const amt = b.prods.reduce((a,c) => a+c.p, 0) - (b.grandDiscAmt||0);
+        return `<div class="history-item">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <strong>${b.cust}</strong>
+              <span class="badge b-cash" style="margin-left:6px;">✅ Paid</span>
+              <br><span style="font-size:11px;color:var(--txt2);">
+                ${b.id} &nbsp;|&nbsp; Bill: ${b.date} &nbsp;|&nbsp; Paid: ${b.duePaidDate}
+              </span>
+            </div>
+            <strong style="color:var(--ok);font-size:16px;">₹${amt}</strong>
+          </div>
+        </div>`;
+      }).join('');
+    }
   }
 }
 
 function renderReports(){
-  const today=new Date().toDateString();
-  const perf=calcStaffPerf(bills.filter(b=>b.date===today&&!b.archived));
-  const sdEl=document.getElementById("staffDetailedList");
+  const today = new Date().toDateString();
+  const perf  = calcStaffPerf(bills.filter(b => b.date === today && !b.archived));
+  const sdEl  = document.getElementById("staffDetailedList");
   if(sdEl){
-    const srt=Object.entries(perf).sort((a,b)=>b[1].total-a[1].total);
-    sdEl.innerHTML=srt.length?srt.map(([name,d],i)=>
-      `<div class="staff-block">
-        <div class="staff-header">
-          <span>${i===0?'🏆':i===1?'🥈':i===2?'🥉':'👤'} ${name}</span>
-          <span style="color:var(--ok);">₹${d.total}</span>
-        </div>
-        <div class="staff-items">${d.actions.join(' &nbsp;•&nbsp; ')}</div>
-      </div>`
-    ).join(''):'<div class="empty-state">আজকে এখনো কোনো record নেই</div>';
+    const srt = Object.entries(perf).sort((a,b) => b[1].total - a[1].total);
+    sdEl.innerHTML = srt.length
+      ? srt.map(([name,d], i) => `<div class="staff-block">
+          <div class="staff-header">
+            <span>${['🏆','🥈','🥉'][i]||'👤'} ${name}</span>
+            <span style="color:var(--ok);">₹${d.total}</span>
+          </div>
+          <div class="staff-items">${d.actions.join(' &nbsp;•&nbsp; ')}</div>
+        </div>`).join('')
+      : '<div class="empty-state">আজকে এখনো কোনো record নেই</div>';
   }
-  const shEl=document.getElementById("staffHistoryList");
+
+  const shEl = document.getElementById("staffHistoryList");
   if(shEl){
-    shEl.innerHTML=staffHist.length?staffHist.slice().reverse().map((h,i)=>{
-      const idx=staffHist.length-1-i;
-      const ent=Object.entries(h.data).sort((a,b)=>b[1]-a[1]);
-      const tot=ent.reduce((a,c)=>a+c[1],0);
-      return `<div class="history-item">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
-          <strong>📅 ${h.date} | মোট: ₹${tot}</strong>
-          <button class="abt abt-d" onclick="initAction('DELETE_STAFF_HIST',${idx})">🗑️</button>
-        </div>
-        <div class="pill-row">${ent.map(([n,v])=>`<span class="pill pill-g">👤 ${n}: ₹${v}</span>`).join('')}</div>
-      </div>`;
-    }).join(''):'<div class="empty-state">কোনো archived history নেই</div>';
+    if(!staffHist.length){
+      shEl.innerHTML = '<div class="empty-state">কোনো archived history নেই</div>';
+    } else {
+      shEl.innerHTML = staffHist.slice().reverse().map((h,i) => {
+        const idx = staffHist.length - 1 - i;
+        const ent = Object.entries(h.data).sort((a,b) => b[1]-a[1]);
+        const tot = ent.reduce((a,c) => a+c[1], 0);
+        return `<div class="history-item">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <strong>📅 ${h.date} &nbsp;|&nbsp; মোট: ₹${tot}</strong>
+            <button class="abt abt-d" onclick="initAction('DELETE_STAFF_HIST',${idx})">🗑️</button>
+          </div>
+          <div class="pill-row">
+            ${ent.map(([n,v]) => `<span class="pill pill-g">👤 ${n}: ₹${v}</span>`).join('')}
+          </div>
+        </div>`;
+      }).join('');
+    }
   }
 }
 
 function renderFinance(){
-  const el=document.getElementById("financeHistory"); if(!el)return;
-  const today=new Date().toDateString();
-  const tf=fin.filter(f=>f.date===today);
-  el.innerHTML=tf.length?tf.map(f=>{
-    const idx=fin.indexOf(f);
-    return `<div class="fin-item">
-      <div>${f.t==='expense'?'💸':'💵'} <strong>${f.n}</strong> <span class="badge b-info">${f.t}</span></div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <strong style="color:${f.t==='expense'?'var(--err)':'var(--wrn)'};">₹${f.a}</strong>
-        <button class="abt abt-d" onclick="initAction('DELETE_FIN',${idx})">🗑️</button>
-      </div>
-    </div>`;
-  }).join(''):'<div class="empty-state">আজকে কোনো entry নেই</div>';
+  const today = new Date().toDateString();
+
+  // Today's records
+  const el = document.getElementById("financeHistory"); if(!el) return;
+  const tf  = fin.filter(f => f.date === today);
+  if(!tf.length){
+    el.innerHTML = '<div class="empty-state">আজকে কোনো entry নেই</div>';
+  } else {
+    el.innerHTML = tf.map(f => {
+      const idx = fin.indexOf(f);
+      return `<div class="fin-item">
+        <div>${f.t==='expense'?'💸':'💵'} <strong>${f.n}</strong>
+          <span class="badge b-info" style="margin-left:5px;">${f.t}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <strong style="color:${f.t==='expense'?'var(--err)':'var(--wrn)'};">₹${f.a}</strong>
+          <button class="abt abt-d" onclick="initAction('DELETE_FIN',${idx})">🗑️</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // All records
+  const allEl = document.getElementById("financeAllHistory"); if(!allEl) return;
+  if(!fin.length){
+    allEl.innerHTML = '<div class="empty-state">কোনো finance record নেই</div>';
+  } else {
+    // Group by date
+    const dm = {};
+    fin.forEach(f => {
+      if(!dm[f.date]) dm[f.date] = [];
+      dm[f.date].push(f);
+    });
+    const srt = Object.entries(dm).sort((a,b) => new Date(b[0]) - new Date(a[0]));
+    allEl.innerHTML = srt.map(([d,items]) => {
+      const tot = items.reduce((a,c)=>a+c.a,0);
+      return `<div class="history-item">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <strong>📅 ${d}</strong><strong style="color:var(--err);">₹${tot}</strong>
+        </div>
+        ${items.map(f=>`<div class="fin-item" style="padding:6px 0;">
+          <span>${f.t==='expense'?'💸':'💵'} ${f.n} <span class="badge b-info">${f.t}</span></span>
+          <strong style="color:${f.t==='expense'?'var(--err)':'var(--wrn)'};">₹${f.a}</strong>
+        </div>`).join('')}
+      </div>`;
+    }).join('');
+  }
 }
 
 function renderOnline(){
-  const el=document.getElementById("onlineHistory"); if(!el)return;
-  const today=new Date().toDateString();
-  const to=onl.filter(o=>o.date===today);
-  el.innerHTML=to.length?to.map(o=>{
-    const idx=onl.indexOf(o);
-    return `<div class="fin-item">
-      <span>📲 <strong>${o.n}</strong></span>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <strong style="color:#3b82f6;">₹${o.a}</strong>
-        <button class="abt abt-d" onclick="initAction('DELETE_ONL',${idx})">🗑️</button>
-      </div>
-    </div>`;
-  }).join(''):'<div class="empty-state">আজকে কোনো payment নেই</div>';
+  const today = new Date().toDateString();
+  const el    = document.getElementById("onlineHistory"); if(!el) return;
+  const to    = onl.filter(o => o.date === today);
+  if(!to.length){
+    el.innerHTML = '<div class="empty-state">আজকে কোনো cash added নেই</div>';
+  } else {
+    el.innerHTML = to.map(o => {
+      const idx = onl.indexOf(o);
+      return `<div class="fin-item">
+        <span>💵 <strong>${o.n}</strong></span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <strong style="color:var(--ok);">₹${o.a}</strong>
+          <button class="abt abt-d" onclick="initAction('DELETE_ONL',${idx})">🗑️</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
 }
 
 function renderAIPanel(){
-  const el=document.getElementById("aiDataPanel"); if(!el)return;
-  const c=getCtx();
-  el.innerHTML=`
+  const el = document.getElementById("aiDataPanel"); if(!el) return;
+  const c  = getCtx();
+  el.innerHTML = `
     <div class="ai-box">
       <div class="ai-box-title">আজকের Summary</div>
-      <div class="ai-row"><span>📦 Products</span><strong>₹${c.tp}</strong></div>
+      <div class="ai-row"><span>📦 Products (net)</span><strong>₹${c.tp}</strong></div>
       <div class="ai-row"><span>✂️ Services</span><strong>₹${c.ts}</strong></div>
       <div class="ai-row"><span>🧾 Bills</span><strong>${c.tb.length}টি</strong></div>
-      <div class="ai-row"><span>💰 Balance</span><strong>₹${c.bal}</strong></div>
+      <div class="ai-row"><span>💰 Balance</span><strong style="color:var(--ok);">₹${c.bal}</strong></div>
     </div>
     <div class="ai-box">
       <div class="ai-box-title">System Info</div>
@@ -1386,35 +2106,63 @@ function renderAIPanel(){
     </div>`;
 }
 
-/* =============================================================
+/* ================================================================
    RENDER ALL
-   ============================================================= */
+   ================================================================ */
 function renderAll(){
-  const el=document.getElementById("billNoDisplay"); if(el)el.textContent="FLS-"+String(counter).padStart(4,"0");
-  renderTags(); renderStats(); renderBillTable(); renderBalance();
-  renderDues(); renderReports(); renderFinance(); renderOnline();
-  renderAIPanel(); renderAIChips();
+  setText("billNoDisplay", "FLS-" + String(counter).padStart(4,"0"));
+  renderTags();
+  renderStats();
+  renderBillTable();
+  renderBalance();
+  renderDues();
+  renderReports();
+  renderFinance();
+  renderOnline();
+  renderAIPanel();
+  renderAIChips();
 }
 
-/* =============================================================
+/* ================================================================
+   HELPERS
+   ================================================================ */
+function todayInputVal(){
+  return new Date().toISOString().split('T')[0];
+}
+
+/* ================================================================
    INIT
-   ============================================================= */
-window.addEventListener('load',()=>{
+   ================================================================ */
+window.addEventListener('load', () => {
+  // Set default bill date to today
+  const bdEl = document.getElementById("billDate");
+  if(bdEl) bdEl.value = todayInputVal();
+
   renderAll();
   addRow('prodArea');
   addRow('servArea');
+
   // Close dropdowns on outside click
-  document.addEventListener('click',e=>{
+  document.addEventListener('click', e => {
     if(!e.target.closest('.ac-wrap')) closeAllDropdowns();
   });
-  // Enter keys
-  document.getElementById("securePass").addEventListener("keypress",e=>{ if(e.key==="Enter")doAction(); });
-  document.getElementById("newStaffName").addEventListener("keypress",e=>{ if(e.key==="Enter")addToList('staff'); });
-  document.getElementById("newServName").addEventListener("keypress",e=>{ if(e.key==="Enter")addToList('service'); });
-  document.getElementById("newProdName").addEventListener("keypress",e=>{ if(e.key==="Enter")addToList('product'); });
-  document.getElementById("expName").addEventListener("keypress",e=>{ if(e.key==="Enter")saveFinance(); });
-  document.getElementById("onCust").addEventListener("keypress",e=>{ if(e.key==="Enter")saveOnline(); });
-  console.log("%c✂️ Fancy Looks Salon POS — All Systems OK","color:#00d4ff;font-size:16px;font-weight:bold;");
+
+  // Enter key shortcuts
+  const enters = {
+    "securePass"   : doAction,
+    "newStaffName" : () => addToList('staff'),
+    "newServName"  : () => addToList('service'),
+    "newProdName"  : () => addToList('product'),
+    "expName"      : saveFinance,
+    "onCust"       : saveOnline,
+    "aiInput"      : sendAI,
+  };
+  Object.entries(enters).forEach(([id, fn]) => {
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('keypress', e => { if(e.key === 'Enter') fn(); });
+  });
+
+  console.log("%c✂️ Fancy Looks Salon POS v2.0 — All Systems Online","color:#00d4ff;font-size:15px;font-weight:bold;");
 });
 </script>
 </body>
