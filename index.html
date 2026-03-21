@@ -184,6 +184,16 @@ input[type="date"]{cursor:pointer;}
   border-radius:7px;margin-top:1px;border-left:3px solid var(--wrn);
 }
 
+/* ── NEW: Per-product payment selector ── */
+.p-pay{
+  flex:0 0 82px!important;min-width:72px!important;max-width:90px!important;
+  margin:0!important;font-size:11px!important;padding:9px 5px!important;
+  border-color:#a5b4fc!important;background:linear-gradient(135deg,#eef2ff,#f0f9ff)!important;
+  color:#3730a3!important;font-weight:700!important;cursor:pointer;
+}
+.p-pay:focus{border-color:#6366f1!important;box-shadow:0 0 0 3px rgba(99,102,241,.12)!important;}
+.p-pay option{background:#fff;color:#1a2a3a;font-weight:600;}
+
 /* ============================================================
    SECTION TITLES
    ============================================================ */
@@ -218,6 +228,18 @@ tbody tr:hover td{background:#f8fbff;}
 .b-info{background:#e0f7fe;color:#0272a8;}
 .b-disc{background:#fef9c3;color:#78350f;}
 .b-wasdueok{background:#d1fae5;color:#065f46;}
+
+/* ── NEW: inline payment badges inside product detail ── */
+.pay-tag-cash{
+  display:inline-block;font-size:9px;font-weight:800;
+  background:#d1fae5;color:#065f46;padding:1px 5px;
+  border-radius:4px;margin-left:3px;vertical-align:middle;
+}
+.pay-tag-online{
+  display:inline-block;font-size:9px;font-weight:800;
+  background:#dbeafe;color:#1e40af;padding:1px 5px;
+  border-radius:4px;margin-left:3px;vertical-align:middle;
+}
 
 /* ============================================================
    TAGS (Staff/Service/Product manager)
@@ -562,7 +584,7 @@ tbody tr:hover td{background:#f8fbff;}
           📦 Products
           <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--ok);margin-left:4px;">(Balance-এ যাবে)</span>
         </div>
-        <div class="tip-bar">💡 <strong>Disc%</strong> field optional — discount percentage দিলে system আপনাআপনি calculate করে দেখাবে</div>
+        <div class="tip-bar">💡 <strong>Disc%</strong> field optional — discount percentage দিলে system আপনাআপনি calculate করে দেখাবে &nbsp;|&nbsp; <strong>💵/📱</strong> প্রতিটি product-এ আলাদা payment method বেছে নিন</div>
         <div id="prodArea"></div>
         <button class="btn btn-add btn-sm" onclick="addRow('prodArea')">➕ Product Row</button>
 
@@ -1194,6 +1216,12 @@ function addRow(area){
     discInp.style.cssText = 'flex:.45;min-width:56px;margin:0;';
     discInp.addEventListener('input', () => { updateDiscCalc(div); calcPreview(); });
 
+    /* ── NEW: Per-product payment selector (Cash / Online) ── */
+    const payInp = document.createElement('select');
+    payInp.className = 'p-pay';
+    payInp.title = 'Payment method for this product';
+    payInp.innerHTML = '<option value="Cash">💵 Cash</option><option value="Online">📱 Online</option>';
+
     const { wrap: sw, inp: si } = makeAC('staff', '👤 Staff...', v => si.value = v);
     sw.style.flex = '1.1'; si.className += ' p-staff';
 
@@ -1204,10 +1232,11 @@ function addRow(area){
     const calcDiv = document.createElement('div');
     calcDiv.className = 'disc-calc';
 
-    div.append(pw, priceInp, discInp, sw, delBtn, calcDiv);
+    /* payInp is inserted between discInp and staff wrap */
+    div.append(pw, priceInp, discInp, payInp, sw, delBtn, calcDiv);
 
   } else {
-    /* ── Service row ── */
+    /* ── Service row ── (unchanged) */
     const { wrap: svw, inp: svi } = makeAC('service', '✂️ Service name...', v => svi.value = v);
     svw.style.flex = '1.8'; svi.className += ' s-name';
 
@@ -1295,7 +1324,9 @@ function saveBill(){
     const disc  = Number(r.querySelector(".p-disc")?.value  || 0);
     const p     = (disc > 0 && disc <= 100) ? origP - Math.round(origP * disc / 100) : origP;
     const st    = (r.querySelector(".p-staff")?.value || "").trim() || "Direct Sale";
-    if(n && origP) prods.push({ n, p, origP, disc, s: st });
+    /* ── NEW: capture per-product payment method ── */
+    const payM  = (r.querySelector(".p-pay")?.value || "Cash");
+    if(n && origP) prods.push({ n, p, origP, disc, s: st, payM });
   });
 
   document.querySelectorAll("#servArea .row-group").forEach(r => {
@@ -1417,8 +1448,8 @@ function buildInvoicePDF(b){
   y += 7;
 
   const allItems = [
-    ...b.prods.map(p => ({ name:p.n, type:'Product', origP:p.origP||p.p, disc:p.disc||0, price:p.p, serv:false })),
-    ...(hasServs ? b.servs.map(s => ({ name:s.n, type:'Service', origP:s.origP||s.p, disc:s.disc||0, price:s.p, serv:true })) : [])
+    ...b.prods.map(p => ({ name:p.n, type:'Product', origP:p.origP||p.p, disc:p.disc||0, price:p.p, serv:false, payM:p.payM||'Cash' })),
+    ...(hasServs ? b.servs.map(s => ({ name:s.n, type:'Service', origP:s.origP||s.p, disc:s.disc||0, price:s.p, serv:true, payM:'' })) : [])
   ];
 
   allItems.forEach((item, i) => {
@@ -1429,7 +1460,7 @@ function buildInvoicePDF(b){
     doc.setFont('helvetica','normal'); doc.setFontSize(8);
     doc.setTextColor(110,130,150); doc.text(String(i+1), 11, y+5.5);
     doc.setTextColor(20,40,60);
-    const nm = item.name.length > 20 ? item.name.slice(0,20)+'…' : item.name;
+    const nm = item.name.length > 20 ? item.name.slice(0,20)+'...' : item.name;
     doc.text(nm, 19, y+5.5);
     item.type==='Product' ? doc.setTextColor(22,101,52) : doc.setTextColor(133,77,14);
     doc.text(item.type, 82, y+5.5);
@@ -1437,12 +1468,31 @@ function buildInvoicePDF(b){
       doc.setFont('helvetica','normal'); doc.setTextColor(110,130,150);
       doc.text('Rs.'+item.origP, 105, y+5.5);
       if(item.disc > 0){ doc.setTextColor(180,80,0); doc.text(item.disc+'%', 118, y+5.5); }
-      else { doc.text('—', 118, y+5.5); }
+      else { doc.text('-', 118, y+5.5); }
       if(item.serv){ doc.setTextColor(160,160,160); doc.setFont('helvetica','italic'); doc.text('Comp.', 128, y+5.5); }
-      else { doc.setFont('helvetica','bold'); doc.setTextColor(0,120,80); doc.text('Rs.'+item.price, 128, y+5.5); }
+      else {
+        doc.setFont('helvetica','bold');
+        /* ── NEW: colour-code by per-product payment in PDF ── */
+        if(item.payM === 'Online'){ doc.setTextColor(25,75,200); }
+        else { doc.setTextColor(0,120,80); }
+        doc.text('Rs.'+item.price, 128, y+5.5);
+        /* tiny pay method label */
+        doc.setFont('helvetica','normal'); doc.setFontSize(6);
+        doc.setTextColor(item.payM==='Online'?[25,75,200]:[0,100,70]);
+        doc.text(item.payM==='Online'?'Online':'Cash', W-9, y+5.5, {align:'right'});
+        doc.setFontSize(8);
+      }
     } else {
       if(item.serv){ doc.setTextColor(160,160,160); doc.setFont('helvetica','italic'); doc.text('Complimentary', 126, y+5.5); }
-      else { doc.setFont('helvetica','bold'); doc.setTextColor(0,120,80); doc.text('Rs.'+item.price, 126, y+5.5); }
+      else {
+        doc.setFont('helvetica','bold');
+        if(item.payM === 'Online'){ doc.setTextColor(25,75,200); }
+        else { doc.setTextColor(0,120,80); }
+        doc.text('Rs.'+item.price, 126, y+5.5);
+        doc.setFont('helvetica','normal'); doc.setFontSize(6);
+        doc.text(item.payM==='Online'?'Online':'Cash', W-9, y+5.5, {align:'right'});
+        doc.setFontSize(8);
+      }
     }
     y += rh;
   });
@@ -1474,7 +1524,7 @@ function buildInvoicePDF(b){
   doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(0,212,255);
   doc.text('Thank you for visiting Fancy Looks Salon!', W/2, fy+8, {align:'center'});
   doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(160,180,200);
-  doc.text('We hope to see you again soon  ✂', W/2, fy+13, {align:'center'});
+  doc.text('We hope to see you again soon', W/2, fy+13, {align:'center'});
   doc.setTextColor(90,110,140);
   doc.text('Powered by Fancy Looks Salon POS', W/2, fy+18, {align:'center'});
   return doc;
@@ -1499,7 +1549,9 @@ async function handleBillAction(idx, type){
   b.prods.forEach(p => {
     let pr = `Rs.${p.p}`;
     if(p.disc && p.disc > 0) pr = `Rs.${p.origP||p.p} - ${p.disc}% = Rs.${p.p}`;
-    rows += `<tr><td>${p.n}</td><td>Product</td><td>${pr}</td></tr>`;
+    /* ── NEW: show per-product payment in print receipt ── */
+    const pmLabel = p.payM ? ` [${p.payM}]` : '';
+    rows += `<tr><td>${p.n}</td><td>Product${pmLabel}</td><td>${pr}</td></tr>`;
   });
   if(hasServs) b.servs.forEach(s => { rows += `<tr><td>${s.n}</td><td>Service</td><td>—</td></tr>`; });
   if(gdAmt > 0) rows += `<tr><td colspan="2"><em>Grand Discount (${b.grandDiscPct}%)</em></td><td>-Rs.${gdAmt}</td></tr>`;
@@ -1648,23 +1700,47 @@ function getFilteredBills(){
 }
 
 /* ================================================================
-   TODAY CALCULATIONS  (grand-discount aware)
+   TODAY CALCULATIONS  (grand-discount aware + per-product payment split)
    ================================================================ */
 function calcToday(){
   const today = new Date().toDateString();
   const tb    = bills.filter(b => b.date === today);
   let tp=0, ts=0, cashT=0, onT=0, dueT=0;
+
   tb.forEach(b => {
     const gd = b.grandDiscAmt || 0;
     let bProd = 0;
     b.prods.forEach(p => bProd += p.p);
-    bProd -= gd; // apply grand discount to product total
+    bProd -= gd; // apply grand discount to net product total
     tp += bProd;
     b.servs.forEach(s => ts += s.p);
-    if(b.payMethod === "Cash")   cashT += bProd;
-    if(b.payMethod === "Online") onT   += bProd;
-    if(b.payMethod === "Due")    dueT  += bProd;
+
+    if(b.payMethod === "Due"){
+      /* Whole bill is due — count entire product amount as due */
+      dueT += bProd;
+    } else {
+      /* ── NEW: use per-product payM to split Cash vs Online ──
+         Grand discount is distributed proportionally across all products */
+      let rawCash = 0, rawOnline = 0;
+      b.prods.forEach(p => {
+        const pm = p.payM || b.payMethod; // fallback to bill-level for old data
+        if(pm === 'Online') rawOnline += p.p;
+        else                rawCash   += p.p;
+      });
+      const rawTotal = rawCash + rawOnline;
+      if(rawTotal > 0 && gd > 0){
+        /* Proportionally subtract grand discount */
+        const cashAfterDisc   = Math.round(rawCash   - (rawCash   / rawTotal) * gd);
+        const onlineAfterDisc = bProd - cashAfterDisc; // keeps rounding consistent
+        cashT += cashAfterDisc;
+        onT   += onlineAfterDisc;
+      } else {
+        cashT += rawCash;
+        onT   += rawOnline;
+      }
+    }
   });
+
   let ton=0;  onl.filter(o => o.date === today).forEach(o => ton += o.a);
   let tadv=0, texp=0;
   fin.filter(f => f.date === today).forEach(f => {
@@ -1826,11 +1902,17 @@ function renderBillTable(){
     const pNet = b.prods.reduce((a,c) => a+c.p, 0) - gd;
     const fT   = pNet + b.servs.reduce((a,c) => a+c.p, 0);
 
+    /* ── NEW: per-product payment badge shown in details column ── */
     const pD = b.prods.map(p => {
       let lbl = `📦 ${p.n} ₹${p.p}`;
       if(p.disc > 0) lbl += ` <em style="color:#d97706;font-size:10px;">(${p.disc}%↓)</em>`;
-      return `<span class="badge b-prod">${lbl} [${p.s}]</span>`;
+      /* small Cash/Online tag */
+      const pmTag = p.payM === 'Online'
+        ? `<span class="pay-tag-online">📱Online</span>`
+        : `<span class="pay-tag-cash">💵Cash</span>`;
+      return `<span class="badge b-prod">${lbl}${pmTag} [${p.s}]</span>`;
     }).join('');
+
     const sD = b.servs.map(s => {
       let lbl = `✂️ ${s.n} ₹${s.p}`;
       if(s.disc > 0) lbl += ` <em style="color:#d97706;font-size:10px;">(${s.disc}%↓)</em>`;
@@ -1840,7 +1922,6 @@ function renderBillTable(){
 
     const pc = b.payMethod==="Cash" ? "b-cash" : b.payMethod==="Online" ? "b-online" : "b-due";
     const pi = b.payMethod==="Cash" ? "💵"      : b.payMethod==="Online" ? "📱"       : "⚠️";
-    // check if was-due
     const wasdue = b.payMethod.includes("was Due") ? `<br><span style="font-size:10px;color:var(--ok);">✅ Paid ${b.duePaidDate||''}</span>` : '';
 
     return `<tr>
@@ -2019,7 +2100,6 @@ function renderReports(){
 function renderFinance(){
   const today = new Date().toDateString();
 
-  // Today's records
   const el = document.getElementById("financeHistory"); if(!el) return;
   const tf  = fin.filter(f => f.date === today);
   if(!tf.length){
@@ -2039,12 +2119,10 @@ function renderFinance(){
     }).join('');
   }
 
-  // All records
   const allEl = document.getElementById("financeAllHistory"); if(!allEl) return;
   if(!fin.length){
     allEl.innerHTML = '<div class="empty-state">কোনো finance record নেই</div>';
   } else {
-    // Group by date
     const dm = {};
     fin.forEach(f => {
       if(!dm[f.date]) dm[f.date] = [];
@@ -2134,7 +2212,6 @@ function todayInputVal(){
    INIT
    ================================================================ */
 window.addEventListener('load', () => {
-  // Set default bill date to today
   const bdEl = document.getElementById("billDate");
   if(bdEl) bdEl.value = todayInputVal();
 
@@ -2142,12 +2219,10 @@ window.addEventListener('load', () => {
   addRow('prodArea');
   addRow('servArea');
 
-  // Close dropdowns on outside click
   document.addEventListener('click', e => {
     if(!e.target.closest('.ac-wrap')) closeAllDropdowns();
   });
 
-  // Enter key shortcuts
   const enters = {
     "securePass"   : doAction,
     "newStaffName" : () => addToList('staff'),
@@ -2162,7 +2237,7 @@ window.addEventListener('load', () => {
     if(el) el.addEventListener('keypress', e => { if(e.key === 'Enter') fn(); });
   });
 
-  console.log("%c✂️ Fancy Looks Salon POS v2.0 — All Systems Online","color:#00d4ff;font-size:15px;font-weight:bold;");
+  console.log("%c✂️ Fancy Looks Salon POS v2.1 — Per-Product Payment Split Active","color:#00d4ff;font-size:15px;font-weight:bold;");
 });
 </script>
 </body>
