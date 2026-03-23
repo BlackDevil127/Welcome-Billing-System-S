@@ -184,7 +184,7 @@ input[type="date"]{cursor:pointer;}
   border-radius:7px;margin-top:1px;border-left:3px solid var(--wrn);
 }
 
-/* ── NEW: Per-product payment selector ── */
+/* Per-product payment selector */
 .p-pay{
   flex:0 0 82px!important;min-width:72px!important;max-width:90px!important;
   margin:0!important;font-size:11px!important;padding:9px 5px!important;
@@ -229,7 +229,7 @@ tbody tr:hover td{background:#f8fbff;}
 .b-disc{background:#fef9c3;color:#78350f;}
 .b-wasdueok{background:#d1fae5;color:#065f46;}
 
-/* ── NEW: inline payment badges inside product detail ── */
+/* Inline payment badges in bill table */
 .pay-tag-cash{
   display:inline-block;font-size:9px;font-weight:800;
   background:#d1fae5;color:#065f46;padding:1px 5px;
@@ -271,9 +271,27 @@ tbody tr:hover td{background:#f8fbff;}
 .staff-header{
   display:flex;justify-content:space-between;align-items:center;
   font-weight:800;font-size:14px;color:var(--pri);
-  border-bottom:2px solid var(--acc);padding-bottom:8px;margin-bottom:8px;
+  border-bottom:2px solid var(--acc);padding-bottom:8px;margin-bottom:10px;
 }
+/* ── NEW: Split panel inside staff block ── */
+.staff-split{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:480px){.staff-split{grid-template-columns:1fr;}}
+.staff-panel{border-radius:10px;padding:10px 12px;}
+.staff-panel-serv{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fde68a;}
+.staff-panel-prod{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac;}
+.staff-panel-title{
+  font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;
+  margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;
+}
+.spt-serv{color:#92400e;}
+.spt-prod{color:#166534;}
+.staff-panel-amt{font-size:18px;font-weight:800;margin-bottom:6px;}
+.spa-serv{color:#b45309;}
+.spa-prod{color:#15803d;}
 .staff-items{font-size:11px;color:var(--txt2);line-height:1.8;}
+.staff-empty{font-size:11px;color:#94a3b8;font-style:italic;}
+/* ── ── */
+
 .history-item{
   background:var(--card);border:1px solid var(--bdr);
   border-left:4px solid var(--acc);border-radius:12px;
@@ -546,10 +564,8 @@ tbody tr:hover td{background:#f8fbff;}
          ======================================================== -->
     <div id="billing" class="tab-content active-tab">
 
-      <!-- Quick stats -->
       <div id="quickStats" class="stats-grid"></div>
 
-      <!-- New Bill Card -->
       <div class="card">
         <div class="card-title"><span>🧾</span> New Bill</div>
 
@@ -579,7 +595,6 @@ tbody tr:hover td{background:#f8fbff;}
           </div>
         </div>
 
-        <!-- Products -->
         <div class="sec-title">
           📦 Products
           <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--ok);margin-left:4px;">(Balance-এ যাবে)</span>
@@ -588,7 +603,6 @@ tbody tr:hover td{background:#f8fbff;}
         <div id="prodArea"></div>
         <button class="btn btn-add btn-sm" onclick="addRow('prodArea')">➕ Product Row</button>
 
-        <!-- Services -->
         <div class="sec-title" style="margin-top:14px;">
           ✂️ Services
           <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--wrn);margin-left:4px;">(Staff Report-এ যাবে)</span>
@@ -596,7 +610,6 @@ tbody tr:hover td{background:#f8fbff;}
         <div id="servArea"></div>
         <button class="btn btn-add btn-sm" onclick="addRow('servArea')">➕ Service Row</button>
 
-        <!-- Bill Preview -->
         <div class="bill-preview" id="billPreview">
           <div class="prev-row">
             <span>📦 Products (after item discounts):</span>
@@ -624,11 +637,9 @@ tbody tr:hover td{background:#f8fbff;}
         <button class="btn btn-save" onclick="saveBill()" style="margin-top:8px;">💾 Save Bill</button>
       </div>
 
-      <!-- Manage Lists Card -->
       <div class="card">
         <div class="card-title"><span>🛠️</span> Manage Staff, Services &amp; Products</div>
         <div class="three-col">
-          <!-- Staff -->
           <div>
             <div class="sec-title">👤 Staff</div>
             <input id="newStaffName" type="text" placeholder="Staff Name">
@@ -636,7 +647,6 @@ tbody tr:hover td{background:#f8fbff;}
             <input type="text" class="list-search" id="searchStaff" placeholder="🔍 Search..." oninput="filterTags('staff')">
             <div id="staffTags" class="list-mgr"><span class="tag-empty">Empty</span></div>
           </div>
-          <!-- Services -->
           <div>
             <div class="sec-title">✂️ Services</div>
             <input id="newServName" type="text" placeholder="Service Name">
@@ -644,7 +654,6 @@ tbody tr:hover td{background:#f8fbff;}
             <input type="text" class="list-search" id="searchService" placeholder="🔍 Search..." oninput="filterTags('service')">
             <div id="serviceTags" class="list-mgr"><span class="tag-empty">Empty</span></div>
           </div>
-          <!-- Products -->
           <div>
             <div class="sec-title">📦 Products</div>
             <input id="newProdName" type="text" placeholder="Product Name">
@@ -656,7 +665,6 @@ tbody tr:hover td{background:#f8fbff;}
         </div>
       </div>
 
-      <!-- Bill History Card -->
       <div class="card">
         <div class="card-title"><span>📋</span> Bill History</div>
         <div class="filter-bar">
@@ -693,6 +701,17 @@ tbody tr:hover td{background:#f8fbff;}
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
           <div class="card-title" style="margin:0;"><span>📊</span> Today's Staff Performance</div>
           <button class="btn btn-warn btn-sm" onclick="initAction('REFRESH_REPORT')">📦 Archive &amp; Reset Today</button>
+        </div>
+        <!-- ── NEW: legend bar ── -->
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#92400e;">
+            <span style="width:12px;height:12px;border-radius:3px;background:#fde68a;display:inline-block;"></span>
+            ✂️ Services — Staff Report-এ count হয়
+          </span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#166534;">
+            <span style="width:12px;height:12px;border-radius:3px;background:#86efac;display:inline-block;"></span>
+            📦 Products — Balance-এ count হয়
+          </span>
         </div>
         <div id="staffDetailedList"></div>
       </div>
@@ -797,7 +816,7 @@ tbody tr:hover td{background:#f8fbff;}
     </div><!-- /finance -->
 
     <!-- ========================================================
-         TAB: ADD CASH (was Online)
+         TAB: ADD CASH
          ======================================================== -->
     <div id="online" class="tab-content">
       <div class="card">
@@ -1191,7 +1210,6 @@ function addRow(area){
   div.className = 'row-group';
 
   if(area === 'prodArea'){
-    /* ── Product row ── */
     const { wrap: pw, inp: pi } = makeAC('product', '📦 Product name...', (v, p) => {
       pi.value = v;
       const priceInp = div.querySelector('.p-price');
@@ -1216,7 +1234,6 @@ function addRow(area){
     discInp.style.cssText = 'flex:.45;min-width:56px;margin:0;';
     discInp.addEventListener('input', () => { updateDiscCalc(div); calcPreview(); });
 
-    /* ── NEW: Per-product payment selector (Cash / Online) ── */
     const payInp = document.createElement('select');
     payInp.className = 'p-pay';
     payInp.title = 'Payment method for this product';
@@ -1232,11 +1249,9 @@ function addRow(area){
     const calcDiv = document.createElement('div');
     calcDiv.className = 'disc-calc';
 
-    /* payInp is inserted between discInp and staff wrap */
     div.append(pw, priceInp, discInp, payInp, sw, delBtn, calcDiv);
 
   } else {
-    /* ── Service row ── (unchanged) */
     const { wrap: svw, inp: svi } = makeAC('service', '✂️ Service name...', v => svi.value = v);
     svw.style.flex = '1.8'; svi.className += ' s-name';
 
@@ -1324,7 +1339,6 @@ function saveBill(){
     const disc  = Number(r.querySelector(".p-disc")?.value  || 0);
     const p     = (disc > 0 && disc <= 100) ? origP - Math.round(origP * disc / 100) : origP;
     const st    = (r.querySelector(".p-staff")?.value || "").trim() || "Direct Sale";
-    /* ── NEW: capture per-product payment method ── */
     const payM  = (r.querySelector(".p-pay")?.value || "Cash");
     if(n && origP) prods.push({ n, p, origP, disc, s: st, payM });
   });
@@ -1344,7 +1358,6 @@ function saveBill(){
   const subTotal = prods.reduce((a,c) => a+c.p, 0) + servs.reduce((a,c) => a+c.p, 0);
   const gdAmt   = (gdPct > 0 && gdPct <= 100) ? Math.round(subTotal * gdPct / 100) : 0;
 
-  // Bill date
   const bdEl   = document.getElementById("billDate");
   const bdVal  = bdEl?.value;
   const billDate = bdVal ? new Date(bdVal + 'T00:00:00').toDateString() : new Date().toDateString();
@@ -1366,7 +1379,6 @@ function saveBill(){
   LS.set("fls_bills", bills);
   localStorage.setItem("fls_counter", ++counter);
 
-  // Reset form
   document.getElementById("custName").value  = "";
   document.getElementById("custPhone").value = "";
   document.getElementById("payMethod").value = "Cash";
@@ -1398,7 +1410,6 @@ function buildInvoicePDF(b){
   const hasServs   = b.servs && b.servs.length > 0;
   const hasDisc    = b.prods.some(p => p.disc > 0) || (b.servs||[]).some(s => s.disc > 0) || gdAmt > 0;
 
-  // Header
   doc.setFillColor(13,27,42); doc.rect(0,0,W,38,'F');
   doc.setFillColor(255,170,0); doc.rect(0,38,W,2.5,'F');
   doc.setFont('helvetica','bold'); doc.setFontSize(21); doc.setTextColor(0,212,255);
@@ -1410,7 +1421,6 @@ function buildInvoicePDF(b){
   doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(13,27,42);
   doc.text('INVOICE', W/2, 34, {align:'center'});
 
-  // Customer box
   let y = 48;
   doc.setFillColor(244,248,252); doc.roundedRect(8,y-4,W-16,24,2,2,'F');
   doc.setDrawColor(210,225,240); doc.roundedRect(8,y-4,W-16,24,2,2,'S');
@@ -1431,7 +1441,6 @@ function buildInvoicePDF(b){
   doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(255,255,255);
   doc.text('Payment: '+b.payMethod, 12.5, y+17.2);
 
-  // Table header
   y = 80;
   doc.setFillColor(13,27,42); doc.rect(8,y,W-16,7,'F');
   doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(255,255,255);
@@ -1472,11 +1481,9 @@ function buildInvoicePDF(b){
       if(item.serv){ doc.setTextColor(160,160,160); doc.setFont('helvetica','italic'); doc.text('Comp.', 128, y+5.5); }
       else {
         doc.setFont('helvetica','bold');
-        /* ── NEW: colour-code by per-product payment in PDF ── */
         if(item.payM === 'Online'){ doc.setTextColor(25,75,200); }
         else { doc.setTextColor(0,120,80); }
         doc.text('Rs.'+item.price, 128, y+5.5);
-        /* tiny pay method label */
         doc.setFont('helvetica','normal'); doc.setFontSize(6);
         doc.setTextColor(item.payM==='Online'?[25,75,200]:[0,100,70]);
         doc.text(item.payM==='Online'?'Online':'Cash', W-9, y+5.5, {align:'right'});
@@ -1497,7 +1504,6 @@ function buildInvoicePDF(b){
     y += rh;
   });
 
-  // Grand discount row
   if(gdAmt > 0){
     doc.setFillColor(255,251,235); doc.rect(8,y,W-16,8,'F');
     doc.setDrawColor(253,211,77); doc.rect(8,y,W-16,8,'S');
@@ -1508,7 +1514,6 @@ function buildInvoicePDF(b){
     y += 8;
   }
 
-  // Divider + Total
   doc.setDrawColor(0,212,255); doc.setLineWidth(0.7);
   doc.line(8, y+3, W-8, y+3); y += 8;
   doc.setFillColor(13,27,42); doc.roundedRect(W-64,y,56,15,2,2,'F');
@@ -1517,7 +1522,6 @@ function buildInvoicePDF(b){
   doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.setTextColor(255,170,0);
   doc.text('Rs.'+totalShown, W-60, y+13);
 
-  // Footer
   const fy = H-20;
   doc.setFillColor(13,27,42); doc.rect(0,fy,W,20,'F');
   doc.setFillColor(255,170,0); doc.rect(0,fy,W,1.2,'F');
@@ -1541,7 +1545,6 @@ async function handleBillAction(idx, type){
   const fT      = pT + (b.servs || []).reduce((a,c) => a+c.p, 0);
   const hasServs= b.servs && b.servs.length > 0;
 
-  // Populate hidden print receipt
   document.getElementById("rtInfo").innerHTML =
     `<div><strong>Bill To:</strong> ${b.cust}<br><strong>Phone:</strong> ${b.phone||'N/A'}</div>
      <div style="text-align:right"><strong>Bill:</strong> ${b.id}<br><strong>Date:</strong> ${b.date}</div>`;
@@ -1549,7 +1552,6 @@ async function handleBillAction(idx, type){
   b.prods.forEach(p => {
     let pr = `Rs.${p.p}`;
     if(p.disc && p.disc > 0) pr = `Rs.${p.origP||p.p} - ${p.disc}% = Rs.${p.p}`;
-    /* ── NEW: show per-product payment in print receipt ── */
     const pmLabel = p.payM ? ` [${p.payM}]` : '';
     rows += `<tr><td>${p.n}</td><td>Product${pmLabel}</td><td>${pr}</td></tr>`;
   });
@@ -1562,7 +1564,6 @@ async function handleBillAction(idx, type){
 
   if(type === 'print'){ window.print(); return; }
 
-  /* WhatsApp PDF flow */
   if(!b.phone) return toast("❌ Phone নম্বর নেই!");
   if(!window.jspdf) return toast("❌ PDF library লোড হয়নি, refresh করুন");
 
@@ -1586,7 +1587,6 @@ async function handleBillAction(idx, type){
     } catch(e){ if(e.name !== 'AbortError') console.warn('Share failed:', e); }
   }
 
-  // Desktop fallback
   const url = URL.createObjectURL(blob);
   const a   = document.createElement('a'); a.href = url; a.download = fname; a.click();
   setTimeout(() => URL.revokeObjectURL(url), 3000);
@@ -1597,29 +1597,54 @@ async function handleBillAction(idx, type){
 }
 
 /* ================================================================
-   STAFF PERFORMANCE CALCULATOR
+   STAFF PERFORMANCE CALCULATOR  ── UPGRADED ──
+   এখন services ও products আলাদা আলাদা track করে
    ================================================================ */
 function calcStaffPerf(billsArr){
   const perf = {};
+
+  /* Helper: ensure staff entry exists with all fields */
+  const ensure = sn => {
+    if(!perf[sn]) perf[sn] = {
+      /* Backwards-compat fields (used by AI Brain) */
+      total   : 0,
+      actions : [],
+      /* ── NEW: separated fields ── */
+      servTotal   : 0,
+      servActions : [],
+      prodTotal   : 0,
+      prodActions : []
+    };
+  };
+
   billsArr.forEach(b => {
-    const hasServ = b.servs && b.servs.length > 0;
-    const hasProd = b.prods && b.prods.length > 0;
-    if(hasServ){
+    /* ── Services: always process ── */
+    if(b.servs && b.servs.length > 0){
       b.servs.forEach(item => {
-        const sn = item.s || "Unassigned";
-        if(!perf[sn]) perf[sn] = { total:0, actions:[] };
-        perf[sn].total += item.p;
-        perf[sn].actions.push(`✂️ ${item.n} (₹${item.p}${item.disc>0?' -'+item.disc+'%':''})`);
+        const sn  = item.s || "Unassigned";
+        ensure(sn);
+        perf[sn].servTotal += item.p;
+        perf[sn].total     += item.p;
+        const lbl = `✂️ ${item.n} (₹${item.p}${item.disc > 0 ? ' -' + item.disc + '%' : ''})`;
+        perf[sn].servActions.push(lbl);
+        perf[sn].actions.push(lbl);
       });
-    } else if(hasProd){
+    }
+
+    /* ── Products: always process, independent of services ── */
+    if(b.prods && b.prods.length > 0){
       b.prods.forEach(item => {
-        const sn = item.s || "Direct Sale";
-        if(!perf[sn]) perf[sn] = { total:0, actions:[] };
-        perf[sn].total += item.p;
-        perf[sn].actions.push(`📦 ${item.n} (₹${item.p}${item.disc>0?' -'+item.disc+'%':''})`);
+        const sn  = item.s || "Direct Sale";
+        ensure(sn);
+        perf[sn].prodTotal += item.p;
+        perf[sn].total     += item.p;
+        const lbl = `📦 ${item.n} (₹${item.p}${item.disc > 0 ? ' -' + item.disc + '%' : ''})`;
+        perf[sn].prodActions.push(lbl);
+        perf[sn].actions.push(lbl);
       });
     }
   });
+
   return perf;
 }
 
@@ -1659,7 +1684,7 @@ function saveFinance(){
 }
 
 /* ================================================================
-   ADD CASH (was Online)
+   ADD CASH
    ================================================================ */
 function saveOnline(){
   const n = document.getElementById("onCust").value.trim();
@@ -1700,7 +1725,7 @@ function getFilteredBills(){
 }
 
 /* ================================================================
-   TODAY CALCULATIONS  (grand-discount aware + per-product payment split)
+   TODAY CALCULATIONS
    ================================================================ */
 function calcToday(){
   const today = new Date().toDateString();
@@ -1711,27 +1736,23 @@ function calcToday(){
     const gd = b.grandDiscAmt || 0;
     let bProd = 0;
     b.prods.forEach(p => bProd += p.p);
-    bProd -= gd; // apply grand discount to net product total
+    bProd -= gd;
     tp += bProd;
     b.servs.forEach(s => ts += s.p);
 
     if(b.payMethod === "Due"){
-      /* Whole bill is due — count entire product amount as due */
       dueT += bProd;
     } else {
-      /* ── NEW: use per-product payM to split Cash vs Online ──
-         Grand discount is distributed proportionally across all products */
       let rawCash = 0, rawOnline = 0;
       b.prods.forEach(p => {
-        const pm = p.payM || b.payMethod; // fallback to bill-level for old data
+        const pm = p.payM || b.payMethod;
         if(pm === 'Online') rawOnline += p.p;
         else                rawCash   += p.p;
       });
       const rawTotal = rawCash + rawOnline;
       if(rawTotal > 0 && gd > 0){
-        /* Proportionally subtract grand discount */
         const cashAfterDisc   = Math.round(rawCash   - (rawCash   / rawTotal) * gd);
-        const onlineAfterDisc = bProd - cashAfterDisc; // keeps rounding consistent
+        const onlineAfterDisc = bProd - cashAfterDisc;
         cashT += cashAfterDisc;
         onT   += onlineAfterDisc;
       } else {
@@ -1902,11 +1923,9 @@ function renderBillTable(){
     const pNet = b.prods.reduce((a,c) => a+c.p, 0) - gd;
     const fT   = pNet + b.servs.reduce((a,c) => a+c.p, 0);
 
-    /* ── NEW: per-product payment badge shown in details column ── */
     const pD = b.prods.map(p => {
       let lbl = `📦 ${p.n} ₹${p.p}`;
       if(p.disc > 0) lbl += ` <em style="color:#d97706;font-size:10px;">(${p.disc}%↓)</em>`;
-      /* small Cash/Online tag */
       const pmTag = p.payM === 'Online'
         ? `<span class="pay-tag-online">📱Online</span>`
         : `<span class="pay-tag-cash">💵Cash</span>`;
@@ -2057,23 +2076,70 @@ function renderDues(){
   }
 }
 
+/* ================================================================
+   RENDER REPORTS  ── UPGRADED ──
+   প্রতিটি staff card-এ এখন Services ও Products আলাদা panel-এ দেখাবে
+   ================================================================ */
 function renderReports(){
   const today = new Date().toDateString();
   const perf  = calcStaffPerf(bills.filter(b => b.date === today && !b.archived));
   const sdEl  = document.getElementById("staffDetailedList");
+
   if(sdEl){
+    /* Sort by combined total descending */
     const srt = Object.entries(perf).sort((a,b) => b[1].total - a[1].total);
-    sdEl.innerHTML = srt.length
-      ? srt.map(([name,d], i) => `<div class="staff-block">
-          <div class="staff-header">
-            <span>${['🏆','🥈','🥉'][i]||'👤'} ${name}</span>
-            <span style="color:var(--ok);">₹${d.total}</span>
-          </div>
-          <div class="staff-items">${d.actions.join(' &nbsp;•&nbsp; ')}</div>
-        </div>`).join('')
-      : '<div class="empty-state">আজকে এখনো কোনো record নেই</div>';
+
+    if(!srt.length){
+      sdEl.innerHTML = '<div class="empty-state">আজকে এখনো কোনো record নেই</div>';
+    } else {
+      sdEl.innerHTML = srt.map(([name, d], i) => {
+
+        /* ── Service panel (yellow) ── */
+        const servPanel = `
+          <div class="staff-panel staff-panel-serv">
+            <div class="staff-panel-title spt-serv">
+              <span>✂️ Services</span>
+              <span class="staff-panel-amt spa-serv">₹${d.servTotal}</span>
+            </div>
+            <div class="staff-items">
+              ${d.servActions.length
+                ? d.servActions.join(' &nbsp;•&nbsp; ')
+                : '<span class="staff-empty">কোনো service নেই</span>'}
+            </div>
+          </div>`;
+
+        /* ── Product panel (green) ── */
+        const prodPanel = `
+          <div class="staff-panel staff-panel-prod">
+            <div class="staff-panel-title spt-prod">
+              <span>📦 Products</span>
+              <span class="staff-panel-amt spa-prod">₹${d.prodTotal}</span>
+            </div>
+            <div class="staff-items">
+              ${d.prodActions.length
+                ? d.prodActions.join(' &nbsp;•&nbsp; ')
+                : '<span class="staff-empty">কোনো product নেই</span>'}
+            </div>
+          </div>`;
+
+        return `
+          <div class="staff-block">
+            <div class="staff-header">
+              <span>${['🏆','🥈','🥉'][i] || '👤'} ${name}</span>
+              <span style="color:var(--ok);">
+                Combined Total: ₹${d.total}
+              </span>
+            </div>
+            <div class="staff-split">
+              ${servPanel}
+              ${prodPanel}
+            </div>
+          </div>`;
+      }).join('');
+    }
   }
 
+  /* History section (unchanged) */
   const shEl = document.getElementById("staffHistoryList");
   if(shEl){
     if(!staffHist.length){
@@ -2237,7 +2303,7 @@ window.addEventListener('load', () => {
     if(el) el.addEventListener('keypress', e => { if(e.key === 'Enter') fn(); });
   });
 
-  console.log("%c✂️ Fancy Looks Salon POS v2.1 — Per-Product Payment Split Active","color:#00d4ff;font-size:15px;font-weight:bold;");
+  console.log("%c✂️ Fancy Looks Salon POS v2.2 — Service + Product Split Report Active","color:#00d4ff;font-size:15px;font-weight:bold;");
 });
 </script>
 </body>
