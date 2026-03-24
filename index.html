@@ -136,12 +136,14 @@ input[type="date"]{cursor:pointer;}
 .btn-red{background:linear-gradient(135deg,var(--err),#cc2233);color:#fff;}
 .btn-ghost{background:#f1f5f9;color:#475569;border:1px solid var(--bdr);}
 .btn-sm{padding:7px 13px;width:auto;font-size:12px;}
+.btn-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;}
 
 .abt{padding:8px 10px;border:none;border-radius:8px;cursor:pointer;font-size:13px;transition:all .15s;flex-shrink:0;}
 .abt:hover{transform:scale(1.07);}
 .abt-p{background:#f1f5f9;color:#475569;}
 .abt-w{background:#d1fae5;color:#065f46;}
 .abt-d{background:#fee2e2;color:#dc2626;}
+.abt-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;}
 
 /* ============================================================
    BILLING ROWS + AUTOCOMPLETE
@@ -272,8 +274,8 @@ tbody tr:hover td{background:#f8fbff;}
   display:flex;justify-content:space-between;align-items:center;
   font-weight:800;font-size:14px;color:var(--pri);
   border-bottom:2px solid var(--acc);padding-bottom:8px;margin-bottom:10px;
+  flex-wrap:wrap;gap:6px;
 }
-/* ── NEW: Split panel inside staff block ── */
 .staff-split{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 @media(max-width:480px){.staff-split{grid-template-columns:1fr;}}
 .staff-panel{border-radius:10px;padding:10px 12px;}
@@ -290,7 +292,67 @@ tbody tr:hover td{background:#f8fbff;}
 .spa-prod{color:#15803d;}
 .staff-items{font-size:11px;color:var(--txt2);line-height:1.8;}
 .staff-empty{font-size:11px;color:#94a3b8;font-style:italic;}
-/* ── ── */
+
+/* ── STAFF DATE-WISE ── */
+.datewise-staff-block{
+  border:1px solid var(--bdr);border-radius:14px;
+  margin-bottom:14px;overflow:hidden;background:#fff;
+}
+.datewise-staff-header{
+  background:var(--grad);color:#fff;padding:14px 16px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+}
+.datewise-staff-name{font-size:14px;font-weight:800;color:var(--acc);}
+.datewise-staff-summary{
+  display:flex;gap:12px;flex-wrap:wrap;
+}
+.datewise-staff-summary-item{
+  background:rgba(255,255,255,.12);border-radius:8px;
+  padding:4px 10px;font-size:11px;font-weight:700;
+  border:1px solid rgba(255,255,255,.2);
+}
+.datewise-date-row{
+  border-bottom:1px solid var(--bdr);padding:12px 14px;
+  background:#fafcff;
+}
+.datewise-date-row:last-child{border-bottom:none;}
+.datewise-date-label{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:10px;flex-wrap:wrap;gap:6px;
+}
+.datewise-date-badge{
+  background:linear-gradient(135deg,var(--pri),var(--pri2));
+  color:var(--acc);padding:4px 12px;border-radius:20px;
+  font-size:11px;font-weight:800;font-family:'JetBrains Mono',monospace;
+}
+.datewise-day-total{
+  font-size:13px;font-weight:800;color:var(--ok);
+}
+.datewise-split{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+@media(max-width:500px){.datewise-split{grid-template-columns:1fr;}}
+.datewise-panel{border-radius:8px;padding:8px 10px;}
+.datewise-panel-serv{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fde68a;}
+.datewise-panel-prod{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac;}
+.datewise-panel-title{
+  font-size:9px;font-weight:800;text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:4px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.datewise-item-list{font-size:11px;color:var(--txt2);line-height:1.9;}
+.datewise-item{
+  display:inline-block;background:rgba(0,0,0,.05);
+  border-radius:4px;padding:1px 6px;margin:2px;
+}
+.datewise-empty{font-size:11px;color:#94a3b8;font-style:italic;}
+
+/* WA Tip box */
+.wa-tip{
+  background:linear-gradient(135deg,#e8fff3,#d1fae5);
+  border:1px solid #6ee7b7;border-radius:10px;
+  padding:10px 14px;font-size:12px;color:#065f46;
+  margin-bottom:14px;font-weight:600;
+  display:flex;align-items:center;gap:8px;
+}
 
 .history-item{
   background:var(--card);border:1px solid var(--bdr);
@@ -441,6 +503,30 @@ tbody tr:hover td{background:#f8fbff;}
 .pass-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:17px;}
 .modal-btns{display:flex;gap:9px;margin-top:12px;}
 
+/* WA Send Modal */
+#waSendModal{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.65);z-index:99998;
+  justify-content:center;align-items:center;backdrop-filter:blur(6px);
+}
+.wa-modal-box{
+  background:#fff;padding:24px;border-radius:16px;width:340px;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);animation:mPop .2s ease;
+}
+.wa-modal-title{font-size:17px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.wa-modal-sub{font-size:12px;color:var(--txt2);margin-bottom:14px;}
+.wa-step{
+  display:flex;align-items:flex-start;gap:10px;
+  background:#f0fdf4;border:1px solid #86efac;border-radius:10px;
+  padding:10px 12px;margin-bottom:8px;font-size:12px;color:#166534;font-weight:600;
+}
+.wa-step-num{
+  background:#166534;color:#fff;width:20px;height:20px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px;
+}
+.wa-modal-btns{display:flex;gap:8px;margin-top:14px;}
+
 /* ============================================================
    TOAST
    ============================================================ */
@@ -472,6 +558,9 @@ tbody tr:hover td{background:#f8fbff;}
 .rct-table th,.rct-table td{text-align:left;padding:7px;border-bottom:1px solid #eee;}
 .rct-footer{margin-top:13px;text-align:right;border-top:2px solid #333;padding-top:10px;}
 .rct-thanks{text-align:center;margin-top:13px;font-size:10px;color:#666;}
+
+/* WhatsApp button special glow */
+.abt-wa:hover{box-shadow:0 0 12px rgba(37,211,102,.5);}
 </style>
 </head>
 <body>
@@ -508,6 +597,41 @@ tbody tr:hover td{background:#f8fbff;}
     <div class="modal-btns">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
       <button class="btn btn-save" onclick="doAction()">Confirm ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     WHATSAPP SEND MODAL
+     ============================================================ -->
+<div id="waSendModal">
+  <div class="wa-modal-box">
+    <div class="wa-modal-title">
+      <span style="font-size:22px;">📱</span> WhatsApp-এ পাঠান
+    </div>
+    <div class="wa-modal-sub" id="waSendInfo">PDF তৈরি হচ্ছে...</div>
+
+    <div class="wa-step">
+      <div class="wa-step-num">1</div>
+      <div>নিচের <strong>"PDF Download করুন"</strong> বাটনে ক্লিক করুন — PDF আপনার device-এ save হবে</div>
+    </div>
+    <div class="wa-step">
+      <div class="wa-step-num">2</div>
+      <div><strong>"WhatsApp খুলুন"</strong> বাটনে ক্লিক করুন — customer-এর number-এ chat খুলবে</div>
+    </div>
+    <div class="wa-step">
+      <div class="wa-step-num">3</div>
+      <div>WhatsApp-এ <strong>📎 Attach</strong> করে download করা PDF টি পাঠিয়ে দিন</div>
+    </div>
+
+    <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:11px;color:#856404;">
+      💡 <strong>Mobile-এ:</strong> Share button দিয়ে সরাসরি WhatsApp-এ পাঠাতে পারবেন।
+    </div>
+
+    <div class="wa-modal-btns">
+      <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="closeWAModal()">বন্ধ করুন</button>
+      <button class="btn btn-blue btn-sm" style="flex:1;" id="waPdfDownBtn" onclick="waPdfDown()">⬇️ PDF Download</button>
+      <button class="btn btn-wa btn-sm" style="flex:1;" id="waOpenBtn" onclick="waOpen()">📱 WhatsApp খুলুন</button>
     </div>
   </div>
 </div>
@@ -667,6 +791,9 @@ tbody tr:hover td{background:#f8fbff;}
 
       <div class="card">
         <div class="card-title"><span>📋</span> Bill History</div>
+        <div class="wa-tip">
+          📱 <strong>WhatsApp:</strong> প্রতিটি bill-এর 📱 বাটনে click করলে customer-এর number-এ সরাসরি PDF পাঠানো যাবে — saved বা unsaved যেকোনো number-এ!
+        </div>
         <div class="filter-bar">
           <input type="text" id="searchFilter" placeholder="🔍 Name / Bill No / Phone..." oninput="renderBillTable()">
           <select id="payFilter" onchange="renderBillTable()">
@@ -702,7 +829,6 @@ tbody tr:hover td{background:#f8fbff;}
           <div class="card-title" style="margin:0;"><span>📊</span> Today's Staff Performance</div>
           <button class="btn btn-warn btn-sm" onclick="initAction('REFRESH_REPORT')">📦 Archive &amp; Reset Today</button>
         </div>
-        <!-- ── NEW: legend bar ── -->
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
           <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#92400e;">
             <span style="width:12px;height:12px;border-radius:3px;background:#fde68a;display:inline-block;"></span>
@@ -715,8 +841,25 @@ tbody tr:hover td{background:#f8fbff;}
         </div>
         <div id="staffDetailedList"></div>
       </div>
+
+      <!-- ── NEW: Staff Date-wise History ── -->
       <div class="card">
-        <div class="card-title"><span>📜</span> Staff Performance History</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+          <div class="card-title" style="margin:0;"><span>📅</span> Staff Date-wise History</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #93c5fd;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#1e40af;font-weight:600;">
+          📌 প্রতিটি staff কোন date-এ কত টাকার ✂️ Service এবং 📦 Product করেছে — date অনুযায়ী পর পর দেখাচ্ছে। এই section থেকে কোনো data delete হবে না।
+        </div>
+        <div class="filter-bar">
+          <input type="text" id="dwStaffFilter" placeholder="🔍 Staff name দিয়ে খুঁজুন..." oninput="renderStaffDatewise()">
+          <input type="date" id="dwDateFilter" onchange="renderStaffDatewise()">
+          <button class="btn btn-ghost btn-sm" onclick="clearDWFilter()">✕ Clear</button>
+        </div>
+        <div id="staffDatewiseList"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span>📜</span> Staff Performance History (Archived)</div>
         <div id="staffHistoryList"></div>
       </div>
     </div><!-- /reports -->
@@ -897,6 +1040,15 @@ let bills     = LS.get("fls_bills"),
     counter   = Number(localStorage.getItem("fls_counter")) || 1;
 
 let curAct = null, curIdx = null;
+
+/* ── WhatsApp state ── */
+let waBlobURL  = null;
+let waFileName = null;
+let waPhone    = null;
+let waCustName = null;
+let waBillId   = null;
+let waBillAmt  = null;
+let waPayMeth  = null;
 
 /* ================================================================
    TOAST
@@ -1535,16 +1687,52 @@ function buildInvoicePDF(b){
 }
 
 /* ================================================================
-   PRINT / WHATSAPP
+   WHATSAPP SEND FUNCTIONS — DIRECT + UNSAVED NUMBER SUPPORT
    ================================================================ */
+function closeWAModal(){
+  document.getElementById("waSendModal").style.display = "none";
+  if(waBlobURL){ URL.revokeObjectURL(waBlobURL); waBlobURL = null; }
+}
+
+function waPdfDown(){
+  if(!waBlobURL) return toast("❌ PDF তৈরি হয়নি। আবার চেষ্টা করুন।");
+  const a = document.createElement('a');
+  a.href = waBlobURL; a.download = waFileName; a.click();
+  toast("✅ PDF Download হয়েছে!");
+}
+
+function waOpen(){
+  /* Build wa.me URL — works for saved & unsaved numbers */
+  let ph   = (waPhone || "").replace(/\D/g,'');
+  const msg = encodeURIComponent(
+    `হ্যালো ${waCustName || 'Customer'}! 🙏\n` +
+    `আপনার Fancy Looks Salon-এর Invoice ${waBillId}।\n` +
+    `Amount: ₹${waBillAmt} (${waPayMeth})\n` +
+    `ধন্যবাদ আমাদের সাথে থাকার জন্য! ✂️`
+  );
+
+  if(ph){
+    const full = ph.startsWith('91') ? ph : '91' + ph;
+    /* On mobile: wa.me opens WhatsApp app directly */
+    window.open(`https://wa.me/${full}?text=${msg}`, '_blank');
+  } else {
+    /* No phone: open WhatsApp Web */
+    window.open(`https://web.whatsapp.com`, '_blank');
+    toast("⚠️ Phone number নেই — WhatsApp খুলছে, নম্বর দিয়ে পাঠান।", 4000);
+  }
+  toast("📱 WhatsApp খুলছে — PDF attach করে পাঠান!", 4000);
+}
+
 async function handleBillAction(idx, type){
   const b = bills[idx]; if(!b) return toast("❌ Bill not found");
+
   const prodNet = b.prods.reduce((a,c) => a+c.p, 0);
   const gdAmt   = b.grandDiscAmt || 0;
   const pT      = prodNet - gdAmt;
   const fT      = pT + (b.servs || []).reduce((a,c) => a+c.p, 0);
   const hasServs= b.servs && b.servs.length > 0;
 
+  /* Build print receipt data */
   document.getElementById("rtInfo").innerHTML =
     `<div><strong>Bill To:</strong> ${b.cust}<br><strong>Phone:</strong> ${b.phone||'N/A'}</div>
      <div style="text-align:right"><strong>Bill:</strong> ${b.id}<br><strong>Date:</strong> ${b.date}</div>`;
@@ -1564,64 +1752,82 @@ async function handleBillAction(idx, type){
 
   if(type === 'print'){ window.print(); return; }
 
-  if(!b.phone) return toast("❌ Phone নম্বর নেই!");
-  if(!window.jspdf) return toast("❌ PDF library লোড হয়নি, refresh করুন");
+  /* ── WHATSAPP SEND ── */
+  if(type === 'wa'){
+    if(!window.jspdf){ return toast("❌ PDF library লোড হয়নি, refresh করুন"); }
 
-  toast("📄 PDF তৈরি হচ্ছে...", 4000);
-  const doc  = buildInvoicePDF(b);
-  const blob = doc.output('blob');
-  const fname= `FancyLooks_Invoice_${b.id}.pdf`;
-  const ph   = b.phone.replace(/\D/g,'');
-  const full = ph.startsWith('91') ? ph : '91' + ph;
+    toast("📄 PDF তৈরি হচ্ছে...", 3000);
 
-  const file = new File([blob], fname, { type:'application/pdf' });
-  if(navigator.canShare && navigator.canShare({ files:[file] })){
-    try{
-      await navigator.share({
-        files: [file],
-        title: `Fancy Looks Salon — Invoice ${b.id}`,
-        text : `হ্যালো ${b.cust}! Bill ${b.id} — ₹${pT} — ${b.payMethod}। ধন্যবাদ! 🙏`
-      });
-      toast("✅ Share করুন — WhatsApp বেছে নিন");
-      return;
-    } catch(e){ if(e.name !== 'AbortError') console.warn('Share failed:', e); }
+    /* Generate PDF */
+    const doc   = buildInvoicePDF(b);
+    const blob  = doc.output('blob');
+    const fname = `FancyLooks_Invoice_${b.id}.pdf`;
+
+    /* Store WA state */
+    if(waBlobURL) URL.revokeObjectURL(waBlobURL);
+    waBlobURL  = URL.createObjectURL(blob);
+    waFileName = fname;
+    waPhone    = b.phone || "";
+    waCustName = b.cust;
+    waBillId   = b.id;
+    waBillAmt  = pT;
+    waPayMeth  = b.payMethod;
+
+    /* Try Web Share API (Android/iOS mobile — sends directly to WhatsApp) */
+    const file = new File([blob], fname, { type:'application/pdf' });
+    if(navigator.canShare && navigator.canShare({ files:[file] })){
+      try{
+        await navigator.share({
+          files : [file],
+          title : `Fancy Looks Salon — Invoice ${b.id}`,
+          text  : `হ্যালো ${b.cust}! Invoice ${b.id} — ₹${pT}। ধন্যবাদ! 🙏`
+        });
+        toast("✅ Share সফল হয়েছে!");
+        return;
+      } catch(e){
+        if(e.name === 'AbortError'){ toast("ℹ️ Share বাতিল করা হয়েছে।"); return; }
+        /* Fall through to modal */
+      }
+    }
+
+    /* Desktop/fallback: show WhatsApp helper modal */
+    const ph = (b.phone || "").replace(/\D/g,'');
+    const full = ph ? (ph.startsWith('91') ? ph : '91'+ph) : '';
+    const infoEl = document.getElementById("waSendInfo");
+    if(infoEl){
+      infoEl.innerHTML = b.phone
+        ? `<strong>${b.cust}</strong> — 📱 ${b.phone} &nbsp;|&nbsp; Bill: <strong>${b.id}</strong> — ₹${pT}`
+        : `<strong>${b.cust}</strong> — ⚠️ Phone নেই &nbsp;|&nbsp; Bill: <strong>${b.id}</strong> — ₹${pT}`;
+    }
+    const waBtn = document.getElementById("waOpenBtn");
+    if(waBtn){
+      waBtn.textContent = full ? `📱 WhatsApp (+91${ph.slice(-10)})` : '📱 WhatsApp খুলুন';
+    }
+    document.getElementById("waSendModal").style.display = "flex";
+    return;
   }
-
-  const url = URL.createObjectURL(blob);
-  const a   = document.createElement('a'); a.href = url; a.download = fname; a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 3000);
-  setTimeout(() => {
-    window.open('https://wa.me/'+full, '_blank');
-    toast("📎 WhatsApp খুলছে — PDF attach করুন");
-  }, 900);
 }
 
 /* ================================================================
-   STAFF PERFORMANCE CALCULATOR  ── UPGRADED ──
-   এখন services ও products আলাদা আলাদা track করে
+   STAFF PERFORMANCE CALCULATOR
    ================================================================ */
 function calcStaffPerf(billsArr){
   const perf = {};
-
-  /* Helper: ensure staff entry exists with all fields */
   const ensure = sn => {
     if(!perf[sn]) perf[sn] = {
-      /* Backwards-compat fields (used by AI Brain) */
-      total   : 0,
-      actions : [],
-      /* ── NEW: separated fields ── */
-      servTotal   : 0,
-      servActions : [],
-      prodTotal   : 0,
-      prodActions : []
+      total      : 0,
+      actions    : [],
+      servTotal  : 0,
+      servActions: [],
+      prodTotal  : 0,
+      prodActions: []
     };
   };
 
   billsArr.forEach(b => {
-    /* ── Services: always process ── */
     if(b.servs && b.servs.length > 0){
       b.servs.forEach(item => {
-        const sn  = item.s || "Unassigned";
+        const sn = item.s || "Unassigned";
         ensure(sn);
         perf[sn].servTotal += item.p;
         perf[sn].total     += item.p;
@@ -1630,11 +1836,9 @@ function calcStaffPerf(billsArr){
         perf[sn].actions.push(lbl);
       });
     }
-
-    /* ── Products: always process, independent of services ── */
     if(b.prods && b.prods.length > 0){
       b.prods.forEach(item => {
-        const sn  = item.s || "Direct Sale";
+        const sn = item.s || "Direct Sale";
         ensure(sn);
         perf[sn].prodTotal += item.p;
         perf[sn].total     += item.p;
@@ -1648,6 +1852,162 @@ function calcStaffPerf(billsArr){
   return perf;
 }
 
+/* ================================================================
+   STAFF DATE-WISE CALCULATOR  ← NEW
+   Returns: { staffName: { date: { servTotal, prodTotal, servItems[], prodItems[], servCount, prodCount } } }
+   ================================================================ */
+function calcStaffDatewise(){
+  const result = {};
+
+  bills.forEach(b => {
+    const d = b.date;
+
+    /* Services */
+    if(b.servs && b.servs.length > 0){
+      b.servs.forEach(item => {
+        const sn = item.s || "Unassigned";
+        if(!result[sn]) result[sn] = {};
+        if(!result[sn][d]) result[sn][d] = { servTotal:0, prodTotal:0, servItems:[], prodItems:[] };
+        result[sn][d].servTotal += item.p;
+        result[sn][d].servItems.push({ name:item.n, price:item.p, disc:item.disc||0 });
+      });
+    }
+
+    /* Products */
+    if(b.prods && b.prods.length > 0){
+      b.prods.forEach(item => {
+        const sn = item.s || "Direct Sale";
+        if(!result[sn]) result[sn] = {};
+        if(!result[sn][d]) result[sn][d] = { servTotal:0, prodTotal:0, servItems:[], prodItems:[] };
+        result[sn][d].prodTotal += item.p;
+        result[sn][d].prodItems.push({ name:item.n, price:item.p, disc:item.disc||0 });
+      });
+    }
+  });
+
+  return result;
+}
+
+/* ================================================================
+   RENDER STAFF DATE-WISE  ← NEW
+   ================================================================ */
+function clearDWFilter(){
+  const sf = document.getElementById("dwStaffFilter");
+  const df = document.getElementById("dwDateFilter");
+  if(sf) sf.value = "";
+  if(df) df.value = "";
+  renderStaffDatewise();
+}
+
+function renderStaffDatewise(){
+  const el = document.getElementById("staffDatewiseList"); if(!el) return;
+  const nameQ = (document.getElementById("dwStaffFilter")?.value || "").toLowerCase().trim();
+  const dateQ = document.getElementById("dwDateFilter")?.value || "";
+
+  const data = calcStaffDatewise();
+  let staffNames = Object.keys(data);
+
+  /* Filter by name */
+  if(nameQ) staffNames = staffNames.filter(n => n.toLowerCase().includes(nameQ));
+
+  if(!staffNames.length){
+    el.innerHTML = '<div class="empty-state">🔍 কোনো data পাওয়া যায়নি</div>';
+    return;
+  }
+
+  /* Sort staff alphabetically */
+  staffNames.sort();
+
+  el.innerHTML = staffNames.map(sn => {
+    /* Get dates sorted descending */
+    let dateEntries = Object.entries(data[sn]).sort((a,b) => new Date(b[0]) - new Date(a[0]));
+
+    /* Filter by date if set */
+    if(dateQ){
+      const dStr = new Date(dateQ + 'T00:00:00').toDateString();
+      dateEntries = dateEntries.filter(([d]) => d === dStr);
+    }
+
+    if(!dateEntries.length) return '';
+
+    /* Grand totals across all dates (filtered) */
+    const grandServ  = dateEntries.reduce((a,[,d]) => a + d.servTotal, 0);
+    const grandProd  = dateEntries.reduce((a,[,d]) => a + d.prodTotal, 0);
+    const grandTotal = grandServ + grandProd;
+
+    const dateRowsHTML = dateEntries.map(([date, d]) => {
+      const dayTotal = d.servTotal + d.prodTotal;
+
+      /* Service items */
+      const servItemsHTML = d.servItems.length
+        ? d.servItems.map(i =>
+            `<span class="datewise-item">✂️ ${i.name} <strong style="color:#b45309;">₹${i.price}</strong>${i.disc > 0 ? `<span style="color:#d97706;font-size:10px;"> -${i.disc}%</span>` : ''}</span>`
+          ).join('')
+        : `<span class="datewise-empty">কোনো service নেই</span>`;
+
+      /* Product items */
+      const prodItemsHTML = d.prodItems.length
+        ? d.prodItems.map(i =>
+            `<span class="datewise-item">📦 ${i.name} <strong style="color:#15803d;">₹${i.price}</strong>${i.disc > 0 ? `<span style="color:#d97706;font-size:10px;"> -${i.disc}%</span>` : ''}</span>`
+          ).join('')
+        : `<span class="datewise-empty">কোনো product নেই</span>`;
+
+      return `
+        <div class="datewise-date-row">
+          <div class="datewise-date-label">
+            <span class="datewise-date-badge">📅 ${date}</span>
+            <span class="datewise-day-total">
+              ✂️ ₹${d.servTotal} &nbsp;+&nbsp; 📦 ₹${d.prodTotal} &nbsp;=&nbsp; 💰 ₹${dayTotal}
+            </span>
+          </div>
+          <div class="datewise-split">
+            <div class="datewise-panel datewise-panel-serv">
+              <div class="datewise-panel-title spt-serv">
+                <span>✂️ Services (${d.servItems.length}টি)</span>
+                <span style="font-size:12px;font-weight:800;color:#b45309;">₹${d.servTotal}</span>
+              </div>
+              <div class="datewise-item-list">${servItemsHTML}</div>
+            </div>
+            <div class="datewise-panel datewise-panel-prod">
+              <div class="datewise-panel-title spt-prod">
+                <span>📦 Products (${d.prodItems.length}টি)</span>
+                <span style="font-size:12px;font-weight:800;color:#15803d;">₹${d.prodTotal}</span>
+              </div>
+              <div class="datewise-item-list">${prodItemsHTML}</div>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="datewise-staff-block">
+        <div class="datewise-staff-header">
+          <div class="datewise-staff-name">👤 ${sn}</div>
+          <div class="datewise-staff-summary">
+            <div class="datewise-staff-summary-item" style="background:rgba(253,230,138,.2);color:#fde68a;">
+              ✂️ Services: ₹${grandServ}
+            </div>
+            <div class="datewise-staff-summary-item" style="background:rgba(134,239,172,.2);color:#86efac;">
+              📦 Products: ₹${grandProd}
+            </div>
+            <div class="datewise-staff-summary-item" style="background:rgba(0,212,255,.2);color:var(--acc);">
+              💰 Total: ₹${grandTotal}
+            </div>
+            <div class="datewise-staff-summary-item" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);">
+              📅 ${dateEntries.length}টি দিন
+            </div>
+          </div>
+        </div>
+        ${dateRowsHTML}
+      </div>`;
+  }).filter(Boolean).join('');
+
+  if(!el.innerHTML.trim()) el.innerHTML = '<div class="empty-state">🔍 কোনো matching data নেই</div>';
+}
+
+/* ================================================================
+   ARCHIVE PERFORMANCE
+   ================================================================ */
 function archivePerf(){
   const today  = new Date().toDateString();
   const active = bills.filter(b => b.date === today && !b.archived);
@@ -1959,7 +2319,7 @@ function renderBillTable(){
       </td>
       <td style="white-space:nowrap;display:flex;gap:4px;flex-wrap:wrap;">
         <button class="abt abt-p" title="Print"    onclick="handleBillAction(${idx},'print')">🖨️</button>
-        <button class="abt abt-w" title="WhatsApp" onclick="handleBillAction(${idx},'wa')">📱</button>
+        <button class="abt abt-wa" title="WhatsApp PDF পাঠান" onclick="handleBillAction(${idx},'wa')">📱</button>
         <button class="abt abt-d" title="Delete"   onclick="initAction('DELETE_BILL',${idx})">🗑️</button>
       </td>
     </tr>`;
@@ -2077,8 +2437,7 @@ function renderDues(){
 }
 
 /* ================================================================
-   RENDER REPORTS  ── UPGRADED ──
-   প্রতিটি staff card-এ এখন Services ও Products আলাদা panel-এ দেখাবে
+   RENDER REPORTS
    ================================================================ */
 function renderReports(){
   const today = new Date().toDateString();
@@ -2086,15 +2445,11 @@ function renderReports(){
   const sdEl  = document.getElementById("staffDetailedList");
 
   if(sdEl){
-    /* Sort by combined total descending */
     const srt = Object.entries(perf).sort((a,b) => b[1].total - a[1].total);
-
     if(!srt.length){
       sdEl.innerHTML = '<div class="empty-state">আজকে এখনো কোনো record নেই</div>';
     } else {
       sdEl.innerHTML = srt.map(([name, d], i) => {
-
-        /* ── Service panel (yellow) ── */
         const servPanel = `
           <div class="staff-panel staff-panel-serv">
             <div class="staff-panel-title spt-serv">
@@ -2107,8 +2462,6 @@ function renderReports(){
                 : '<span class="staff-empty">কোনো service নেই</span>'}
             </div>
           </div>`;
-
-        /* ── Product panel (green) ── */
         const prodPanel = `
           <div class="staff-panel staff-panel-prod">
             <div class="staff-panel-title spt-prod">
@@ -2121,25 +2474,22 @@ function renderReports(){
                 : '<span class="staff-empty">কোনো product নেই</span>'}
             </div>
           </div>`;
-
         return `
           <div class="staff-block">
             <div class="staff-header">
               <span>${['🏆','🥈','🥉'][i] || '👤'} ${name}</span>
-              <span style="color:var(--ok);">
-                Combined Total: ₹${d.total}
-              </span>
+              <span style="color:var(--ok);">Combined Total: ₹${d.total}</span>
             </div>
-            <div class="staff-split">
-              ${servPanel}
-              ${prodPanel}
-            </div>
+            <div class="staff-split">${servPanel}${prodPanel}</div>
           </div>`;
       }).join('');
     }
   }
 
-  /* History section (unchanged) */
+  /* Date-wise staff history */
+  renderStaffDatewise();
+
+  /* Archived history */
   const shEl = document.getElementById("staffHistoryList");
   if(shEl){
     if(!staffHist.length){
@@ -2165,7 +2515,6 @@ function renderReports(){
 
 function renderFinance(){
   const today = new Date().toDateString();
-
   const el = document.getElementById("financeHistory"); if(!el) return;
   const tf  = fin.filter(f => f.date === today);
   if(!tf.length){
@@ -2287,6 +2636,8 @@ window.addEventListener('load', () => {
 
   document.addEventListener('click', e => {
     if(!e.target.closest('.ac-wrap')) closeAllDropdowns();
+    /* Close WA modal on backdrop click */
+    if(e.target === document.getElementById('waSendModal')) closeWAModal();
   });
 
   const enters = {
@@ -2303,7 +2654,7 @@ window.addEventListener('load', () => {
     if(el) el.addEventListener('keypress', e => { if(e.key === 'Enter') fn(); });
   });
 
-  console.log("%c✂️ Fancy Looks Salon POS v2.2 — Service + Product Split Report Active","color:#00d4ff;font-size:15px;font-weight:bold;");
+  console.log("%c✂️ Fancy Looks Salon POS v3.0 — WhatsApp Direct + Staff Datewise History","color:#00d4ff;font-size:15px;font-weight:bold;");
 });
 </script>
 </body>
